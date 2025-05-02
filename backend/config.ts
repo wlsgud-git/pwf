@@ -1,0 +1,41 @@
+import dotenv from "dotenv";
+dotenv.config();
+
+const required = (key: string, defaultValue?: undefined) => {
+  let value = process.env[key] || defaultValue;
+  if (!value) throw new Error("해당 환경변수는 존재하지 않습니다");
+  return value;
+};
+
+export let config = {
+  http: {
+    port: required("PORT"),
+  },
+
+  database: {
+    user: required("DB_USER"),
+    password: required("DB_PASSWORD"),
+    host: required("DB_HOST"),
+    database: required("DB_DATABASE"),
+    port: parseInt(required("DB_PORT")),
+  },
+
+  secure: {
+    salt: parseInt(required("SALT")),
+  },
+
+  nodemailer: {
+    email: required("NODEMAIL_EMAIL"),
+    password: required("NODEMAIL_PASSWORD"),
+    port: parseInt(required("NODEMAIL_PORT")),
+  },
+
+  redis: {
+    host: required("REDIS_HOST"),
+    port: parseInt(required("REDIS_PORT")),
+  },
+
+  session: {
+    session_expire: parseInt(required("SESSION_EXPIRE")),
+  },
+};
