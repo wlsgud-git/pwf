@@ -1,0 +1,118 @@
+@import url("index.css");
+
+:root {
+  --login-box-width: 300px;
+  --login-box-height: 325px;
+
+  --login-header-height: 80px;
+  --login-footer-height: 55px;
+}
+
+.login_page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login_container {
+  width: var(--login-box-width);
+  min-height: var(--login-box-height);
+  border: 1px solid var(--pwf-gray);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 6px;
+}
+
+.login_header,
+.login_content,
+.login_footer,
+.login_content form {
+  width: 100%;
+}
+
+/* 로그인 헤더 */
+.login_header {
+  height: var(--login-header-height);
+  border-bottom: 1px solid var(--pwf-gray);
+}
+
+.login_header span {
+  color: var(--pwf-white);
+  text-align: center;
+  line-height: var(--login-header-height);
+  font-size: 19px;
+}
+
+/* 로그인 내용 */
+.login_content {
+  height: calc(100% - var(--login-header-height) - var(--login-footer-height));
+}
+
+.login_error_box {
+  width: 100%;
+  background-color: var(--pwf-error-color);
+  color: var(--pwf-red);
+  font-size: 13px;
+  justify-content: center;
+  padding: 4px 6px;
+}
+
+.login_content form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 25px 20px;
+}
+
+.login_content input {
+  width: 100%;
+  padding: 8px 8px;
+  border: 1px solid var(--pwf-gray);
+  background-color: inherit;
+  color: var(--pwf-white);
+  margin-bottom: 10px;
+}
+
+.login_content button {
+  width: 100%;
+  background-color: var(--pwf-blue);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--pwf-white);
+  margin-top: 15px;
+  padding: 6px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  outline: none;
+}
+
+.login_content button:hover {
+  text-decoration: underline;
+}
+
+/* 로그인 풋터 */
+.login_footer {
+  height: var(--login-footer-height);
+  border-top: 1px solid var(--pwf-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* .login_footer span {
+  line-height: var(--login-footer-height);
+  color: var(--pwf-white);
+  margin: 8px;
+} */
+
+.login_footer a {
+  font-size: 14px;
+  color: var(--pwf-gray);
+  margin: 0px 5px;
+}
+
+.login_footer a:hover {
+  text-decoration: underline;
+}

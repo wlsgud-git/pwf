@@ -1,0 +1,65 @@
+@import url("index.css");
+
+:root {
+  --friend-height: 50px;
+
+  --friend-profile-img-size: 30px;
+  --friend-online-circle-size: 15px;
+}
+
+.pwf-my_friends {
+  height: 100%;
+  width: var(--pwf-menu-width);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.friend_li {
+  width: 100%;
+  height: var(--friend-height);
+  display: flex;
+  align-items: center;
+  /* justify-content: flex-start; */
+  padding: 0px 8px;
+}
+
+.friend_img {
+  width: var(--friend-profile-img-size);
+  height: var(--friend-profile-img-size);
+  border: 1px solid white;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 13px;
+}
+
+.friend_img img {
+  width: 100%;
+  height: 100%;
+}
+
+.friend_nickname {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--pwf-white);
+}
+
+.friend_online_state {
+  width: var(--friend-online-circle-size);
+  height: var(--friend-online-circle-size);
+  border: 1px solid red;
+  text-align: end;
+}
+
+@media screen and (max-width: 725px) {
+  .pwf-my_friends {
+    width: 100%;
+    height: var(--friend-height);
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  .friend_li {
+    width: 120px;
+    height: 100%;
+  }
+}

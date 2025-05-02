@@ -1,0 +1,77 @@
+@import url("index.css");
+
+:root {
+  --profile-modal-width: 400px;
+  --profile-modal-height: 480px;
+
+  /* img */
+  --profile-imgbox-height: 120px;
+
+  --profile-imgbox-circle-size: 90px;
+}
+
+.profile_modal {
+  width: var(--profile-modal-width);
+  height: var(--profile-modal-height);
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--pwf-signiture-color);
+  border-radius: 7px;
+}
+
+.profile_content {
+  width: 100%;
+  height: calc(100% - var(--modal-hedaer-height) - var(--modal-footer-height));
+}
+
+.profile_content form {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 20px;
+  border: 1px solid green;
+}
+
+.profile_content form div {
+  margin-bottom: 12px;
+  width: 100%;
+  display: flex;
+}
+
+/* img */
+.profile_img_box {
+  width: 100%;
+  height: var(--profile-imgbox-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile_img_circle {
+  width: var(--profile-imgbox-circle-size);
+  height: var(--profile-imgbox-circle-size);
+  border-radius: 50%;
+  border: 1px solid white;
+}
+
+.profile_email_box,
+.profile_nickname_box {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.profile_content form div label {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--pwf-white);
+}
+
+.profile_content form div input {
+  padding: 8px 6px;
+  width: 100%;
+  background-color: inherit;
+  color: var(--pwf-white);
+  border: 1px solid var(--pwf-white);
+}
