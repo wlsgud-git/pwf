@@ -8,11 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { userAction } from "../context/actions/userAction";
 
 // component
-// modal
-import { FriendModal } from "../components/friend";
-import { StreamModal } from "../components/streamRoom";
-import { ProfileModal } from "../components/profile";
-
+import { Modal } from "./modal";
 import { PageHeader } from "../components/pageHeader";
 const MyFriends = lazy(() =>
   import("../components/myFriend").then(({ MyFriends }) => ({
@@ -34,15 +30,13 @@ export const Home = () => {
       <PageHeader />
 
       {/* streamroom modal */}
-      <StreamModal />
-      <ProfileModal />
-      <FriendModal />
+      <Modal />
 
       {/* content */}
       <div className="pwf_content">
         {/* 내가 참가자인 방 모음 */}
         <ul className="stream_room_lists">
-          <button onClick={() => emitter.emit("stream modal", true)}>
+          <button onClick={() => emitter.emit("modal", "stream")}>
             방만들기
           </button>
         </ul>

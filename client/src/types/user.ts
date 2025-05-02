@@ -10,3 +10,7 @@ export interface User {
   stream_room?: [];
   request_friends?: User[];
 }
+
+export interface UserComponent {
+  [user: string]: User;
+}

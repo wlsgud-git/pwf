@@ -32,7 +32,7 @@ export const PageHeader = () => {
         <div className="pwf_friend_box">
           <button
             className="friend_btn"
-            onClick={() => emitter.emit("friend modal", true)}
+            onClick={() => emitter.emit("modal", "friend")}
           >
             <i className="fa-solid fa-user-plus"></i>
           </button>
@@ -66,7 +66,7 @@ export const PageHeader = () => {
             className="check_box"
             style={{ display: userOption ? "flex" : "none" }}
           >
-            <button onMouseDown={() => emitter.emit("profile modal", true)}>
+            <button onMouseDown={() => emitter.emit("modal", "profile")}>
               내 프로필
             </button>
             <button>로그아웃</button>

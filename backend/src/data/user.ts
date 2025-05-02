@@ -51,7 +51,7 @@ export const getUserByEmail = async (email: string) => {
   try {
     let query = `select u.*
 , (
-    select json_agg(rf_data)
+    select json_agg(distinct rf_data)
 	from (
 		select ru.id, ru.nickname, ru.email, ru.profile_img from requestFriend rf
 		join users ru on ru.nickname = rf.req_nickname
@@ -59,7 +59,7 @@ export const getUserByEmail = async (email: string) => {
 	) rf_data
 ) as request_friend_list
 , (
-    select json_agg(f_data)
+    select json_agg(distinct f_data)
 	from (
 		select fu.id, fu.nickname, fu.email, fu.profile_img 
 		from requestFriend ff

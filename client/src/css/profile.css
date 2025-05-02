@@ -3,10 +3,10 @@
 :root {
   --profile-modal-width: 400px;
   --profile-modal-height: 480px;
+  --profile-modal-footer-height: 60px;
 
   /* img */
   --profile-imgbox-height: 120px;
-
   --profile-imgbox-circle-size: 90px;
 }
 
@@ -21,7 +21,7 @@
 
 .profile_content {
   width: 100%;
-  height: calc(100% - var(--modal-hedaer-height) - var(--modal-footer-height));
+  height: calc(100% - var(--profile-modal-footer-height));
 }
 
 .profile_content form {
@@ -30,7 +30,6 @@
   display: flex;
   flex-direction: column;
   padding: 10px 20px;
-  border: 1px solid green;
 }
 
 .profile_content form div {
@@ -53,6 +52,12 @@
   height: var(--profile-imgbox-circle-size);
   border-radius: 50%;
   border: 1px solid white;
+  overflow: hidden;
+}
+
+.profile_img_circle img {
+  width: 100%;
+  height: 100%;
 }
 
 .profile_email_box,
@@ -74,4 +79,23 @@
   background-color: inherit;
   color: var(--pwf-white);
   border: 1px solid var(--pwf-white);
+}
+
+.profile_modal_footer {
+  width: 100%;
+  height: var(--profile-modal-footer-height);
+  line-height: var(--profile-modal-footer-height);
+}
+
+.profile_modal_footer button {
+  padding: 6px;
+  background-color: var(--pwf-blue);
+  color: var(--pwf-white);
+  font-weight: 600;
+  outline: none;
+  border: none;
+}
+
+.profile_modal_footer button:hover {
+  text-decoration: underline;
 }

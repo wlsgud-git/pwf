@@ -3,17 +3,17 @@ import "../css/myfriends.css";
 import { RootState } from "../context/store";
 import { useEffect } from "react";
 
-import { User } from "../types/user";
+import { User, UserComponent } from "../types/user";
 
-export const MyFriendLi = (props: { user: User }) => {
+export const MyFriendLi = ({ user }: UserComponent) => {
   return (
     <li className="friend_li">
       {/* 친구 이미지 */}
       <span className="friend_img">
-        <img src={props.user.profile_img} />
+        <img src={user.profile_img} />
       </span>
       {/* 친구 닉네임 */}
-      <span className="friend_nickname">{props.user.nickname}</span>
+      <span className="friend_nickname">{user.nickname}</span>
       <span className="friend_online_state"></span>
     </li>
   );
