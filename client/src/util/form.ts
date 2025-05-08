@@ -1,4 +1,4 @@
-export function createFormData<T>(data: T): FormData {
+export function createFormData(data: any): FormData {
   let formdata = new FormData();
 
   for (const key in data) {
@@ -6,7 +6,7 @@ export function createFormData<T>(data: T): FormData {
     if (Array.isArray(value)) {
       value.map((val) => formdata.append(`${key}[]`, val));
     } else {
-      formdata.append(key, value);
+      formdata.append(key, JSON.stringify(value));
     }
   }
 

@@ -4,7 +4,7 @@
   --friend-height: 50px;
 
   --friend-profile-img-size: 30px;
-  --friend-online-circle-size: 15px;
+  --friend-online-circle-size: 10px;
 }
 
 .pwf-my_friends {
@@ -20,8 +20,10 @@
   height: var(--friend-height);
   display: flex;
   align-items: center;
+  border: 1px solid green;
   /* justify-content: flex-start; */
   padding: 0px 8px;
+  position: relative;
 }
 
 .friend_img {
@@ -45,10 +47,13 @@
 }
 
 .friend_online_state {
+  position: absolute;
+  right: 10px;
+  /* top: 50%; */
   width: var(--friend-online-circle-size);
   height: var(--friend-online-circle-size);
-  border: 1px solid red;
   text-align: end;
+  border-radius: 50%;
 }
 
 @media screen and (max-width: 725px) {

@@ -14,11 +14,21 @@ export class userService extends HttpClient {
     }
   }
 
+  async logout() {
+    try {
+      return await this.axiosFetch<string>("/logout", {
+        method: "post",
+      });
+    } catch (err) {
+      throw err;
+    }
+  }
+
   async handleRequestFriend(data: FormData) {
     try {
       return await this.axiosFetch<{
         result: boolean;
-        sender: string;
+        sender: User;
         msg: string;
       }>(`/request/friend/response`, {
         method: "post",

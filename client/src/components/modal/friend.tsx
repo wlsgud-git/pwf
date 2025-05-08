@@ -18,6 +18,7 @@ interface ComponentProps {
 interface RequestFriendProps {
   receiver: User;
   sender: User;
+  response?: boolean;
 }
 
 // 친구요청 보낸 친구들 리스트
@@ -27,8 +28,8 @@ export const RequestFriendLi = ({ receiver, sender }: RequestFriendProps) => {
   const handleRequestFriend = async (response: boolean) => {
     try {
       let formdata = createFormData({
-        receiver: receiver.nickname,
-        sender: sender.nickname,
+        receiver,
+        sender,
         response,
       });
       dispatch(userAction.requestFriendHandle(formdata));

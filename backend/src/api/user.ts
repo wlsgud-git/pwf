@@ -16,6 +16,7 @@ import {
   handleRequestFriend,
   loginControl,
   requestFriendWithNickname,
+  logoutControl,
 } from "../controller/user";
 import { loginValidate, signupUserValidate } from "../validation/auth";
 
@@ -44,6 +45,8 @@ router.post("/request/friend/response", handleRequestFriend);
 router.post("/send_authcode", sendAuthcodeWithEmail);
 // 닉네임이나 이메일 중복검사
 router.post("/overlap_check", userOverlapCheck);
+// 로그아웃
+router.post("/logout", logoutControl);
 
 router.post("/test", testFunction);
 

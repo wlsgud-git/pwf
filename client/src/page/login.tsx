@@ -8,6 +8,7 @@ import { LoginError } from "../types/auth";
 import { errorHandling } from "../error/error";
 import { user_service } from "../service/userservice";
 import { createFormData } from "../util/form";
+import { socketClient } from "../util/socket";
 
 export const Login = () => {
   let navigate = useNavigate();
@@ -45,8 +46,12 @@ export const Login = () => {
     setLoading(true);
 
     try {
-      await user_service.sendLoginInfo(formdata);
-      alert("로그인에 성공하였습니다");
+      let { user, msg } = await user_service.sendLoginInfo(formdata);
+      socketClient.auth = {
+        user,
+      };
+      alert(msg);
+      socketClient.connect();
       navigate("/");
     } catch (err) {
       let { path, msg } = errorHandling(err);

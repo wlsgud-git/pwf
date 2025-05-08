@@ -3,27 +3,35 @@ import { profile } from "console";
 import "../css/pageheader.css";
 
 import React, { memo, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import Head from "../image/head.jpg";
 import { emitter } from "../util/event";
 import { useSelector } from "react-redux";
 import { RootState } from "../context/store";
-
-interface ModalProps {
-  state: boolean;
-  type: string;
-}
+import { user_service } from "../service/userservice";
+import { socketClient } from "../util/socket";
 
 export const PageHeader = () => {
+  let navigate = useNavigate();
   let user = useSelector((state: RootState) => state.user);
   let [userOption, setUserOption] = useState<boolean>(false);
+
+  const logout = async () => {
+    try {
+      await user_service.logout();
+      socketClient.disconnect();
+      navigate("/login");
+    } catch (err) {
+      throw err;
+    }
+  };
 
   return (
     <header className="pwf_header">
       <span>
         <Link to="/result" className="home_anchor">
-          PWF
+          PWF {user.nickname}
         </Link>
       </span>
 
@@ -69,7 +77,7 @@ export const PageHeader = () => {
             <button onMouseDown={() => emitter.emit("modal", "profile")}>
               내 프로필
             </button>
-            <button>로그아웃</button>
+            <button onMouseDown={logout}>로그아웃</button>
           </div>
         </div>
       </div>

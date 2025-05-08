@@ -10,6 +10,7 @@ const required = (key: string, defaultValue?: undefined) => {
 export let config = {
   http: {
     port: required("PORT"),
+    host: required("HOST"),
   },
 
   database: {
@@ -18,6 +19,10 @@ export let config = {
     host: required("DB_HOST"),
     database: required("DB_DATABASE"),
     port: parseInt(required("DB_PORT")),
+  },
+
+  socket: {
+    client_url: required("SOCKET_CLIENT_URL"),
   },
 
   secure: {

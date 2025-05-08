@@ -6,6 +6,7 @@ import { lazy, Suspense, useEffect, useMemo } from "react";
 import { AppDispatch, RootState } from "../context/store";
 import { useDispatch, useSelector } from "react-redux";
 import { userAction } from "../context/actions/userAction";
+import { socketClient, testing } from "../util/socket";
 
 // component
 import { Modal } from "./modal";
@@ -22,6 +23,7 @@ export const Home = () => {
 
   useEffect(() => {
     dispatch(userAction.getUserAction());
+    testing(socketClient, dispatch);
   }, [dispatch]);
 
   return (

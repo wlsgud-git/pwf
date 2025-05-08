@@ -1,5 +1,5 @@
 export interface User {
-  id?: number;
+  id?: number | undefined;
   nickname?: string;
   email?: string;
   password?: string;
@@ -9,6 +9,12 @@ export interface User {
   profile_img?: string;
   stream_room?: [];
   request_friends?: User[];
+  online?: boolean;
+}
+
+export interface FriendOnlineStatus {
+  nickname: string;
+  state: boolean;
 }
 
 export interface UserComponent {

@@ -14,7 +14,10 @@ export const MyFriendLi = ({ user }: UserComponent) => {
       </span>
       {/* 친구 닉네임 */}
       <span className="friend_nickname">{user.nickname}</span>
-      <span className="friend_online_state"></span>
+      <span
+        className="friend_online_state"
+        style={{ backgroundColor: user.online ? "green" : "red" }}
+      ></span>
     </li>
   );
 };

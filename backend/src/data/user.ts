@@ -68,7 +68,7 @@ export const getUserByEmail = async (email: string) => {
 		  when ff.res_nickname = u.nickname then ff.req_nickname = fu.nickname
 		  else ff.res_nickname = fu.nickname
 		end
-		where ff.state = true and ff.res_nickname = u.nickname or ff.req_nickname = u.nickname
+		where ff.state = true and (ff.res_nickname = u.nickname or ff.req_nickname = u.nickname)
 	) f_data
 ) as friends
 from users u

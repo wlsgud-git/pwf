@@ -4,7 +4,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { userAction } from "../actions/userAction";
 
 // type
-import { User } from "../../types/user";
+import { FriendOnlineStatus, User } from "../../types/user";
 import { isSwitchStatement } from "typescript";
 
 interface userReducer {
@@ -26,7 +26,23 @@ const initialState: User = {
 const userSlice = createSlice({
   name: "user",
   initialState, // reducer
-  reducers: {} satisfies userReducer, // actions
+  reducers: {
+    onlineUpdate: (current: any, data: PayloadAction<User>) => {
+      let { nickname, online } = data.payload;
+      return {
+        ...current,
+        friends: current.friends.map((val: User) =>
+          val.nickname == nickname ? { ...val, online } : val
+        ),
+      };
+    },
+
+    insertReceiver: (current: any, data: PayloadAction<User>) => {
+      let { nickname, profile_img, online } = data.payload;
+
+      return { ...current, friends: [...current.friends, data.payload] };
+    },
+  }, // actions
   extraReducers: (builder) => {
     // 세션으로 유저 정보 가져오기
     builder.addCase(userAction.getUserAction.fulfilled, (state, action) => {
@@ -43,6 +59,7 @@ const userSlice = createSlice({
       if (friends && friends.length)
         state.friends = friends.map((val: User) => val);
     });
+
     // 친구요청에 대한 결과
     builder.addCase(
       userAction.requestFriendHandle.fulfilled,
@@ -61,5 +78,5 @@ const userSlice = createSlice({
   },
 });
 
-// export const { getUser } = userSlice.actions;
+export const { onlineUpdate, insertReceiver } = userSlice.actions;
 export default userSlice.reducer;
