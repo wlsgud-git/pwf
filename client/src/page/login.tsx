@@ -23,6 +23,7 @@ export const Login = () => {
     msg: "",
   });
 
+  // 로그인 에러 핸들
   const loginErrorHandler = (type: string, msg: string) => {
     if (type == "email") emailRef.current?.focus();
     else passwordRef.current?.focus();
@@ -30,6 +31,7 @@ export const Login = () => {
     setLoginError((c) => ({ ...c, error: true, msg }));
   };
 
+  // 로그인 정보 보내기
   const loginSubmit = async (e: FormSubmit) => {
     e.preventDefault();
 
@@ -47,11 +49,7 @@ export const Login = () => {
 
     try {
       let { user, msg } = await user_service.sendLoginInfo(formdata);
-      socketClient.auth = {
-        user,
-      };
-      alert(msg);
-      socketClient.connect();
+      alert("로그인 되었습니다.");
       navigate("/");
     } catch (err) {
       let { path, msg } = errorHandling(err);

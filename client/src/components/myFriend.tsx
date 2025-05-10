@@ -5,6 +5,7 @@ import { useEffect } from "react";
 
 import { User, UserComponent } from "../types/user";
 
+// 내 친구
 export const MyFriendLi = ({ user }: UserComponent) => {
   return (
     <li className="friend_li">
@@ -22,6 +23,7 @@ export const MyFriendLi = ({ user }: UserComponent) => {
   );
 };
 
+// 내 친구들리스트
 export const MyFriends = () => {
   let user = useSelector((state: RootState) => state.user);
 

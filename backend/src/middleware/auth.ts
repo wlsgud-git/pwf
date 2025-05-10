@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 
 // other file
-import { overlapCheck } from "../data/user";
+import { nicknameOverlap, emailOverlap } from "../data/user";
 import { transporter, sendAuthcodeMail } from "../util/mail";
 
 // types
@@ -13,7 +13,8 @@ import { AuthcodeError, SignupError } from "../../types/auth";
 import { emailValidate } from "../validation/auth";
 import { RequestQuery } from "../../types/http";
 
-// 유저 인가 middleware
+// Authentication Or Authorization --------------------------
+// 유저 인가
 export const IsAuth: RequestHandler = async (req, res, next) => {
   let session_id = req.cookies["session_id"];
 
@@ -25,20 +26,31 @@ export const IsAuth: RequestHandler = async (req, res, next) => {
   }
 };
 
-// 회원가입 이메일과 닉네임 중복체크
-export const userOverlapCheck: RequestHandler = async (req, res) => {
-  let { type, value } = req.body;
+//  이메일 중복체크
+export const emailOverlapCheck: RequestHandler = async (req, res) => {
+  let { email } = req.body;
   try {
-    if (type == "email" && !emailValidate(value))
-      throw { type, msg: SignupError.EMAIL };
-    let user = await overlapCheck(type, value);
+    if (!emailValidate(email)) throw { type: "email", msg: SignupError.EMAIL };
+    let user = await emailOverlap(email);
     if (user.length)
       throw {
-        type,
-        msg:
-          type == "email"
-            ? SignupError.EMAIL_OVERLAP
-            : SignupError.NICKNAME_OVERLAP,
+        type: "email",
+        msg: SignupError.EMAIL_OVERLAP,
+      };
+    res.status(200).json(user[0]);
+  } catch (error) {
+    res.status(400).json(error);
+  }
+};
+// 닉네임 중복검사
+export const nicknameOverlapCheck: RequestHandler = async (req, res) => {
+  let { nickname } = req.body;
+  try {
+    let user = await nicknameOverlap(nickname);
+    if (user.length)
+      throw {
+        type: "nickname",
+        msg: SignupError.NICKNAME_OVERLAP,
       };
     res.status(200).json(user[0]);
   } catch (error) {
@@ -46,8 +58,8 @@ export const userOverlapCheck: RequestHandler = async (req, res) => {
   }
 };
 
-// 이메일에 인증코드 보내기
-// nomailer를 이용하여 인증코드 보냄 - 레디스에 저장함
+// authencate code ---------------------------------
+// 인증코드 보내기
 export const sendAuthcodeWithEmail: RequestHandler = async (req, res, next) => {
   let { email } = req.body;
 
@@ -60,8 +72,7 @@ export const sendAuthcodeWithEmail: RequestHandler = async (req, res, next) => {
   }
 };
 
-// 이메일의 인증코드 확인
-// 인증코드를 받음 - 해당 이메일에 맞는 인증번호가 있는지 확인함
+// 인증코드 확인
 export const authcodeCheck: RequestHandler = async (req, res, next) => {
   let { email, authcode } = req.body;
 
@@ -74,16 +85,5 @@ export const authcodeCheck: RequestHandler = async (req, res, next) => {
     next();
   } catch (err) {
     res.status(400).json(err);
-  }
-};
-
-// 테스트
-export const testFunction: RequestHandler = async (req, res, next) => {
-  let { email } = req.body;
-  try {
-    let code = await redisGet(email);
-    res.status(200).json({ code });
-  } catch (err) {
-    throw err;
   }
 };

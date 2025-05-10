@@ -6,7 +6,7 @@ import { lazy, Suspense, useEffect, useMemo } from "react";
 import { AppDispatch, RootState } from "../context/store";
 import { useDispatch, useSelector } from "react-redux";
 import { userAction } from "../context/actions/userAction";
-import { socketClient, testing } from "../util/socket";
+import { socketClient, userSocket } from "../util/socket";
 
 // component
 import { Modal } from "./modal";
@@ -21,10 +21,15 @@ export const Home = () => {
   let dispatch = useDispatch<AppDispatch>();
   let user = useSelector((state: RootState) => state.user);
 
+  // 시작할때 유저 정보를 가져옴
   useEffect(() => {
     dispatch(userAction.getUserAction());
-    testing(socketClient, dispatch);
   }, [dispatch]);
+
+  // 유저 정보가 변경되면 소켓연결을 시작함
+  useEffect(() => {
+    if (user.id) userSocket(socketClient, dispatch, user);
+  }, [user]);
 
   return (
     <div className="page home_page">

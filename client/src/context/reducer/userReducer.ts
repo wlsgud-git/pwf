@@ -64,11 +64,11 @@ const userSlice = createSlice({
     builder.addCase(
       userAction.requestFriendHandle.fulfilled,
       (state, action) => {
-        let { result, sender, msg } = action.payload;
+        let { sender, msg } = action.payload;
 
         state.request_friends = state.request_friends?.filter((val) => {
-          if (val.nickname == sender) state.friends?.push(val);
-          return val.nickname != sender;
+          if (val.nickname == sender.nickname) state.friends?.push(sender);
+          return val.nickname != sender.nickname;
         });
 
         alert(msg);

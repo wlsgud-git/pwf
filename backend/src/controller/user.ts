@@ -3,7 +3,7 @@ import { compareText, hashingText } from "../util/crypto";
 import {
   createUser,
   getUserByEmail,
-  overlapCheck,
+  nicknameOverlap,
   requestFriend,
   requestFriendhandle,
 } from "../data/user";
@@ -37,7 +37,7 @@ export const current: RequestHandler = async (req, res) => {
   }
 };
 
-// 회원가입 관련 -------------------------------------------
+// signup -------------------------------------------
 // 회원가입 전 유저정보 확인
 export const signupUserInfoControl: RequestHandler = async (req, res, next) => {
   res.status(200).json({ message: "success" });
@@ -56,8 +56,8 @@ export const accountUser: RequestHandler = async (req, res, next) => {
   }
 };
 
-// 로그인 관련 -------------------------------------
-// 받은 이메일 패스워드와 db에 저장된 패스워드가 같은지 확인 같으면 로그인 성공
+// login -------------------------------------
+// 로그인
 export const loginControl: RequestHandler = async (req, res) => {
   let { email, password } = req.body;
   try {
@@ -90,6 +90,7 @@ export const loginControl: RequestHandler = async (req, res) => {
   }
 };
 
+// 로그아웃
 export const logoutControl: RequestHandler = async (req, res) => {
   try {
     await redisDelete(req.cookies["session_id"]);
@@ -106,7 +107,7 @@ export const requestFriendWithNickname: RequestHandler = async (req, res) => {
   try {
     let { res_nickname, req_nickname, state } = req.body;
     if (res_nickname == req_nickname) throw { msg: "잘못된 친구요청입니다." };
-    let user = await overlapCheck("nickname", res_nickname);
+    let user = await nicknameOverlap(res_nickname);
     if (!user.length) throw { msg: "존재하지 않은 닉네임입니다." };
 
     let response = await requestFriend(res_nickname, req_nickname, state);
@@ -126,14 +127,13 @@ export const handleRequestFriend: RequestHandler = async (req, res) => {
     receiver = JSON.parse(receiver);
     sender = JSON.parse(sender);
     response = response == "true" ? true : false;
-    let result = await requestFriendhandle(
-      receiver.nickname,
-      sender.nickname,
-      response
-    );
+
+    // 데이터 베이스 친구요청 업데이트
+    await requestFriendhandle(receiver.nickname, sender.nickname, response);
 
     if (response) {
       receiver.online = true;
+      // 현재 sender가 접속중인지 확인
       await onlineUser(sender);
 
       if (sender.online)
@@ -141,9 +141,8 @@ export const handleRequestFriend: RequestHandler = async (req, res) => {
     }
 
     res.status(200).json({
-      result: response,
       sender,
-      msg: `${sender}의 요청을 ${
+      msg: `${sender.nickname}의 요청을 ${
         response ? "수락하였습니다." : "거절하였습니다."
       }`,
     });

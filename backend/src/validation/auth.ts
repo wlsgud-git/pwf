@@ -5,7 +5,6 @@ import { getUserByEmail } from "../data/user";
 
 // 이메일 인가
 export const emailValidate = (email: string) => {
-  console.log(email);
   return email
     .toString()
     .trim()

@@ -104,6 +104,7 @@ export const Signup = () => {
     }));
   };
 
+  // step 2 -----------------------------------
   // 인증번호 재전송
   const resendAuthcode = async () => {
     let formdata = createFormData({ email: email.value });
@@ -142,16 +143,6 @@ export const Signup = () => {
     } catch (err) {
       let { msg } = errorHandling(err);
       setAuthError((c) => ({ ...c, error: true, msg }));
-    }
-  };
-
-  const testing = async () => {
-    try {
-      let formdata = createFormData({ email });
-      let code = await user_service.testing(formdata);
-      console.log(code);
-    } catch (err) {
-      console.log(err);
     }
   };
 
@@ -199,7 +190,6 @@ export const Signup = () => {
           {/* 로그인 헤더 */}
           <div className="signup_header">
             <span>PWF</span>
-            <button onClick={testing}>test</button>
           </div>
 
           {/* 로그인 내용 */}

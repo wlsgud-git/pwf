@@ -22,11 +22,12 @@ export function initSocket() {
 
   io.use(async (socket: Socket, next: NextFunction) => {
     let { user } = socket.handshake.auth;
+
     try {
       let result = await redisGet(user.nickname);
       next();
     } catch (err) {
-      throw new Error("unAuthenticated user");
+      next(err);
     }
   });
 
@@ -34,12 +35,16 @@ export function initSocket() {
     let { user } = socket.handshake.auth;
 
     // 로그인하면 online인걸 친구들한테 보내줘야 함
+    console.log("online friend", user.nickname);
     socket.join(`online:${user.nickname}`);
     userOnlineFriend(user.friends, true, user);
 
     // 로그아웃하면 offline인걸 친구들한테 보내줘야함
     socket.on("disconnect", async () => {
-      userOnlineFriend(user.friends, false, user);
+      setTimeout(async () => {
+        let onlineState = await redisGet(user.nickname);
+        if (!onlineState) userOnlineFriend(user.friends, false, user);
+      }, 2000);
     });
   });
 }

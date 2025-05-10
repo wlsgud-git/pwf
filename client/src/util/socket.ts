@@ -1,10 +1,12 @@
 import { io, Socket } from "socket.io-client";
-import { User, FriendOnlineStatus } from "../types/user";
-import { userAction } from "../context/actions/userAction";
+import { User } from "../types/user";
 import { AppDispatch } from "../context/store";
 import { insertReceiver, onlineUpdate } from "../context/reducer/userReducer";
 
 export const socketClient: Socket = io("http://localhost:5000", {
+  reconnection: true,
+  reconnectionAttempts: 5,
+  reconnectionDelay: 1000,
   withCredentials: true,
   autoConnect: false,
   extraHeaders: {
@@ -12,11 +14,20 @@ export const socketClient: Socket = io("http://localhost:5000", {
   },
 });
 
-export const testing = (socket: Socket, dispatch: AppDispatch) => {
-  socket.on("online friend", (data: User) => {
-    dispatch(onlineUpdate(data));
-  });
+export const userSocket = (
+  socket: Socket,
+  dispatch: AppDispatch,
+  user: User
+) => {
+  socketClient.auth = {
+    user,
+  };
+  socketClient.connect();
 
+  // 친구의 온라인 오프라인 상태
+  socket.on("online friend", (data: User) => dispatch(onlineUpdate(data)));
+
+  // 요청자가 친구추가를 받아줬을때
   socket.on("receiver data", (receiver: User) => {
     dispatch(insertReceiver(receiver));
   });
