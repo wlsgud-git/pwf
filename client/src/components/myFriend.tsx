@@ -9,12 +9,15 @@ import { User, UserComponent } from "../types/user";
 export const MyFriendLi = ({ user }: UserComponent) => {
   return (
     <li className="friend_li">
-      {/* 친구 이미지 */}
-      <span className="friend_img">
-        <img src={user.profile_img} />
-      </span>
-      {/* 친구 닉네임 */}
-      <span className="friend_nickname">{user.nickname}</span>
+      <div className="friend_info">
+        {/* 친구 이미지 */}
+        <span className="friend_img">
+          <img src={user.profile_img} />
+        </span>
+        {/* 친구 닉네임 */}
+        <span className="friend_nickname">{user.nickname}</span>
+      </div>
+      {/* 해당 친구 온라인 상태 유무 */}
       <span
         className="friend_online_state"
         style={{ backgroundColor: user.online ? "green" : "red" }}

@@ -17,7 +17,7 @@
 
 .stream_create_box {
   width: 100%;
-  height: calc(100% - var(--stream-modal-footer-height));
+  height: 100%;
 }
 
 .stream_create_box form {
@@ -25,7 +25,8 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
-  padding: 20px 35px;
+  padding: 10px 35px;
+  justify-content: space-between;
 }
 
 .stream_create_box form div {
@@ -44,6 +45,7 @@
   margin-bottom: 10px;
 }
 
+/* 방 이름 */
 .pwf_roomname_input {
   flex: 1;
   width: 100%;
@@ -53,24 +55,60 @@
   border: 1px solid var(--pwf-gray);
 }
 
+/* 방 참가자 */
 .participants_list {
   width: 100%;
   display: flex;
   max-height: 60px;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   border: 1px solid var(--pwf-white);
-}
-
-.friends_list {
-  width: 100%;
-  height: 140px;
-  /* border: 1px solid var(--pwf-white); */
   overflow-y: auto;
 }
 
-.friends_list {
+.participants_list li {
   color: var(--pwf-white);
+  font-size: 16px;
+  font-weight: 600;
+  width: 100%;
+  text-align: start;
+  padding: 3px 6px;
+}
+
+.participants_list::-webkit-scrollbar {
+  width: var(--scroll-size);
+}
+
+.participants_list::-webkit-scrollbar-track {
+  background-color: inherit;
+  border-radius: 4px;
+}
+
+.participants_list::-webkit-scrollbar-thumb {
+  background-color: var(--pwf-gray);
+  border-radius: 10px;
+}
+
+/* 초대할 친구목록 */
+.friends_list {
+  width: 100%;
+  height: 140px;
+  overflow-y: auto;
+  color: var(--pwf-white);
+}
+
+.friends_list::-webkit-scrollbar {
+  width: var(--scroll-size);
+}
+
+.friends_list::-webkit-scrollbar-track {
+  background-color: inherit;
+  border-radius: 4px;
+}
+
+.friends_list::-webkit-scrollbar-thumb {
+  background-color: var(--pwf-gray);
+  border-radius: 10px;
 }
 
 .invite_friend_li {

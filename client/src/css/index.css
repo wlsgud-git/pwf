@@ -19,6 +19,9 @@
   /* streaming room */
   --pwf-menu-width: 370px;
   --pwf-menu-height: 65px;
+
+  /* scroll */
+  --scroll-size: 7px;
 }
 
 body {

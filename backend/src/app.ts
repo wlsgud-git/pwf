@@ -30,8 +30,10 @@ app.use(cors(corsOption));
 app.use(express.static(path.join(__dirname, "../../client/build")));
 
 const UserApi = require("./api/user");
+const StreamRoomApi = require("./api/streamRoom");
 
 app.use("/", UserApi);
+app.use("/", StreamRoomApi);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ message: "fuck" });

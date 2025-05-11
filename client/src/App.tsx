@@ -7,7 +7,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 // page
 import { Home } from "./page/home";
 import { Notfound } from "./page/notfound";
-import { Result } from "./page/result";
+import { StreamRoom } from "./page/streamroom";
 import { Login } from "./page/login";
 import { Signup } from "./page/signup";
 
@@ -17,6 +17,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/room" element={<StreamRoom />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="*" element={<Notfound />} />

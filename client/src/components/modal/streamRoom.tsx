@@ -1,16 +1,20 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import "../../css/stream.css";
 import { emitter } from "../../util/event";
 
 // types
 import { User, UserComponent } from "../../types/user";
-import { FormSubmit } from "../../types/event";
+import { FormSubmit, InputChange } from "../../types/event";
+import { createImportSpecifier } from "typescript";
+import { stream_service } from "../../service/streamservice";
+import { createFormData } from "../../util/form";
 
 interface CompoentProps {
   user: User;
   type: string;
 }
 
+// 초대할 친구정보
 export const LiFriend = ({ user }: UserComponent) => {
   let [select, Setselect] = useState<boolean>(false);
 
@@ -38,8 +42,11 @@ export const LiFriend = ({ user }: UserComponent) => {
 };
 
 export const StreamModal = ({ user, type }: CompoentProps) => {
-  // let [open, setOpen] = useState<boolean>(false);
+  let formRef = useRef<HTMLFormElement>(null);
   let [inviteUsers, setInviteUsers] = useState<User[]>([]);
+
+  // infomation
+  let [roomname, setRoomname] = useState<string>("");
 
   // invite
   useEffect(() => {
@@ -60,8 +67,27 @@ export const StreamModal = ({ user, type }: CompoentProps) => {
     };
   }, []);
 
-  const submitStreamRoomInfo = async (e: FormSubmit) => {
+  // 방 생성
+  const createStreamRoom = async (e: FormSubmit) => {
     e.preventDefault();
+
+    if (!roomname.length || roomname.length >= 21) {
+      alert("방 이름은 1~20자 이내여야 합니다.");
+      return;
+    }
+
+    if (!inviteUsers.length) {
+      alert("최소 1명이상의 친구를 초대해야 합니다.");
+      return;
+    }
+
+    try {
+      let participants = inviteUsers.map((val) => val.id);
+      let formdata = createFormData({ room_name: roomname, participants });
+      let res = await stream_service.createStreamRoom(formdata);
+    } catch (err) {
+      alert(err);
+    }
   };
 
   return (
@@ -71,13 +97,18 @@ export const StreamModal = ({ user, type }: CompoentProps) => {
     >
       {/* 모달 내용 */}
       <div className="stream_create_box">
-        <form onSubmit={submitStreamRoomInfo}>
+        <form onSubmit={createStreamRoom} ref={formRef}>
           {/* 방 이름 */}
           <div className="stream_roomname_box">
             <label htmlFor="stream_roomname">방이름</label>
-            <input type="text" className="pwf_roomname_input" />
+            <input
+              type="text"
+              value={roomname}
+              className="pwf_roomname_input"
+              placeholder="방이름"
+              onChange={(e: InputChange) => setRoomname(e.target.value)}
+            />
           </div>
-
           {/* 참여자 목록 */}
           <div className="participants_box">
             <label htmlFor="participants">참여자 {inviteUsers.length}</label>
@@ -100,12 +131,12 @@ export const StreamModal = ({ user, type }: CompoentProps) => {
               )}
             </ul>
           </div>
+          {/* 모달 풋터 */}
+          <footer className="stream_modal_footer">
+            <button>방 만들기</button>
+          </footer>
         </form>
       </div>
-      {/* 모달 풋터 */}
-      <footer className="stream_modal_footer">
-        <button>방 만들기</button>
-      </footer>
     </div>
   );
 };

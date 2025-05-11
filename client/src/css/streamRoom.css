@@ -1,0 +1,84 @@
+:root {
+  /* room main */
+  --streamroom-footer-height: 55px;
+
+  /* menu */
+  --streamroom-menu-width: 400px;
+}
+
+.streamRoom_page {
+  display: flex;
+}
+/* main */
+.pwf-streamRoom_container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.streamRoom_footer {
+  width: 100%;
+  height: var(--streamroom-footer-height);
+  border: 1px solid red;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.streamRoom_footer div {
+  height: 100%;
+  display: flex;
+}
+
+/* 유저 옵션 부분 */
+.user_video_options button {
+  align-items: center;
+  border: none;
+  width: 80px;
+  height: 100%;
+  font-size: 18px;
+  color: var(--pwf-white);
+  background-color: inherit;
+}
+
+.user_video_options button:hover {
+  text-decoration: underline;
+}
+
+/* 비디오 옵션 부분 */
+.room_options button {
+  align-items: center;
+  border: none;
+  width: 80px;
+  height: 100%;
+  font-size: 18px;
+  color: var(--pwf-white);
+  background-color: inherit;
+}
+
+/* 비디오 메뉴부분 */
+.room_exit {
+  margin-right: 10px;
+  background-color: var(--pwf-red);
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pwf-white);
+}
+
+.room_exit:hover {
+  text-decoration: underline;
+}
+
+/* menu */
+.pwf-streamRoom_menu {
+  width: var(--streamroom-menu-width);
+  border: 1px solid blue;
+  height: 100%;
+  position: relative;
+}

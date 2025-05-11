@@ -1,7 +1,7 @@
 @import url("index.css");
 
 :root {
-  --friend-height: 50px;
+  --friend-height: 45px;
 
   --friend-profile-img-size: 30px;
   --friend-online-circle-size: 10px;
@@ -13,17 +13,39 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  border-left: 1px solid var(--pwf-white);
 }
 
+.pwf-my_friends::-webkit-scrollbar {
+  width: var(--scroll-size);
+}
+
+.pwf-my_friends::-webkit-scrollbar-track {
+  background-color: inherit;
+  border-radius: 4px;
+}
+
+.pwf-my_friends::-webkit-scrollbar-thumb {
+  background-color: var(--pwf-gray);
+  border-radius: 10px;
+}
+
+/* 친구 리스트 부분 ---------------------- */
 .friend_li {
   width: 100%;
-  height: var(--friend-height);
+  min-height: var(--friend-height);
   display: flex;
   align-items: center;
-  border: 1px solid green;
-  /* justify-content: flex-start; */
+  justify-content: flex-start;
   padding: 0px 8px;
-  position: relative;
+}
+
+.friend_info {
+  width: calc(100% - var(--friend-online-circle-size) - 10px);
+  display: flex;
+  height: 100%;
+  align-items: center;
+  margin-right: 10px;
 }
 
 .friend_img {
@@ -44,12 +66,13 @@
   font-size: 18px;
   font-weight: 600;
   color: var(--pwf-white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+/* 친구 온라인 상태 유무 */
 .friend_online_state {
-  position: absolute;
-  right: 10px;
-  /* top: 50%; */
   width: var(--friend-online-circle-size);
   height: var(--friend-online-circle-size);
   text-align: end;
@@ -59,12 +82,19 @@
 @media screen and (max-width: 725px) {
   .pwf-my_friends {
     width: 100%;
-    height: var(--friend-height);
+    height: calc(var(--scroll-size) + var(--friend-height));
     flex-direction: row;
     overflow-x: auto;
+    border-bottom: 1px solid var(--pwf-white);
+    border-left: none;
+  }
+
+  .pwf-my_friends::-webkit-scrollbar {
+    height: var(--scroll-size);
   }
   .friend_li {
-    width: 120px;
+    min-height: 0;
+    width: 160px;
     height: 100%;
   }
 }

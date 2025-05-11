@@ -1,3 +1,5 @@
+import { Room } from "./room";
+
 export interface User {
   id?: number | undefined;
   nickname?: string;
@@ -7,7 +9,7 @@ export interface User {
   create_at?: Date;
   friends?: User[];
   profile_img?: string;
-  stream_room?: [];
+  stream_room?: Room[];
   request_friends?: User[];
   online?: boolean;
 }

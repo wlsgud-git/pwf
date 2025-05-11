@@ -21,6 +21,7 @@ const initialState: User = {
   friends: [],
   email: "",
   request_friends: [],
+  stream_room: [],
 };
 
 const userSlice = createSlice({
@@ -46,8 +47,15 @@ const userSlice = createSlice({
   extraReducers: (builder) => {
     // 세션으로 유저 정보 가져오기
     builder.addCase(userAction.getUserAction.fulfilled, (state, action) => {
-      let { id, email, nickname, profile_img, request_friend_list, friends } =
-        action.payload;
+      let {
+        id,
+        email,
+        nickname,
+        profile_img,
+        request_friend_list,
+        friends,
+        stream_room,
+      } = action.payload;
 
       state.id = id;
       state.email = email;

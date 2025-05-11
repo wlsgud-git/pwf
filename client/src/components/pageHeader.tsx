@@ -30,7 +30,7 @@ export const PageHeader = () => {
   return (
     <header className="pwf_header">
       <span>
-        <Link to="/result" className="home_anchor">
+        <Link to="/" className="home_anchor">
           PWF {user.nickname}
         </Link>
       </span>
