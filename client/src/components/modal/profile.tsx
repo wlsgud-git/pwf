@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "../../css/profile.css";
+import "../../css/modal/profile.css";
 
 import { emitter } from "../../util/event";
 import { useSelector } from "react-redux";
@@ -11,7 +11,7 @@ interface ProfileProps {
   type: string;
 }
 
-export const ProfileModal = ({ user, type }: ProfileProps) => {
+export const Profile = ({ user, type }: ProfileProps) => {
   return (
     <div
       className="profile_modal"

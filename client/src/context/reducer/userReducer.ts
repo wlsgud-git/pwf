@@ -5,7 +5,7 @@ import { userAction } from "../actions/userAction";
 
 // type
 import { FriendOnlineStatus, User } from "../../types/user";
-import { isSwitchStatement } from "typescript";
+import { Room } from "../../types/room";
 
 interface userReducer {
   // getUser(state: User, info: PayloadAction<User>): void;
@@ -66,6 +66,8 @@ const userSlice = createSlice({
         state.request_friends = request_friend_list.map((val: User) => val);
       if (friends && friends.length)
         state.friends = friends.map((val: User) => val);
+      if (stream_room && stream_room.length)
+        state.stream_room = stream_room.map((val: Room) => val);
     });
 
     // 친구요청에 대한 결과

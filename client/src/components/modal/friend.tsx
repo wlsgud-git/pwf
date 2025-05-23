@@ -1,4 +1,4 @@
-import "../../css/friend.css";
+import "../../css/modal/friend.css";
 import { useState, useEffect, ChangeEvent } from "react";
 import { emitter } from "../../util/event";
 import { FormSubmit, InputChange } from "../../types/event";
@@ -65,12 +65,17 @@ export const RequestFriendLi = ({ receiver, sender }: RequestFriendProps) => {
 };
 
 // 친구 관련 모달
-export const FriendModal = ({ user, type }: ComponentProps) => {
+export const Friend = ({ user, type }: ComponentProps) => {
   let [error, setError] = useState<{ state: boolean; msg: string }>({
     state: false,
     msg: "",
   });
   let [nickname, setNickname] = useState<string>("");
+
+  function resetModal() {
+    setNickname("");
+    emitter.emit("modal", { type });
+  }
 
   // 친구요청
   const requestFriend = async (e: FormSubmit) => {
@@ -97,6 +102,9 @@ export const FriendModal = ({ user, type }: ComponentProps) => {
       className="pwf_friend_modal"
       style={{ display: type == "friend" ? "flex" : "none" }}
     >
+      <header className="modal_header">
+        <button onClick={resetModal}>X</button>
+      </header>
       <div className="friend_content">
         {/* 친추요청 검색 */}
         <div className="friend_search_box">

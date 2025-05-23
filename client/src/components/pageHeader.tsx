@@ -40,7 +40,9 @@ export const PageHeader = () => {
         <div className="pwf_friend_box">
           <button
             className="friend_btn"
-            onClick={() => emitter.emit("modal", "friend")}
+            onClick={() =>
+              emitter.emit("modal", { type: "friend", open: true })
+            }
           >
             <i className="fa-solid fa-user-plus"></i>
           </button>

@@ -3,17 +3,21 @@ import { User } from "../../types/user";
 import { Room } from "../../types/streamroom";
 
 // Authentication OR Authorization ------------------------
-// 유저 정보 얻기 (email)
-// export const getEmail = async (email: string) => {
-//   try {
-//     let query = ``;
-//     let data = [email];
-//     return await dbPlay<User>(query, data);
-//   } catch (err) {
-//     throw err;
-//   }
-// };
+export const getStreamRoomData = async (id: number) => {
+  try {
+    let query = `
+    select str.id, str.room_name, jsonb_agg(distinct to_jsonb(u)) as participants  from streamingRoom str
+    left join users u on u.id = any(str.participants)
+    where str.id = $1
+    group by str.id`;
+    let data = [id];
+    return await dbPlay<Room>(query, data);
+  } catch (err) {
+    throw err;
+  }
+};
 
+// 방 정보 얻기
 export const createStreamRoom = async (info: Room) => {
   try {
     let { room_name, participants } = info;

@@ -3,7 +3,7 @@ import express, { Router } from "express";
 // middleware
 
 // controller
-import { createRoom } from "../controller/streamRoom";
+import { createRoom, getRoom } from "../controller/streamRoom";
 import { streamRoomValidate } from "../validation/streamroom";
 
 // import { loginValidate, signupUserValidate } from "../validation/auth";
@@ -11,6 +11,7 @@ import { streamRoomValidate } from "../validation/streamroom";
 const router: Router = express.Router();
 
 //  authentication  Or  authorization
+router.get("/room/:id", getRoom);
 router.post("/room", streamRoomValidate, createRoom);
 
 module.exports = router;

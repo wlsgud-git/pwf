@@ -1,0 +1,22 @@
+@import url("../index.css");
+:root {
+  /* room main */
+
+  --video-screen-width: 300px;
+  --video-screen-height: 200px;
+
+  /* footer */
+  --streamroom-footer-height: 60px;
+
+  /* menu */
+  --streamroom-menu-width: 300px;
+  --streamroom-menu-btnbox-height: 100px;
+
+  /* menu chat */
+  --chat-form-height: 45px;
+  --chat-btn-width: 40px;
+}
+
+.streamRoom_page {
+  display: flex;
+}

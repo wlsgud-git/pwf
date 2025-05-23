@@ -1,0 +1,2 @@
+:root{--stream-li-height:55px}.stream_room_li{height:55px;height:var(--stream-li-height);width:100%}.stream_room_li a{align-items:center;display:flex;height:100%;padding:0 12px;width:100%}.stream_room_li a:hover{background-color:var(--pwf-background-transparent)}.stream_room_name{color:var(--pwf-white);font-weight:600;margin-right:8px}.stream_room_participant{background-color:var(--pwf-blue);border-radius:10px;color:var(--pwf-white);font-size:16px;font-weight:600;padding:4px 10px}.stream_room_participant i{margin-right:3px}
+/*# sourceMappingURL=867.f40e5d5b.chunk.css.map*/

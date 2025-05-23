@@ -7,6 +7,7 @@ import { NextFunction } from "express";
 
 import { User } from "../../types/user";
 import { userOnlineFriend } from "./auth";
+import { p2pSignalling } from "../middleware/user";
 
 let io: any = null;
 
@@ -35,9 +36,11 @@ export function initSocket() {
     let { user } = socket.handshake.auth;
 
     // 로그인하면 online인걸 친구들한테 보내줘야 함
-    console.log("online friend", user.nickname);
     socket.join(`online:${user.nickname}`);
     userOnlineFriend(user.friends, true, user);
+
+    // signaling
+    p2pSignalling(socket, user);
 
     // 로그아웃하면 offline인걸 친구들한테 보내줘야함
     socket.on("disconnect", async () => {

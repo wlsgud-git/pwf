@@ -1,22 +1,29 @@
-import "../css/modal.css";
+import "../css/modal/modal.css";
 import { useEffect, useState } from "react";
 import { emitter } from "../util/event";
 import { useSelector } from "react-redux";
 import { RootState } from "../context/store";
 
 // modal component
-import { FriendModal } from "../components/modal/friend";
-import { StreamModal } from "../components/modal/streamRoom";
-import { ProfileModal } from "../components/modal/profile";
+import { Friend } from "../components/modal/friend";
+import { StreamRoom } from "../components/modal/streamRoom";
+import { Profile } from "../components/modal/profile";
 
 export const Modal = () => {
   let user = useSelector((state: RootState) => state.user);
   let [open, setOpen] = useState<boolean>(false);
   let [content, setContent] = useState<string>("");
 
+  // modal control
   useEffect(() => {
-    const handler = (type: string) => {
-      setOpen(true);
+    const handler = ({
+      type,
+      open = false,
+    }: {
+      type: string;
+      open?: boolean;
+    }) => {
+      setOpen(open);
       setContent(type);
     };
 
@@ -34,14 +41,10 @@ export const Modal = () => {
   return (
     <div className="modal_box" style={{ display: open ? "flex" : "none" }}>
       <div className="modal_content">
-        {/* 모달 헤더부분 */}
-        <header className="modal_header">
-          <button onClick={() => setOpen(false)}>X</button>
-        </header>
         {/* 모달 콘텐츠 부분 */}
-        <FriendModal user={user} type={content} />
-        <StreamModal user={user} type={content} />
-        <ProfileModal user={user} type={content} />
+        <Friend user={user} type={content} />
+        <StreamRoom user={user} type={content} />
+        <Profile user={user} type={content} />
       </div>
     </div>
   );

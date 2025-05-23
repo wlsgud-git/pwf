@@ -25,3 +25,4 @@ create table StreamingRoom (
 -- grant
 grant all on (table_name) to pwf_user
 grant usage, select, update on sequence (users_id_seq) to pwf_user
+

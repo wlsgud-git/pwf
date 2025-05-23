@@ -5,7 +5,11 @@ import { User } from "../../types/user";
 // 유저 정보 얻기 (email)
 export const getUserByEmail = async (email: string) => {
   try {
-    let query = `select u.*
+    let query = `select u.*,
+case
+  when count(str.*) = 0 then null
+  else jsonb_agg(distinct to_jsonb(str)) 
+end as stream_room
 , (
     select json_agg(distinct rf_data)
 	from (
@@ -28,7 +32,9 @@ export const getUserByEmail = async (email: string) => {
 	) f_data
 ) as friends
 from users u
-where u.email = $1`;
+left join streamingRoom str on u.id = any(str.participants)
+where u.email = $1
+group by u.id`;
     let data = [email];
     return await dbPlay<User>(query, data);
   } catch (err) {

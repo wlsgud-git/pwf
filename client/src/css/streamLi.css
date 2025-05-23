@@ -1,0 +1,42 @@
+@import url("index.css");
+
+:root {
+  --stream-li-height: 55px;
+}
+
+.stream_room_li {
+  width: 100%;
+  height: var(--stream-li-height);
+  /* border: 1px solid red; */
+}
+
+.stream_room_li a {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0px 12px;
+}
+
+.stream_room_li a:hover {
+  background-color: var(--pwf-background-transparent);
+}
+
+.stream_room_name {
+  color: var(--pwf-white);
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.stream_room_participant {
+  color: var(--pwf-white);
+  font-size: 16px;
+  font-weight: 600;
+  background-color: var(--pwf-blue);
+  border-radius: 10px;
+  padding: 4px 10px;
+}
+
+.stream_room_participant i {
+  margin-right: 3px;
+}

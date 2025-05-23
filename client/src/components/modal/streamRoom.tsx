@@ -1,11 +1,10 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react";
-import "../../css/stream.css";
+import "../../css/modal/streamRoom.css";
 import { emitter } from "../../util/event";
 
 // types
 import { User, UserComponent } from "../../types/user";
 import { FormSubmit, InputChange } from "../../types/event";
-import { createImportSpecifier } from "typescript";
 import { stream_service } from "../../service/streamservice";
 import { createFormData } from "../../util/form";
 
@@ -15,10 +14,23 @@ interface CompoentProps {
 }
 
 // 초대할 친구정보
-export const LiFriend = ({ user }: UserComponent) => {
+export const LiFriend = ({ user }: { [user: string]: User }) => {
   let [select, Setselect] = useState<boolean>(false);
 
   const selectControl = () => Setselect((c) => !c);
+
+  // 강제 select 제거
+  useEffect(() => {
+    const handler = () => {
+      Setselect(false);
+    };
+
+    emitter.on(`${user.nickname} select off`, handler);
+
+    return () => {
+      emitter.off(`${user.nickname} select off`, handler);
+    };
+  }, []);
 
   useEffect(() => {
     emitter.emit("invite select", { select, user });
@@ -41,12 +53,22 @@ export const LiFriend = ({ user }: UserComponent) => {
   );
 };
 
-export const StreamModal = ({ user, type }: CompoentProps) => {
+// 방 만들기 모달
+export const StreamRoom = ({ user, type }: CompoentProps) => {
   let formRef = useRef<HTMLFormElement>(null);
   let [inviteUsers, setInviteUsers] = useState<User[]>([]);
 
   // infomation
   let [roomname, setRoomname] = useState<string>("");
+
+  // 모달 리셋
+  function resetModal() {
+    setRoomname("");
+    inviteUsers.map((val) => {
+      emitter.emit(`${val.nickname} select off`);
+    });
+    emitter.emit("modal", { type });
+  }
 
   // invite
   useEffect(() => {
@@ -83,8 +105,10 @@ export const StreamModal = ({ user, type }: CompoentProps) => {
 
     try {
       let participants = inviteUsers.map((val) => val.id);
+      participants.push(user.id);
       let formdata = createFormData({ room_name: roomname, participants });
-      let res = await stream_service.createStreamRoom(formdata);
+      let { msg, room } = await stream_service.createStreamRoom(formdata);
+      resetModal();
     } catch (err) {
       alert(err);
     }
@@ -95,6 +119,9 @@ export const StreamModal = ({ user, type }: CompoentProps) => {
       className="stream_modal"
       style={{ display: type == "stream" ? "flex" : "none" }}
     >
+      <header className="modal_header">
+        <button onClick={resetModal}>X</button>
+      </header>
       {/* 모달 내용 */}
       <div className="stream_create_box">
         <form onSubmit={createStreamRoom} ref={formRef}>

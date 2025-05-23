@@ -1,0 +1,16 @@
+@import url("../streamRoom.css");
+/* participants section */
+.menu_participants_list {
+  width: 100%;
+  height: 100%;
+  border: 1px solid blue;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.participant_li {
+  width: 100%;
+  height: 60px;
+  border: 1px solid green;
+}

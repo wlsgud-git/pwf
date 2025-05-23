@@ -16,6 +16,11 @@ const MyFriends = lazy(() =>
     default: MyFriends,
   }))
 );
+const StreamRoomLi = lazy(() =>
+  import("../components/roomLi").then(({ StreamRoomLi }) => ({
+    default: StreamRoomLi,
+  }))
+);
 
 export const Home = () => {
   let dispatch = useDispatch<AppDispatch>();
@@ -43,7 +48,14 @@ export const Home = () => {
       <div className="pwf_content">
         {/* 내가 참가자인 방 모음 */}
         <ul className="stream_room_lists">
-          <button onClick={() => emitter.emit("modal", "stream")}>
+          {user.stream_room && user.stream_room.length
+            ? user.stream_room.map((val) => <StreamRoomLi data={val} />)
+            : ""}
+          <button
+            onClick={() =>
+              emitter.emit("modal", { type: "stream", open: true })
+            }
+          >
             방만들기
           </button>
         </ul>

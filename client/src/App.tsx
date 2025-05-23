@@ -17,7 +17,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/room" element={<StreamRoom />} />
+          <Route path="/room/:id" element={<StreamRoom />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="*" element={<Notfound />} />
