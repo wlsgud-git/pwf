@@ -7,8 +7,12 @@ export interface Room {
   create_at?: Date;
 }
 
-export interface StreamInfomation {
-  stream: MediaStream;
-  video?: boolean;
-  audio?: boolean;
+export interface PeerConnects {
+  [nickname: string]: {
+    pc: RTCPeerConnection;
+    channel: RTCDataChannel;
+    stream: MediaStream;
+    video?: boolean;
+    audio?: boolean;
+  };
 }

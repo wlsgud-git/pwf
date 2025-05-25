@@ -9,13 +9,16 @@ import "../../../css/room/main/roomMain.css";
 
 // type
 import { User } from "../../../types/user";
+import { PeerConnects } from "../../../types/room";
+import { FriendStream } from "../friendStream";
 
 interface RoomMainProps {
   user: User;
   stream: MediaStream | null;
+  connects: object;
 }
 
-export const RoomMain = ({ user, stream }: RoomMainProps) => {
+export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
   let { id } = useParams();
   let roomId = `room${id}`;
   let navigate = useNavigate();
@@ -23,8 +26,8 @@ export const RoomMain = ({ user, stream }: RoomMainProps) => {
   let localRef = useRef<HTMLVideoElement | null>(null);
   let localStreamRef = useRef<MediaStream | null>(null);
 
-  let [audio, setAudio] = useState<boolean>(false);
-  let [video, setVideo] = useState<boolean>(false);
+  let [audio, setAudio] = useState<boolean>(true);
+  let [video, setVideo] = useState<boolean>(true);
 
   // 스트림 ref 설정
   useEffect(() => {
@@ -33,6 +36,10 @@ export const RoomMain = ({ user, stream }: RoomMainProps) => {
       localStreamRef.current = stream;
     }
   }, [stream]);
+
+  useEffect(() => {
+    // console.log(connects);
+  }, [connects]);
 
   // 화면 on/off
   let toggleMedia = (type: "audio" | "video") => {
@@ -63,6 +70,7 @@ export const RoomMain = ({ user, stream }: RoomMainProps) => {
     <div className="pwf-streamRoom_container">
       {/* 화면창 */}
       <ul className="user_screen_lists">
+        {/* 내 화면 */}
         <div className="user_video_box">
           {/* 유저 비디오 */}
           <video
@@ -89,9 +97,9 @@ export const RoomMain = ({ user, stream }: RoomMainProps) => {
           </div>
         </div>
         {/* 다른 참가자 스트리밍 */}
-        {/* {Object.entries(connectList).map(([from, stream]) => ( */}
-        {/* // <StreamBox from={from} stream={stream} /> */}
-        {/* ))} */}
+        {Object.entries(connects).map(([from, stream]) => (
+          <FriendStream from={from} stream={stream} />
+        ))}
       </ul>
       {/* main footer */}
       <footer className="streamRoom_footer">
@@ -113,6 +121,7 @@ export const RoomMain = ({ user, stream }: RoomMainProps) => {
             <span>{video ? "비디오" : "비디오 해제"}</span>
           </button>
         </div>
+
         {/* 비디오 메뉴 */}
         <div className="room_options">
           <button>
@@ -121,8 +130,13 @@ export const RoomMain = ({ user, stream }: RoomMainProps) => {
           </button>
 
           <button>
-            <i className="fa-solid fa-desktop"></i>
+            <i className="fa-brands fa-creative-commons-share"></i>
             <span>화면공유</span>
+          </button>
+
+          <button>
+            <i className="fa-solid fa-desktop"></i>
+            <span>내 미디어</span>
           </button>
 
           <button onClick={() => emitter.emit("room menu", true)}>

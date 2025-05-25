@@ -8,13 +8,22 @@ import "../../../css/room/menu/menu.css";
 // component
 import { Chat } from "./chat";
 import { Participants } from "./participants";
+import { User } from "../../../types/user";
+import { Room } from "../../../types/room";
 
-export const Menu = () => {
+interface MenuProps {
+  user: User;
+  connects: object;
+  participants: Room["participants"];
+}
+
+export const Menu = ({ user, connects, participants }: MenuProps) => {
   let [menu, setMenu] = useState<{
     state: boolean;
     content: "participants" | "chat";
   }>({ state: false, content: "participants" });
 
+  // menu 열고 닫기
   useEffect(() => {
     const handler = (state: boolean) => setMenu((c) => ({ ...c, state }));
     emitter.on("room menu", handler);
@@ -50,7 +59,17 @@ export const Menu = () => {
         </div>
         <ul className="pwf-streamRoom_menu_content">
           {/* 참가자 채팅창 */}
-          {menu.content == "chat" ? <Chat /> : <Participants />}
+
+          <Chat
+            user={user}
+            connects={connects}
+            state={menu.content == "chat"}
+          />
+          <Participants
+            user={user}
+            state={menu.content == "participants"}
+            participants={participants}
+          />
         </ul>
       </div>
     </div>

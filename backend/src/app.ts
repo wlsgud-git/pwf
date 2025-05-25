@@ -3,8 +3,10 @@ import express, { Application, NextFunction, Request, Response } from "express";
 import path from "path";
 import bodyParser from "body-parser";
 import cors from "cors";
+import fs from "fs";
 import cookieParser from "cookie-parser";
 import { createServer } from "http";
+import https from "https";
 
 // other file
 import { config } from "../config";
@@ -13,16 +15,23 @@ import { initSocket } from "./util/socket";
 // types
 import { corsProps } from "../types/http";
 
-const app: Application = express();
-export const HttpServer = createServer(app);
-// const server =
+// option ---------------------------
 const corsOption: corsProps = {
   credentials: true,
   optionsSuccessStatus: 200,
   origin: config.http.host,
 };
 
-// middleware
+const httpsOption = {
+  key: fs.readFileSync("./cert/key.pem"),
+  cert: fs.readFileSync("./cert/cert.pem"),
+};
+
+const app: Application = express();
+export const HttpServer = createServer(app);
+export const HttpsServer = https.createServer(httpsOption, app);
+
+// middleware --------------------------
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -45,6 +54,10 @@ app.get("*", (req: Request, res: Response) => {
 
 initSocket();
 
-HttpServer.listen(config.http.port, () => {
-  console.log(`pwf start with ${config.http.port}`);
+// HttpServer.listen(config.http.port, () => {
+//   console.log(`pwf start with ${config.http.port}`);
+// });
+
+HttpsServer.listen(config.http.https_port, () => {
+  console.log(`pwf start with ${config.http.https_port}`);
 });

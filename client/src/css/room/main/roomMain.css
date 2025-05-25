@@ -7,7 +7,6 @@
 }
 
 .user_screen_lists {
-  border: 1px solid red;
   display: flex;
   width: 100%;
   height: calc(100% - var(--streamroom-footer-height));
@@ -46,9 +45,7 @@
 .user_video_box video {
   width: 100%;
   height: 100%;
-
   object-fit: cover;
-  border: 1px solid red;
 }
 
 .user_info_box {

@@ -1,14 +1,14 @@
 import { useEffect, useRef } from "react";
 
 // interface
-import { StreamInfomation } from "../../types/room";
+import { PeerConnects } from "../../types/room";
 
 export const FriendStream = ({
   from,
   stream,
 }: {
   from: string;
-  stream: StreamInfomation;
+  stream: any;
 }) => {
   let videoRef = useRef<HTMLVideoElement | null>(null);
 
