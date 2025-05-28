@@ -48,6 +48,7 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
     });
   };
 
+  // 화면 공유 과정
   let changeProcess = (
     streamTrack: MediaStreamTrack | undefined,
     stream: MediaStream | null,
@@ -56,8 +57,9 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
     state
       ? socketClient.emit("share screen", roomId, user.nickname)
       : socketClient.emit("share screen off", roomId);
-    trackChange(streamTrack);
+
     setShareStream(stream);
+    trackChange(streamTrack);
     setOtherShare((c) => ({ ...c, state }));
   };
 
@@ -75,9 +77,32 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
 
     changeProcess(streamTrack, s_stream, true);
 
-    streamTrack.onended = () =>
+    streamTrack.onended = () => {
       changeProcess(stream?.getVideoTracks()[0], null, false);
+    };
   };
+
+  // 상대가 화면 공유 시작시 상대방의 비디오 트랙을 shareSTream으로 설정
+  useEffect(() => {
+    let con = Object.entries(connects);
+    if (con.length && otherShare.state && otherShare.nickname !== "") {
+      let shareInfo = con.find(([from, info]) => from === otherShare.nickname);
+      if (shareInfo) {
+        let info = shareInfo[1];
+        info.pc.getReceivers().forEach((receive: any) => {
+          setShareStream(new MediaStream([receive.track]));
+        });
+      }
+    }
+  }, [connects, otherShare.nickname]);
+
+  // 공유 스트림이 변경되면 공유 ref.srcObject 변경
+  useEffect(() => {
+    if (shareStream && shareStreamRef.current) {
+      console.log("share stream change");
+      shareStreamRef.current.srcObject = shareStream;
+    }
+  }, [shareStream]);
 
   // 다른 사용자가 화면 공유를 시작함
   let otherScreenShare = (from: string) => {
@@ -87,7 +112,7 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
   // 다른 사용자가 화면 공유를 종료함
   let otherSCreenShareOFf = () => {
     setShareStream(null);
-    setOtherShare((c) => ({ ...c, state: false }));
+    setOtherShare((c) => ({ ...c, state: false, nickname: "" }));
   };
 
   // 화면 on/off
@@ -135,29 +160,6 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
       socketClient.on("share screen off", otherSCreenShareOFf);
     };
   }, []);
-
-  useEffect(() => {
-    let con = Object.entries(connects);
-    if (con.length && otherShare.state) {
-      let shareInfo = con.find(([from, info]) => from === otherShare.nickname);
-      if (shareInfo) {
-        let info = shareInfo[1];
-        info.pc.getReceivers().forEach((receive: any) => {
-          setShareStream(new MediaStream([receive.track]));
-        });
-      }
-    }
-  }, [connects, otherShare.state]);
-
-  useEffect(() => {
-    if (shareStream) {
-      console.log("change share stream", shareStream);
-      shareStreamRef.current!.srcObject = shareStream;
-      shareStreamRef.current!.onload = () => {
-        shareStreamRef.current!.play();
-      };
-    }
-  }, [shareStream]);
 
   return (
     <div className="pwf-streamRoom_container">
@@ -239,9 +241,12 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
             <span>초대</span>
           </button>
 
-          <button onClick={ShareStart}>
+          <button
+            onClick={ShareStart}
+            style={{ color: otherShare.state ? "var(--pwf-blue)" : "white" }}
+          >
             <i className="fa-brands fa-creative-commons-share"></i>
-            <span>{`화면공유${otherShare.state ? "X" : ""}`}</span>
+            <span>화면공유</span>
           </button>
 
           <button>
