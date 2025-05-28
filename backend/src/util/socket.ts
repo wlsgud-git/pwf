@@ -12,7 +12,7 @@ import { p2pSignalling } from "../middleware/user";
 let io: any = null;
 
 export function initSocket() {
-  io = new Server(HttpsServer, {
+  io = new Server(HttpServer, {
     cors: {
       origin: config.socket.client_url,
       methods: ["get", "post"],

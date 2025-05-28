@@ -36,7 +36,7 @@ router.post(
 ); // 회원가입시 유저정보 확인
 
 // login -----------------------------
-router.post("/login", loginValidate, loginControl); //로그인
+router.post("/login", loginControl); //로그인
 router.post("/logout", logoutControl); //로그아웃
 
 // requestFriend ------------------------

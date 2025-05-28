@@ -3,7 +3,7 @@ import { User } from "../types/user";
 import { AppDispatch } from "../context/store";
 import { insertReceiver, onlineUpdate } from "../context/reducer/userReducer";
 
-export const socketClient: Socket = io("http://localhost:5000", {
+export const socketClient: Socket = io(process.env.REACT_APP_BASEURL, {
   reconnection: true,
   reconnectionAttempts: 5,
   reconnectionDelay: 1000,

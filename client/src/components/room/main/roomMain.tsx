@@ -11,6 +11,7 @@ import "../../../css/room/main/roomMain.css";
 import { User } from "../../../types/user";
 import { PeerConnects } from "../../../types/room";
 import { FriendStream } from "../friendStream";
+import { info } from "console";
 
 interface RoomMainProps {
   user: User;
@@ -26,20 +27,68 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
   let localRef = useRef<HTMLVideoElement | null>(null);
   let localStreamRef = useRef<MediaStream | null>(null);
 
+  let shareStreamRef = useRef<HTMLVideoElement | null>(null);
+
   let [audio, setAudio] = useState<boolean>(true);
   let [video, setVideo] = useState<boolean>(true);
 
-  // 스트림 ref 설정
-  useEffect(() => {
-    if (stream) {
-      localRef.current!.srcObject = stream;
-      localStreamRef.current = stream;
-    }
-  }, [stream]);
+  let [otherShare, setOtherShare] = useState<{
+    state: boolean;
+    nickname: string;
+  }>({ state: false, nickname: "" });
+  let [shareStream, setShareStream] = useState<MediaStream | null>(null);
 
-  useEffect(() => {
-    // console.log(connects);
-  }, [connects]);
+  // 다른 사용자 트랙 변경
+  let trackChange = (stream: any) => {
+    Object.entries(connects).forEach(([from, info]) => {
+      let sender = info.pc
+        .getSenders()
+        .find((s: any) => s.track.kind == "video");
+      if (sender) sender.replaceTrack(stream);
+    });
+  };
+
+  let changeProcess = (
+    streamTrack: MediaStreamTrack | undefined,
+    stream: MediaStream | null,
+    state: boolean
+  ) => {
+    state
+      ? socketClient.emit("share screen", roomId, user.nickname)
+      : socketClient.emit("share screen off", roomId);
+    trackChange(streamTrack);
+    setShareStream(stream);
+    setOtherShare((c) => ({ ...c, state }));
+  };
+
+  //내 화면 공유 시작
+  let ShareStart = async () => {
+    if (otherShare.state) {
+      alert("다른 이가 화면공유 중입니다");
+      return;
+    }
+
+    let s_stream = await navigator.mediaDevices.getDisplayMedia({
+      video: true,
+    });
+    let streamTrack = s_stream.getVideoTracks()[0];
+
+    changeProcess(streamTrack, s_stream, true);
+
+    streamTrack.onended = () =>
+      changeProcess(stream?.getVideoTracks()[0], null, false);
+  };
+
+  // 다른 사용자가 화면 공유를 시작함
+  let otherScreenShare = (from: string) => {
+    setOtherShare((c) => ({ ...c, state: true, nickname: from }));
+  };
+
+  // 다른 사용자가 화면 공유를 종료함
+  let otherSCreenShareOFf = () => {
+    setShareStream(null);
+    setOtherShare((c) => ({ ...c, state: false }));
+  };
 
   // 화면 on/off
   let toggleMedia = (type: "audio" | "video") => {
@@ -66,41 +115,102 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
     }
   };
 
+  // useEffect ---------------
+
+  // 스트림 ref 설정
+  useEffect(() => {
+    if (stream) {
+      localRef.current!.srcObject = stream;
+      localStreamRef.current = stream;
+    }
+  }, [stream]);
+
+  // 화면공유 소켓 초기화
+  useEffect(() => {
+    socketClient.on("share screen", otherScreenShare);
+    socketClient.on("share screen off", otherSCreenShareOFf);
+
+    return () => {
+      socketClient.off("share screen", otherScreenShare);
+      socketClient.on("share screen off", otherSCreenShareOFf);
+    };
+  }, []);
+
+  useEffect(() => {
+    let con = Object.entries(connects);
+    if (con.length && otherShare.state) {
+      let shareInfo = con.find(([from, info]) => from === otherShare.nickname);
+      if (shareInfo) {
+        let info = shareInfo[1];
+        info.pc.getReceivers().forEach((receive: any) => {
+          setShareStream(new MediaStream([receive.track]));
+        });
+      }
+    }
+  }, [connects, otherShare.state]);
+
+  useEffect(() => {
+    if (shareStream) {
+      console.log("change share stream", shareStream);
+      shareStreamRef.current!.srcObject = shareStream;
+      shareStreamRef.current!.onload = () => {
+        shareStreamRef.current!.play();
+      };
+    }
+  }, [shareStream]);
+
   return (
     <div className="pwf-streamRoom_container">
       {/* 화면창 */}
-      <ul className="user_screen_lists">
-        {/* 내 화면 */}
-        <div className="user_video_box">
-          {/* 유저 비디오 */}
+      <div className="pwf-screen_container">
+        {/* p2p 연결화면들 */}
+        <ul className={otherShare.state ? "share" : "user_screen_lists"}>
+          {/* 내 화면 */}
+          <div className="user_video_box">
+            {/* 유저 비디오 */}
+            <video
+              ref={localRef}
+              autoPlay
+              playsInline
+              className="user_video"
+            ></video>
+            {/* 유저 정보 */}
+            <div className="user_info_box">
+              <div>
+                <span>
+                  <i
+                    className={`fa-solid fa-microphone-lines${
+                      audio ? "" : "-slash"
+                    }`}
+                  ></i>
+                </span>
+                <span>
+                  <i
+                    className={`fa-solid fa-video${video ? "" : "-slash"}`}
+                  ></i>
+                </span>
+              </div>
+              <span>{user.nickname}</span>
+            </div>
+          </div>
+          {/* 다른 참가자 스트리밍 */}
+          {Object.entries(connects).map(([from, stream]) => (
+            <FriendStream from={from} stream={stream} />
+          ))}
+        </ul>
+        {/* 화면 공유시 공유창 */}
+        <div
+          className="share_screen_container"
+          style={{ display: otherShare.state ? "flex" : "none" }}
+        >
           <video
-            ref={localRef}
+            ref={shareStreamRef}
             autoPlay
             playsInline
-            className="user_video"
+            className="share_video"
           ></video>
-          {/* 유저 정보 */}
-          <div className="user_info_box">
-            <div>
-              <span>
-                <i
-                  className={`fa-solid fa-microphone-lines${
-                    audio ? "" : "-slash"
-                  }`}
-                ></i>
-              </span>
-              <span>
-                <i className={`fa-solid fa-video${video ? "" : "-slash"}`}></i>
-              </span>
-            </div>
-            <span>{user.nickname}</span>
-          </div>
         </div>
-        {/* 다른 참가자 스트리밍 */}
-        {Object.entries(connects).map(([from, stream]) => (
-          <FriendStream from={from} stream={stream} />
-        ))}
-      </ul>
+      </div>
       {/* main footer */}
       <footer className="streamRoom_footer">
         {/* 유저 음성 및 비디오 */}
@@ -129,9 +239,9 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
             <span>초대</span>
           </button>
 
-          <button>
+          <button onClick={ShareStart}>
             <i className="fa-brands fa-creative-commons-share"></i>
-            <span>화면공유</span>
+            <span>{`화면공유${otherShare.state ? "X" : ""}`}</span>
           </button>
 
           <button>

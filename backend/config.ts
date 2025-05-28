@@ -9,9 +9,10 @@ const required = (key: string, defaultValue?: undefined) => {
 
 export let config = {
   http: {
-    port: parseInt(required("PORT")),
+    http_port: parseInt(required("HTTP_PORT")),
+    http_host: required("HTTP_HOST"),
+
     https_port: parseInt(required("HTTPS_PORT")),
-    host: required("HTTP_HOST"),
     https_host: required("HTTPS_HOST"),
   },
 

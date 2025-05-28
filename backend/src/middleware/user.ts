@@ -14,12 +14,23 @@ export const p2pSignalling = async (socket: Socket, user: User) => {
     // socket.to(room_id).emit("other join", user.nickname);
   });
 
+  // 오디오/비디오 트랙 컨트롤
   socket.on(
     "toggle track",
     (room_id: string, to: string, type: "audio" | "video", state: boolean) => {
       socket.to(room_id).emit("toggle track", to, type, state);
     }
   );
+
+  // 화면 공유
+  socket.on("share screen", (room_id: string, from: string) => {
+    socket.to(room_id).emit("share screen", from);
+  });
+
+  // 화면 공유 종료
+  socket.on("share screen off", (room_id: string) => {
+    socket.to(room_id).emit("share screen off", `${room_id}화면 공유 종료`);
+  });
 
   //   offer
   socket.on(

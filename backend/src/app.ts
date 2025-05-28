@@ -19,7 +19,7 @@ import { corsProps } from "../types/http";
 const corsOption: corsProps = {
   credentials: true,
   optionsSuccessStatus: 200,
-  origin: config.http.host,
+  origin: config.http.http_host,
 };
 
 const httpsOption = {
@@ -54,10 +54,10 @@ app.get("*", (req: Request, res: Response) => {
 
 initSocket();
 
-// HttpServer.listen(config.http.port, () => {
-//   console.log(`pwf start with ${config.http.port}`);
-// });
-
-HttpsServer.listen(config.http.https_port, () => {
-  console.log(`pwf start with ${config.http.https_port}`);
+HttpServer.listen(config.http.http_port, () => {
+  console.log(`pwf start with ${config.http.http_port}`);
 });
+
+// HttpsServer.listen(config.http.https_port, () => {
+//   console.log(`pwf start with ${config.http.https_port}`);
+// });
