@@ -15,6 +15,7 @@
   --pwf-error-color: #fef2f2;
   --pwf-notactive-blue: rgb(62, 62, 180);
   --pwf-background-transparent: rgb(0, 0, 0, 0.6);
+  --pwf-background-transparent-light: rgba(0, 0, 0, 0.1);
 
   /* streaming room */
   --pwf-menu-width: 370px;

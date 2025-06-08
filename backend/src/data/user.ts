@@ -71,7 +71,7 @@ export const requestFriend = async (
   state: boolean
 ) => {
   try {
-    let query = `insert into requestFriend values($1, $2, $3)`;
+    let query = `insert into requestFriend values($1, $2, $3) where not exists ( select 1 from requestFriend )`;
     let data = [res_nickname, req_nickname, state];
     return await dbPlay<null>(query, data);
   } catch (err) {

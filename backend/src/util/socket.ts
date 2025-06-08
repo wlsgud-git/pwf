@@ -1,7 +1,7 @@
 import { Socket, Server } from "socket.io";
 import { redisGet } from "./redis";
 
-import { HttpServer, HttpsServer } from "../app";
+import { HttpsServer } from "../app";
 import { config } from "../../config";
 import { NextFunction } from "express";
 
@@ -12,7 +12,7 @@ import { p2pSignalling } from "../middleware/user";
 let io: any = null;
 
 export function initSocket() {
-  io = new Server(HttpServer, {
+  io = new Server(HttpsServer, {
     cors: {
       origin: config.socket.client_url,
       methods: ["get", "post"],

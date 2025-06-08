@@ -8,7 +8,7 @@ import { LoginError } from "../types/auth";
 import { errorHandling } from "../error/error";
 import { user_service } from "../service/userservice";
 import { createFormData } from "../util/form";
-import { socketClient } from "../util/socket";
+import { emitter } from "../util/event";
 
 export const Login = () => {
   let navigate = useNavigate();
@@ -22,6 +22,7 @@ export const Login = () => {
     error: false,
     msg: "",
   });
+  let [showPw, setShowPw] = useState<boolean>(false);
 
   // 로그인 에러 핸들
   const loginErrorHandler = (type: string, msg: string) => {
@@ -76,22 +77,31 @@ export const Login = () => {
           </div>
           {/* 로그인 정보 (폼) */}
           <form action="post" onSubmit={loginSubmit}>
-            <input
-              type="email"
-              spellCheck={false}
-              placeholder="이메일"
-              ref={emailRef}
-              value={email}
-              onChange={(e: InputChange) => setEmail(e.target.value)}
-            />
-            <input
-              type="password"
-              value={password}
-              ref={passwordRef}
-              placeholder="비밀번호"
-              onChange={(e: InputChange) => setPassword(e.target.value)}
-            />
-            <button disabled={loading}>
+            {/* 이메일 */}
+            <div>
+              <input
+                type="email"
+                spellCheck={false}
+                placeholder="이메일"
+                ref={emailRef}
+                value={email}
+                onChange={(e: InputChange) => setEmail(e.target.value)}
+              />
+            </div>
+            {/* 비밀번호 */}
+            <div className="password_box">
+              <input
+                type={showPw ? "text" : "password"}
+                value={password}
+                ref={passwordRef}
+                placeholder="비밀번호"
+                onChange={(e: InputChange) => setPassword(e.target.value)}
+              />
+              <button type="button" onClick={() => setShowPw(!showPw)}>
+                <i className={`fa-solid fa-eye${showPw ? "-slash" : ""}`}></i>
+              </button>
+            </div>
+            <button className="login_btn" disabled={loading}>
               {loading ? "진행중..." : "로그인"}{" "}
             </button>
           </form>
@@ -100,7 +110,13 @@ export const Login = () => {
         <footer className="login_footer">
           <Link to="/signup">회원가입</Link>
 
-          <Link to="/">비밀번호 찾기</Link>
+          <span
+            onClick={() =>
+              emitter.emit("modal", { type: "password", open: true })
+            }
+          >
+            비밀번호 찾기
+          </span>
         </footer>
       </div>
     </div>

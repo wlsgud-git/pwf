@@ -1,6 +1,7 @@
 import axios, { Axios, AxiosInstance } from "axios";
 
 import { HttpRequest, HttpResponse } from "../types/http";
+// import { config } from "";
 
 export class HttpClient {
   baseURL: string | undefined;
@@ -33,7 +34,6 @@ export class HttpClient {
       let res = await this.client(req);
       return res.data;
     } catch (err) {
-      console.log("error is:", err);
       throw err;
     }
   }

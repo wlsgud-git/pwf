@@ -12,6 +12,7 @@ import { redisGet, redisSet } from "../util/redis";
 import { AuthcodeError, SignupError } from "../../types/auth";
 import { emailValidate } from "../validation/auth";
 import { RequestQuery } from "../../types/http";
+import { verifyJwt } from "../util/jwt";
 
 // Authentication Or Authorization --------------------------
 // 유저 인가
@@ -42,6 +43,7 @@ export const emailOverlapCheck: RequestHandler = async (req, res) => {
     res.status(400).json(error);
   }
 };
+
 // 닉네임 중복검사
 export const nicknameOverlapCheck: RequestHandler = async (req, res) => {
   let { nickname } = req.body;
@@ -55,6 +57,18 @@ export const nicknameOverlapCheck: RequestHandler = async (req, res) => {
     res.status(200).json(user[0]);
   } catch (error) {
     res.status(400).json(error);
+  }
+};
+
+export const csrfProtection: RequestHandler = async (req, res, next) => {
+  try {
+    let token = req.cookies["csrf_token"];
+    let result = await verifyJwt(token);
+
+    if (!result) throw new Error("csrf_token 갱신이 필요합니다");
+    next();
+  } catch (err) {
+    res.status(400).json({ message: err });
   }
 };
 

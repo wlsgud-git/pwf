@@ -2,11 +2,12 @@
 :root {
   /* room main */
 
-  --video-screen-width: 300px;
-  --video-screen-height: 200px;
+  --video-screen-width: 280px;
+  --video-screen-height: 180px;
 
   --video-share-screen-width: 160px;
-  --video-share-screen-height: 90px;
+  --video-share-screen-height: 95px;
+  --video-share-screen-padding: 25px;
 
   /* footer */
   --streamroom-footer-height: 60px;

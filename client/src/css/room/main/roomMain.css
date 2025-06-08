@@ -28,15 +28,6 @@
   justify-content: center;
 }
 
-.share {
-  border: 1px solid;
-  height: calc(40px + var(--video-share-screen-height));
-  width: 100%;
-  flex-direction: row;
-  overflow-x: auto;
-  justify-content: start;
-}
-
 .user_screen_lists::-webkit-scrollbar {
   width: var(--scroll-size);
 }
@@ -49,6 +40,22 @@
 .user_screen_lists::-webkit-scrollbar-thumb {
   background-color: var(--pwf-gray);
   border-radius: 10px;
+}
+
+.user_screen_lists .user_video_box {
+  width: var(--video-screen-width);
+  height: var(--video-screen-height);
+}
+
+/* 화면 공유시 바뀌는 참가자들 이미지 사이즈 */
+.share {
+  height: calc(
+    var(--video-share-screen-padding) + var(--video-share-screen-height)
+  );
+  width: 100%;
+  flex-direction: row;
+  overflow-x: auto;
+  justify-content: start;
 }
 
 .share::-webkit-scrollbar {
@@ -66,16 +73,13 @@
 }
 
 .share .user_video_box {
-  min-width: var(--video-share-screen-width);
-  max-width: var(--video-share-screen-width);
+  width: var(--video-share-screen-width);
   height: var(--video-share-screen-height);
 }
 
 /* 비디오 화면 부분 */
 .user_video_box {
-  width: var(--video-screen-width);
-  height: var(--video-screen-height);
-  margin: 10px;
+  margin: 5px;
   display: flex;
   flex-direction: column;
   border-radius: 10px;
@@ -96,30 +100,41 @@
   left: 0;
   color: var(--pwf-white);
   width: 100%;
-  height: 24px;
+  height: 20%;
   display: flex;
+  padding: 0px 5px;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.1);
+  font-size: 13px;
+  background-color: var(--pwf-background-transparent-light);
 }
 
-.user_info_box div {
-  margin-right: 10px;
-}
-
-.user_info_box div span {
-  padding: 0px 6px;
+.user_info_box span {
+  margin: 0px 4px;
 }
 
 /* 화면공유 화면 */
 .share_screen_container {
   width: 100%;
-  height: calc(100% - var(--video-share-screen-height));
+  position: relative;
+  height: calc(
+    100% - var(--video-share-screen-height) - var(--video-share-screen-padding)
+  );
 }
 
 .share_video {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.share_user_nickname {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 6px 8px;
+  color: var(--pwf-white);
+  font-weight: 600;
+  background-color: var(--pwf-background-transparent-light);
 }
 
 /* footer section */

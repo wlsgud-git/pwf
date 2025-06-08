@@ -4,22 +4,26 @@ import "../css/pageheader.css";
 
 import React, { memo, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { userInit } from "../context/reducer/userReducer";
 
-import Head from "../image/head.jpg";
 import { emitter } from "../util/event";
 import { useSelector } from "react-redux";
-import { RootState } from "../context/store";
+import { AppDispatch, persistor, RootState } from "../context/store";
 import { user_service } from "../service/userservice";
 import { socketClient } from "../util/socket";
+import { useDispatch } from "react-redux";
 
 export const PageHeader = () => {
   let navigate = useNavigate();
   let user = useSelector((state: RootState) => state.user);
+  let dispatch = useDispatch<AppDispatch>();
   let [userOption, setUserOption] = useState<boolean>(false);
 
   const logout = async () => {
     try {
       await user_service.logout();
+      dispatch(userInit());
+      // persistor.purge();
       socketClient.disconnect();
       navigate("/login");
     } catch (err) {
@@ -76,10 +80,18 @@ export const PageHeader = () => {
             className="check_box"
             style={{ display: userOption ? "flex" : "none" }}
           >
-            <button onMouseDown={() => emitter.emit("modal", "profile")}>
-              내 프로필
+            <button
+              onMouseDown={() =>
+                emitter.emit("modal", { type: "profile", open: true })
+              }
+            >
+              <i className="fa-solid fa-user"></i>
+              <span>프로필</span>
             </button>
-            <button onMouseDown={logout}>로그아웃</button>
+            <button onMouseDown={logout}>
+              <i className="fa-solid fa-right-from-bracket"></i>
+              <span>로그아웃</span>
+            </button>
           </div>
         </div>
       </div>

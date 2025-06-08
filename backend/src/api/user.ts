@@ -7,6 +7,7 @@ import {
   nicknameOverlapCheck,
   authcodeCheck,
   IsAuth,
+  csrfProtection,
 } from "../middleware/auth";
 
 // controller
@@ -40,10 +41,20 @@ router.post("/login", loginControl); //로그인
 router.post("/logout", logoutControl); //로그아웃
 
 // requestFriend ------------------------
-router.post("/request/friend", requestFriendWithNickname); //친구요청 전송
-router.post("/request/friend/response", handleRequestFriend); //친구요청 수락/거절
+router.post(
+  "/request/friend",
+  IsAuth,
+  csrfProtection,
+  requestFriendWithNickname
+); //친구요청 전송
+router.post(
+  "/request/friend/response",
+  IsAuth,
+  csrfProtection,
+  handleRequestFriend
+); //친구요청 수락/거절
 
-// 인증코드 전송 ---- nodemailer send Authdo -
+// authcode -------------------------------
 router.post("/send_authcode", sendAuthcodeWithEmail);
 
 module.exports = router;

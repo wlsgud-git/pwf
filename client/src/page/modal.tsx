@@ -8,11 +8,19 @@ import { RootState } from "../context/store";
 import { Friend } from "../components/modal/friend";
 import { StreamRoom } from "../components/modal/streamRoom";
 import { Profile } from "../components/modal/profile";
+import { Invitation } from "../components/modal/invitaion";
+
+export type ModalList =
+  | "friend"
+  | "profile"
+  | "invitation"
+  | "stream"
+  | "password";
 
 export const Modal = () => {
   let user = useSelector((state: RootState) => state.user);
   let [open, setOpen] = useState<boolean>(false);
-  let [content, setContent] = useState<string>("");
+  let [content, setContent] = useState<ModalList>("friend");
 
   // modal control
   useEffect(() => {
@@ -20,9 +28,10 @@ export const Modal = () => {
       type,
       open = false,
     }: {
-      type: string;
+      type: ModalList;
       open?: boolean;
     }) => {
+      console.log("modal hi");
       setOpen(open);
       setContent(type);
     };
@@ -34,10 +43,6 @@ export const Modal = () => {
     };
   }, []);
 
-  //   useEffect(() => {
-  //     console.log(content);
-  //   }, [content]);
-
   return (
     <div className="modal_box" style={{ display: open ? "flex" : "none" }}>
       <div className="modal_content">
@@ -45,6 +50,7 @@ export const Modal = () => {
         <Friend user={user} type={content} />
         <StreamRoom user={user} type={content} />
         <Profile user={user} type={content} />
+        <Invitation user={user} type={content} />
       </div>
     </div>
   );

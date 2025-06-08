@@ -139,7 +139,14 @@ export const StreamRoom = ({ user, type }: CompoentProps) => {
           {/* 참여자 목록 */}
           <div className="participants_box">
             <label htmlFor="participants">참여자 {inviteUsers.length}</label>
-            <ul className="participants_list">
+            <ul
+              className="participants_list"
+              style={{
+                border: inviteUsers.length
+                  ? "1px solid var(--pwf-white)"
+                  : "none",
+              }}
+            >
               {inviteUsers.length ? (
                 inviteUsers.map((val) => <li>{val.nickname}</li>)
               ) : (

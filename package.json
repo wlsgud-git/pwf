@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/pg": "^8.11.11",
+    "jsonwebtoken": "^9.0.2",
     "react-router-dom": "^7.4.0"
   }
 }

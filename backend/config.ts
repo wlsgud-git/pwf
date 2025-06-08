@@ -8,12 +8,9 @@ const required = (key: string, defaultValue?: undefined) => {
 };
 
 export let config = {
-  http: {
-    http_port: parseInt(required("HTTP_PORT")),
-    http_host: required("HTTP_HOST"),
-
-    https_port: parseInt(required("HTTPS_PORT")),
-    https_host: required("HTTPS_HOST"),
+  https: {
+    port: parseInt(required("PORT"), 8443),
+    host: required("HOST"),
   },
 
   database: {
@@ -45,5 +42,11 @@ export let config = {
 
   session: {
     session_expire: parseInt(required("SESSION_EXPIRE")),
+  },
+
+  jwt: {
+    secret_key: required("JWT_SECRET_KEY"),
+    access_expires: required("JWT_ACCESS_EXPIRES"),
+    refresh_expires: required("JWT_REFRESH_EXPRIES"),
   },
 };

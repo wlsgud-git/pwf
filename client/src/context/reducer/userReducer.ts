@@ -43,7 +43,11 @@ const userSlice = createSlice({
 
       return { ...current, friends: [...current.friends, data.payload] };
     },
-  }, // actions
+
+    userInit: () => initialState,
+  },
+
+  // actions
   extraReducers: (builder) => {
     // 세션으로 유저 정보 가져오기
     builder.addCase(userAction.getUserAction.fulfilled, (state, action) => {
@@ -88,5 +92,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { onlineUpdate, insertReceiver } = userSlice.actions;
+export const { onlineUpdate, insertReceiver, userInit } = userSlice.actions;
 export default userSlice.reducer;

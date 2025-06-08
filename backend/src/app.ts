@@ -5,8 +5,8 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import fs from "fs";
 import cookieParser from "cookie-parser";
-import { createServer } from "http";
 import https from "https";
+import helmet from "helmet";
 
 // other file
 import { config } from "../config";
@@ -19,22 +19,22 @@ import { corsProps } from "../types/http";
 const corsOption: corsProps = {
   credentials: true,
   optionsSuccessStatus: 200,
-  origin: config.http.http_host,
+  origin: config.https.host,
 };
 
 const httpsOption = {
-  key: fs.readFileSync("./cert/key.pem"),
-  cert: fs.readFileSync("./cert/cert.pem"),
+  key: fs.readFileSync(path.resolve(__dirname, "./cert/key.pem")),
+  cert: fs.readFileSync(path.resolve(__dirname, "./cert/cert.pem")),
 };
 
 const app: Application = express();
-export const HttpServer = createServer(app);
 export const HttpsServer = https.createServer(httpsOption, app);
 
 // middleware --------------------------
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(helmet());
 app.use(cors(corsOption));
 app.use(express.static(path.join(__dirname, "../../client/build")));
 
@@ -43,6 +43,11 @@ const StreamRoomApi = require("./api/streamRoom");
 
 app.use("/", UserApi);
 app.use("/", StreamRoomApi);
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log("hi");
+  next();
+});
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ message: "fuck" });
@@ -54,10 +59,6 @@ app.get("*", (req: Request, res: Response) => {
 
 initSocket();
 
-HttpServer.listen(config.http.http_port, () => {
-  console.log(`pwf start with ${config.http.http_port}`);
+HttpsServer.listen(8443, () => {
+  console.log(`pwf start with ${8443}`);
 });
-
-// HttpsServer.listen(config.http.https_port, () => {
-//   console.log(`pwf start with ${config.http.https_port}`);
-// });

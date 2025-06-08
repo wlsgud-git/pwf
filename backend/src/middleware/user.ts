@@ -58,7 +58,6 @@ export const p2pSignalling = async (socket: Socket, user: User) => {
 
   // room exit
   socket.on("leave room", (who: string, room_id: string) => {
-    console.log(who, room_id);
     socket.to(room_id).emit("leave room", who);
     socket.leave(room_id);
   });

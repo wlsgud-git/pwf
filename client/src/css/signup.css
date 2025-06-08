@@ -156,13 +156,20 @@
   align-items: start;
 }
 
-.signup_content input {
+.signup_input_box div {
   width: 100%;
-  padding: 8px 8px;
+  display: flex;
   border: 1px solid var(--pwf-gray);
+  margin-bottom: 5px;
+}
+
+.signup_input_box input {
+  flex: 1;
+  padding: 8px 8px;
+  border: none;
+  outline: none;
   background-color: inherit;
   color: var(--pwf-white);
-  margin-bottom: 5px;
 }
 
 .signup_error {
@@ -170,7 +177,16 @@
   font-size: 12px;
 }
 
-.signup_content button {
+.pw_show_btn {
+  padding: 0px 3px;
+  margin: 0px 5px;
+  background-color: inherit;
+  color: var(--pwf-white);
+  border: none;
+  outline: none;
+}
+
+.signup_btn {
   width: 100%;
   /* background-color: var(--pwf-blue); */
   background-color: var(--pwf-blue);

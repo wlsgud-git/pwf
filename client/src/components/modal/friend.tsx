@@ -87,6 +87,7 @@ export const Friend = ({ user, type }: ComponentProps) => {
         req_nickname: user.nickname,
         state: false,
       });
+      console.log("request sending");
       let res = await user_service.requestFriend(formdata);
       alert(`${nickname}에게 친구요청이 전송되었습니다`);
       setNickname("");

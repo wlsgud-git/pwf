@@ -65,16 +65,32 @@
   padding: 25px 20px;
 }
 
-.login_content input {
+.login_content form div {
+  display: flex;
   width: 100%;
-  padding: 8px 8px;
-  border: 1px solid var(--pwf-gray);
-  background-color: inherit;
-  color: var(--pwf-white);
   margin-bottom: 10px;
+  border: 1px solid var(--pwf-gray);
+  align-items: center;
 }
 
-.login_content button {
+.login_content input {
+  flex: 1;
+  border: none;
+  padding: 8px 8px;
+  background-color: inherit;
+  color: var(--pwf-white);
+  outline: none;
+}
+
+.password_box button {
+  color: var(--pwf-white);
+  background-color: inherit;
+  border: none;
+  padding: 4px;
+  margin: 0px 3px;
+}
+
+.login_btn {
   width: 100%;
   background-color: var(--pwf-blue);
   border-radius: 6px;
@@ -88,7 +104,7 @@
   outline: none;
 }
 
-.login_content button:hover {
+.login_btn:hover {
   text-decoration: underline;
 }
 
@@ -107,12 +123,15 @@
   margin: 8px;
 } */
 
-.login_footer a {
+.login_footer a,
+.login_footer span {
   font-size: 14px;
   color: var(--pwf-gray);
   margin: 0px 5px;
+  cursor: pointer;
 }
 
-.login_footer a:hover {
+.login_footer a:hover,
+.login_footer span:hover {
   text-decoration: underline;
 }

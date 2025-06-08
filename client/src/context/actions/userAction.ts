@@ -24,15 +24,19 @@ class UserAction extends userService {
       }
     }
   );
+
   // 유저 정보 불러오기
-  getUserAction = createAsyncThunk("user/fetchUser", async (): Promise<any> => {
-    try {
-      let res = await this.getUser();
-      return await res!;
-    } catch (error) {
-      window.location.href = "/login";
+  getUserAction = createAsyncThunk(
+    "user/fetchUser",
+    async (_, { rejectWithValue }): Promise<any> => {
+      try {
+        let res = await this.getUser();
+        return await res!;
+      } catch (error: any) {
+        return rejectWithValue(error.response!.data || "unknown error");
+      }
     }
-  });
+  );
 }
 
 export let userAction = new UserAction();

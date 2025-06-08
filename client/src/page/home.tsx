@@ -2,7 +2,7 @@
 import "../css/home.css";
 
 import { emitter } from "../util/event";
-import { lazy, Suspense, useEffect, useMemo } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { AppDispatch, RootState } from "../context/store";
 import { useDispatch, useSelector } from "react-redux";
 import { userAction } from "../context/actions/userAction";
@@ -25,11 +25,6 @@ const StreamRoomLi = lazy(() =>
 export const Home = () => {
   let dispatch = useDispatch<AppDispatch>();
   let user = useSelector((state: RootState) => state.user);
-
-  // 시작할때 유저 정보를 가져옴
-  useEffect(() => {
-    dispatch(userAction.getUserAction());
-  }, [dispatch]);
 
   // 유저 정보가 변경되면 소켓연결을 시작함
   useEffect(() => {
@@ -58,6 +53,8 @@ export const Home = () => {
           >
             방만들기
           </button>
+
+          {/* {Object.entries(test).map(([id, info]))} */}
         </ul>
         {/* 내 친구 리스트 */}
         <Suspense fallback={<div>loading...</div>}>

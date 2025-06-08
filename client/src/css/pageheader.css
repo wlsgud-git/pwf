@@ -84,10 +84,33 @@
 .check_box {
   overflow: hidden;
   z-index: 1232;
-  background-color: white;
+  background-color: var(--pwf-signiture-color);
   position: absolute;
   width: 120px;
   right: 0;
   flex-direction: column;
-  top: var(--user-thumbnail-box-size);
+  top: calc(var(--user-thumbnail-box-size) + 10px);
+  box-shadow: 1.5px 1.5px 1.5px 1.5px var(--pwf-background-transparent);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.check_box button {
+  background-color: inherit;
+  color: var(--pwf-white);
+  font-weight: 600;
+  padding: 6px 12px;
+  outline: none;
+  display: flex;
+  border: none;
+  font-size: 14px;
+  align-items: center;
+}
+
+.check_box button:hover {
+  background-color: var(--pwf-background-transparent);
+}
+
+.check_box button i {
+  margin-right: 10px;
 }

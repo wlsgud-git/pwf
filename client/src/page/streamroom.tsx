@@ -16,10 +16,12 @@ import { PeerConnects } from "../types/room";
 import { Menu } from "../components/room/menu/menu";
 import { RoomMain } from "../components/room/main/roomMain";
 import { convertToObject } from "typescript";
+import { Participants } from "../components/room/menu/participants";
 
 export const StreamRoom = () => {
   let user = useSelector((state: RootState) => state.user);
   let { id } = useParams();
+  let navigate = useNavigate();
 
   // ref
   let peerConnects = useRef<{
@@ -38,8 +40,13 @@ export const StreamRoom = () => {
 
   // room leave 처리
   let leaveRoomHandler = (who: string) => {
+    peerConnects.current[who].pc.close();
     delete peerConnects.current[who];
-    // setConnectList((c) => c.filter((val) => val.from !== who));
+    setConnects((c) => {
+      const copy = { ...c };
+      delete copy[who];
+      return copy;
+    });
   };
 
   // 비디오/오디오 상태 ----------------------------
@@ -73,11 +80,11 @@ export const StreamRoom = () => {
 
     pc.ontrack = (e) => {
       let kind = e.track.kind;
+      // peerConnects.current[to] = { pc, channel };
       setConnects((c) => {
-        let { pc, channel, stream, video, audio } = c[to];
-
-        // stream이 없으면 미디어스트림 추가해줌
-        if (!stream) stream = new MediaStream();
+        let stream = new MediaStream();
+        let audio = true;
+        let video = true;
 
         // 만약에 event track이 stream에 존재하지 않으면 추가해줌
         if (!stream.getTracks().includes(e.track)) stream.addTrack(e.track);
@@ -96,21 +103,12 @@ export const StreamRoom = () => {
       emitter.emit("menu chat", JSON.parse(e.data));
     };
 
+    // offer 부분
     let offer = await pc.createOffer();
     await pc.setLocalDescription(offer!);
     socketClient.emit("offer", user.nickname, to, offer);
 
     peerConnects.current[to] = { pc, channel };
-
-    setConnects((c) => ({
-      ...c,
-      [to]: {
-        ...c.to,
-        pc,
-        channel,
-        stream: new MediaStream(),
-      },
-    }));
   };
 
   // 연결 시작
@@ -136,8 +134,9 @@ export const StreamRoom = () => {
 
   // offer처리
   let offerHandler = async (from: string, offer: RTCSessionDescriptionInit) => {
+    console.log(`offer from ${from}`);
+    if (!peerConnects.current[from]) await peerConnect(from);
     try {
-      // if (!peerConnects.current[from].pc) peerConnect(from);
       await peerConnects.current[from].pc?.setRemoteDescription(
         new RTCSessionDescription(offer)
       );
@@ -170,8 +169,16 @@ export const StreamRoom = () => {
 
   // candidate처리
   let candidateHandler = async (from: string, candidate: RTCIceCandidate) => {
-    const iceCandidate = new RTCIceCandidate(candidate);
-    await peerConnects.current[from]?.pc.addIceCandidate(iceCandidate);
+    // console.log(`candidate from ${from}`);
+    if (!peerConnects.current[from]) await peerConnect(from);
+    try {
+      if (peerConnects.current[from].pc?.remoteDescription) {
+        const iceCandidate = new RTCIceCandidate(candidate);
+        await peerConnects.current[from]?.pc.addIceCandidate(iceCandidate);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   // useEffect -----------------------------
@@ -190,14 +197,20 @@ export const StreamRoom = () => {
 
   // 룸정보가 오면 start시작
   useEffect(() => {
-    if (room) {
-      room.participants?.map((val: any) => {
+    if (room && user.id) {
+      let participants = (room.participants as User[]).map((val) => val);
+      if (!participants.find((val) => val.id === user.id)) {
+        alert("참가자가 아닙니다.");
+        navigate("/");
+        return;
+      }
+      participants.map((val: any) => {
         if (val.nickname !== user.nickname) {
           peerConnect(val.nickname);
         }
       });
+      start();
     }
-    start();
   }, [room]);
 
   // 소켓 연결

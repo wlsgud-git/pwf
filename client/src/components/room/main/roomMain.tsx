@@ -60,7 +60,7 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
 
     setShareStream(stream);
     trackChange(streamTrack);
-    setOtherShare((c) => ({ ...c, state }));
+    setOtherShare((c) => ({ ...c, state, nickname: user.nickname! }));
   };
 
   //내 화면 공유 시작
@@ -69,17 +69,20 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
       alert("다른 이가 화면공유 중입니다");
       return;
     }
+    try {
+      let s_stream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+      });
+      let streamTrack = s_stream.getVideoTracks()[0];
 
-    let s_stream = await navigator.mediaDevices.getDisplayMedia({
-      video: true,
-    });
-    let streamTrack = s_stream.getVideoTracks()[0];
+      changeProcess(streamTrack, s_stream, true);
 
-    changeProcess(streamTrack, s_stream, true);
-
-    streamTrack.onended = () => {
-      changeProcess(stream?.getVideoTracks()[0], null, false);
-    };
+      streamTrack.onended = () => {
+        changeProcess(stream?.getVideoTracks()[0], null, false);
+      };
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   // 상대가 화면 공유 시작시 상대방의 비디오 트랙을 shareSTream으로 설정
@@ -99,7 +102,6 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
   // 공유 스트림이 변경되면 공유 ref.srcObject 변경
   useEffect(() => {
     if (shareStream && shareStreamRef.current) {
-      console.log("share stream change");
       shareStreamRef.current.srcObject = shareStream;
     }
   }, [shareStream]);
@@ -211,6 +213,7 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
             playsInline
             className="share_video"
           ></video>
+          <span className="share_user_nickname">{otherShare.nickname}</span>
         </div>
       </div>
       {/* main footer */}
@@ -236,11 +239,16 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
 
         {/* 비디오 메뉴 */}
         <div className="room_options">
-          <button>
+          {/* 방에 친구초대 */}
+          <button
+            onClick={() =>
+              emitter.emit("modal", { type: "invitation", open: true })
+            }
+          >
             <i className="fa-solid fa-user-plus"></i>
             <span>초대</span>
           </button>
-
+          {/* 화면공유 */}
           <button
             onClick={ShareStart}
             style={{ color: otherShare.state ? "var(--pwf-blue)" : "white" }}
@@ -248,12 +256,12 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
             <i className="fa-brands fa-creative-commons-share"></i>
             <span>화면공유</span>
           </button>
-
+          {/* 내 미디어 변경 */}
           <button>
             <i className="fa-solid fa-desktop"></i>
             <span>내 미디어</span>
           </button>
-
+          {/* 메뉴 */}
           <button onClick={() => emitter.emit("room menu", true)}>
             <i className="fa-brands fa-elementor"></i>
             <span>메뉴</span>

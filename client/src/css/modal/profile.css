@@ -8,6 +8,7 @@
   /* img */
   --profile-imgbox-height: 120px;
   --profile-imgbox-circle-size: 90px;
+  --profile-img-change-btn-size: 24px;
 }
 
 .profile_modal {
@@ -42,9 +43,7 @@
 .profile_img_box {
   width: 100%;
   height: var(--profile-imgbox-height);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
 }
 
 .profile_img_circle {
@@ -53,13 +52,36 @@
   border-radius: 50%;
   border: 1px solid white;
   overflow: hidden;
+  left: calc(50% - var(--profile-imgbox-circle-size) / 2);
+  top: calc(50% - var(--profile-imgbox-circle-size) / 2);
+  position: relative;
 }
 
 .profile_img_circle img {
   width: 100%;
   height: 100%;
+  object-fit: cover;
 }
 
+.profile_change_btn {
+  position: absolute;
+  z-index: 12341;
+  width: var(--profile-img-change-btn-size);
+  height: var(--profile-img-change-btn-size);
+  left: calc(
+    50% - var(--profile-img-change-btn-size) / 2 +
+      var(--profile-imgbox-circle-size) / 2 - 3%
+  );
+  bottom: 17%;
+  background-color: var(--pwf-blue);
+  color: var(--pwf-white);
+  border: none;
+  border-radius: 50%;
+  font-size: 11px;
+  text-align: center;
+}
+
+/* 이메일과 닉네임 */
 .profile_email_box,
 .profile_nickname_box {
   flex-direction: column;
@@ -73,12 +95,42 @@
   color: var(--pwf-white);
 }
 
-.profile_content form div input {
+.profile_email_box input,
+.profile_nickname_box input {
   padding: 8px 6px;
-  width: 100%;
   background-color: inherit;
   color: var(--pwf-white);
   border: 1px solid var(--pwf-white);
+}
+
+/* email */
+.profile_email_box input {
+  width: 100%;
+}
+
+/* nickname */
+
+.profile_nickname_content {
+  display: flex;
+  justify-content: space-between;
+}
+
+.profile_nickname_content input {
+  width: 82%;
+}
+
+.profile_nickname_content button {
+  background-color: var(--pwf-blue);
+  color: var(--pwf-white);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0px 5px;
+  border: none;
+  outline: none;
+}
+
+.profile_nickname_content button:hover {
+  background-color: var(--pwf-notactive-blue);
 }
 
 .profile_modal_footer {

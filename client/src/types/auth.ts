@@ -7,6 +7,7 @@ export interface SignupInputProps {
   error: boolean;
   value: string;
   error_msg: string;
+  show?: boolean;
 }
 
 export enum SignupError {
