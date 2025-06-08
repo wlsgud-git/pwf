@@ -51,7 +51,7 @@ export const Login = () => {
     try {
       let { user, msg } = await user_service.sendLoginInfo(formdata);
       alert("로그인 되었습니다.");
-      navigate("/");
+      window.location.href = "/";
     } catch (err) {
       let { path, msg } = errorHandling(err);
       loginErrorHandler(path, msg);

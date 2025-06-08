@@ -23,10 +23,11 @@ export const PageHeader = () => {
     try {
       await user_service.logout();
       dispatch(userInit());
-      // persistor.purge();
+      await persistor.purge();
       socketClient.disconnect();
       navigate("/login");
     } catch (err) {
+      console.log(err);
       throw err;
     }
   };
