@@ -1,0 +1,78 @@
+@import url("modal.css");
+
+:root {
+  --pw-find-width: 370px;
+  --pw-find-height: 280px;
+}
+
+.pw_find_modal {
+  width: var(--pw-find-width);
+  display: flex;
+  flex-direction: column;
+}
+
+.pw_find_box {
+  width: 100%;
+  min-height: var(--pw-find-height);
+  padding: 40px;
+}
+
+.pw_find_form {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pw_find_info_box {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.pw_find_input_box {
+  width: 100%;
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.pw_find_input_box input {
+  flex: 1;
+  padding: 8px 8px;
+  border: none;
+  background-color: inherit;
+  color: var(--pwf-white);
+  outline: none;
+}
+
+.pw_find_input_box button {
+  background-color: inherit;
+  color: var(--pwf-white);
+  border: none;
+  margin: 0px 8px;
+}
+
+.pw_find_error_box {
+  width: 100%;
+  font-size: 14px;
+  color: var(--pwf-red);
+  text-align: start;
+}
+
+.pw_find_btn {
+  width: 100%;
+  outline: none;
+  border: none;
+  background-color: var(--pwf-blue);
+  color: var(--pwf-white);
+  padding: 8px 0px;
+  margin-top: 20px;
+  font-weight: 600;
+}
+
+.pw_find_btn:hover {
+  text-decoration: underline;
+}

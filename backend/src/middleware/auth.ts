@@ -33,11 +33,6 @@ export const emailOverlapCheck: RequestHandler = async (req, res) => {
   try {
     if (!emailValidate(email)) throw { type: "email", msg: SignupError.EMAIL };
     let user = await emailOverlap(email);
-    if (user.length)
-      throw {
-        type: "email",
-        msg: SignupError.EMAIL_OVERLAP,
-      };
     res.status(200).json(user[0]);
   } catch (error) {
     res.status(400).json(error);

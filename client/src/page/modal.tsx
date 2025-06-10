@@ -9,6 +9,7 @@ import { Friend } from "../components/modal/friend";
 import { StreamRoom } from "../components/modal/streamRoom";
 import { Profile } from "../components/modal/profile";
 import { Invitation } from "../components/modal/invitaion";
+import { PwFind } from "../components/modal/pwFind";
 
 export type ModalList =
   | "friend"
@@ -31,7 +32,6 @@ export const Modal = () => {
       type: ModalList;
       open?: boolean;
     }) => {
-      console.log("modal hi");
       setOpen(open);
       setContent(type);
     };
@@ -51,6 +51,7 @@ export const Modal = () => {
         <StreamRoom user={user} type={content} />
         <Profile user={user} type={content} />
         <Invitation user={user} type={content} />
+        <PwFind type={content} />
       </div>
     </div>
   );

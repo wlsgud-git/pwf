@@ -212,7 +212,7 @@ export const Signup = () => {
                     placeholder="이메일"
                     ref={emailRef}
                     value={email.value}
-                    onBlur={() => emailValidate(email.value, setEmail)}
+                    onBlur={() => emailValidate(email.value, setEmail, false)}
                     onChange={(e: InputChange) =>
                       setEmail((c) => ({ ...c, value: e.target.value }))
                     }

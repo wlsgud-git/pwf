@@ -29,12 +29,21 @@ export const passwordFormValid = (password: string) => {
 // 이메일 검증
 export const emailValidate = async (
   email: string,
-  set_email: StateDispatch<SignupInputProps>
+  set_email: StateDispatch<SignupInputProps>,
+  overlap: boolean
 ) => {
   try {
     if (!emailFormValid(email)) throw { type: "email", msg: SignupError.EMAIL };
     let formdata = createFormData({ email });
     let res = await user_service.emailOverlap(formdata);
+
+    if (overlap) {
+      if (typeof res == "string")
+        throw { type: "email", msg: "존재하지 않는 이메일입니다." };
+    } else {
+      if (typeof res == "object")
+        throw { type: "email", msg: "이미 존재하는 이메일입니다." };
+    }
     set_email((c) => ({ ...c, error: false }));
   } catch (err) {
     let { type, msg } = errorHandling(err);

@@ -9,9 +9,8 @@ import { userAction } from "../context/actions/userAction";
 import { socketClient, userSocket } from "../util/socket";
 
 // component
-import { Modal } from "./modal";
 import { PageHeader } from "../components/pageHeader";
-import { useLocation } from "react-router-dom";
+
 const MyFriends = lazy(() =>
   import("../components/myFriend").then(({ MyFriends }) => ({
     default: MyFriends,
@@ -31,9 +30,6 @@ export const Home = () => {
     <div className="page home_page">
       {/* header */}
       <PageHeader />
-
-      {/* streamroom modal */}
-      <Modal />
 
       {/* content */}
       <div className="pwf_content">

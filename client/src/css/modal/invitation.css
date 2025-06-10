@@ -1,7 +1,7 @@
 @import url("modal.css");
 
 :root {
-  --invitation-width: 300px;
+  --invitation-width: 350px;
   --invitation-height: 400px;
 
   --invitation-li-height: 50px;
@@ -12,6 +12,7 @@
   height: var(--invitation-height);
   display: flex;
   flex-direction: column;
+  border-radius: 8px;
 }
 
 .invitation_list {

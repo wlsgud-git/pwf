@@ -7,6 +7,7 @@ import { emitter } from "../../util/event";
 // type
 import { User } from "../../types/user";
 import { ModalList } from "../../page/modal";
+import { Room } from "../../types/room";
 
 interface InvitationProps {
   user: User;
@@ -31,14 +32,13 @@ const InvitationLi = ({ user }: { [user: string]: User }) => {
 
 // 친구 관련 모달
 export const Invitation = ({ user, type }: InvitationProps) => {
-
   return (
     <div
       className="invitation_modal"
       style={{ display: type == "invitation" ? "flex" : "none" }}
     >
       <header className="modal_header">
-        <button onClick={()=> emitter.emit("modal", { type })}>X</button>
+        <button onClick={() => emitter.emit("modal", { type })}>X</button>
       </header>
 
       <ul className="invitation_list">

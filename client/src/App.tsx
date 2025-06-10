@@ -21,6 +21,7 @@ import { StreamRoom } from "./page/streamroom";
 import { Login } from "./page/login";
 import { Signup } from "./page/signup";
 import { useSelector } from "react-redux";
+import { Modal } from "./page/modal";
 
 function App() {
   let dispatch = useDispatch<AppDispatch>();
@@ -30,7 +31,6 @@ function App() {
 
   useEffect(() => {
     let test = () => {
-      if (user.id) return;
       dispatch(userAction.getUserAction())
         .unwrap()
         .catch((err: any) => {
@@ -39,15 +39,12 @@ function App() {
           navigate("/login");
         });
     };
-    test();
+    if (!user.id) test();
   }, [dispatch]);
-
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
 
   return (
     <div className="App">
+      <Modal />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/room/:id" element={<StreamRoom />} />

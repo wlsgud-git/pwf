@@ -15,8 +15,6 @@ import { PeerConnects } from "../types/room";
 // component
 import { Menu } from "../components/room/menu/menu";
 import { RoomMain } from "../components/room/main/roomMain";
-import { convertToObject } from "typescript";
-import { Participants } from "../components/room/menu/participants";
 
 export const StreamRoom = () => {
   let user = useSelector((state: RootState) => state.user);
