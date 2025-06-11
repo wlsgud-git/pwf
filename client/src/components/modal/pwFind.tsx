@@ -7,8 +7,11 @@ import { emitter } from "../../util/event";
 import { FormEvent, useState } from "react";
 import { InputChange } from "../../types/event";
 import { emailValidate, passwordValidate } from "../../validation/auth";
+import { user_service } from "../../service/userservice";
+import { createFormData } from "../../util/form";
 
 interface PwFindProps {
+  user: User;
   type: ModalList;
 }
 
@@ -19,19 +22,44 @@ interface InputProps {
   show?: boolean;
 }
 
-export const PwFind = ({ type }: PwFindProps) => {
+export const PwFind = ({ user, type }: PwFindProps) => {
   let initState = {
     error: false,
     error_msg: "",
     value: "",
     show: false,
   };
-  let [email, setEmail] = useState<InputProps>(initState);
   let [password, setPassword] = useState<InputProps>(initState);
   let [passwordCheck, setPasswordCheck] = useState<InputProps>(initState);
 
   let submit = async (e: FormEvent) => {
     e.preventDefault();
+
+    if (
+      password.value == "" ||
+      password.error ||
+      passwordCheck.value == "" ||
+      passwordCheck.error
+    ) {
+      alert("값을 정확히 입력해야 합니다.");
+      return;
+    }
+    try {
+      let res = await user_service.passwordChange(
+        createFormData({ email: user.email, password: password.value })
+      );
+
+      alert(res.message);
+      reset();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  let reset = () => {
+    setPassword(initState);
+    setPasswordCheck(initState);
+    emitter.emit("modal", { type });
   };
 
   // 비밀번호 확인값 검증
@@ -52,38 +80,11 @@ export const PwFind = ({ type }: PwFindProps) => {
       style={{ display: type == "password" ? "flex" : "none" }}
     >
       <header className="modal_header">
-        <button onClick={() => emitter.emit("modal", { type })}>X</button>
+        <button onClick={reset}>X</button>
       </header>
 
       <div className="pw_find_box">
         <form className="pw_find_form" onSubmit={submit}>
-          {/* email */}
-          <div className="pw_find_info_box">
-            <div
-              className="pw_find_input_box"
-              style={{
-                border: `1px solid ${email.error ? "red" : "gray"}`,
-              }}
-            >
-              <input
-                type="email"
-                placeholder="이메일"
-                value={email.value}
-                spellCheck={false}
-                onFocus={() => setEmail((c) => ({ ...c, error: false }))}
-                onBlur={() => emailValidate(email.value, setEmail, true)}
-                onChange={(e: InputChange) =>
-                  setEmail((c) => ({ ...c, value: e.target.value }))
-                }
-              />
-            </div>
-            <div
-              style={{ display: email.error ? "block" : "none" }}
-              className="pw_find_error_box"
-            >
-              {email.error_msg}
-            </div>
-          </div>
           {/* password */}
           <div className="pw_find_info_box">
             <div

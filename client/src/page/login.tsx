@@ -108,15 +108,8 @@ export const Login = () => {
         </div>
         {/* 로그인 풋터 */}
         <footer className="login_footer">
+          <span>계정이 없다면?</span>
           <Link to="/signup">회원가입</Link>
-
-          <span
-            onClick={() =>
-              emitter.emit("modal", { type: "password", open: true })
-            }
-          >
-            비밀번호 찾기
-          </span>
         </footer>
       </div>
     </div>

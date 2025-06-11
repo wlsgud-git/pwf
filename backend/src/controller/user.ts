@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { compareText, hashingText } from "../util/crypto";
 import {
+  changePassword,
   createUser,
   getUserByEmail,
   nicknameOverlap,
@@ -160,6 +161,18 @@ export const handleRequestFriend: RequestHandler = async (req, res) => {
         response ? "수락하였습니다." : "거절하였습니다."
       }`,
     });
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
+
+export const passwordChange: RequestHandler = async (req, res) => {
+  let { email, password } = req.body;
+  try {
+    let hash_pw = await hashingText(password);
+    await changePassword(email, hash_pw);
+
+    res.status(200).json({ message: "비밀번호가 변경되었습니다" });
   } catch (err) {
     res.status(400).json(err);
   }

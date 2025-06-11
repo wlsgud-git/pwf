@@ -33,6 +33,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   width: 100%;
+  background-color: var(--pwf-signiture-color);
 }
 
 code {

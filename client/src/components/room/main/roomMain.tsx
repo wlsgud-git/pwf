@@ -6,9 +6,11 @@ import { emitter } from "../../../util/event";
 
 // css
 import "../../../css/room/main/roomMain.css";
+import "../../../css/invitation.css";
 
 // type
 import { User } from "../../../types/user";
+import { Room } from "../../../types/room";
 import { PeerConnects } from "../../../types/room";
 import { FriendStream } from "../friendStream";
 import { info } from "console";
@@ -17,9 +19,66 @@ interface RoomMainProps {
   user: User;
   stream: MediaStream | null;
   connects: object;
+  participants: Room["participants"];
 }
 
-export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
+interface InvitationProps {
+  user: User;
+  show: boolean;
+  setShow: any;
+  participants: Room["participants"];
+}
+
+const InvitationLi = ({ user }: { [user: string]: User }) => {
+  return (
+    <li className="invitation_li">
+      {/* 유저 정보 */}
+      <div>
+        <span className="invitation_profile_box">
+          <img src={user.profile_img} />
+        </span>
+        <span className="invitation_nickname">{user.nickname}</span>
+      </div>
+      {/* 초대버튼 */}
+      <button>초대</button>
+    </li>
+  );
+};
+
+// 친구 관련 모달
+export const Invitation = ({
+  user,
+  show,
+  setShow,
+  participants,
+}: InvitationProps) => {
+  function reset() {
+    setShow(false);
+    emitter.emit("modal", { type: "friend" });
+  }
+  return (
+    <div
+      className="invitation_modal"
+      style={{ display: show ? "flex" : "none" }}
+    >
+      <header className="modal_header">
+        <button onClick={reset}>X</button>
+      </header>
+
+      <ul className="invitation_list">
+        {user.friends?.length &&
+          user.friends.map((val) => <InvitationLi user={user} />)}
+      </ul>
+    </div>
+  );
+};
+
+export const RoomMain = ({
+  user,
+  stream,
+  connects,
+  participants,
+}: RoomMainProps) => {
   let { id } = useParams();
   let roomId = `room${id}`;
   let navigate = useNavigate();
@@ -37,6 +96,12 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
     nickname: string;
   }>({ state: false, nickname: "" });
   let [shareStream, setShareStream] = useState<MediaStream | null>(null);
+  let [showInvitation, setShowInvitation] = useState<boolean>(false);
+
+  let openModal = () => {
+    setShowInvitation(true);
+    emitter.emit("modal", { type: "invitation", open: true });
+  };
 
   // 다른 사용자 트랙 변경
   let trackChange = (stream: any) => {
@@ -84,27 +149,6 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
       console.log(err);
     }
   };
-
-  // 상대가 화면 공유 시작시 상대방의 비디오 트랙을 shareSTream으로 설정
-  useEffect(() => {
-    let con = Object.entries(connects);
-    if (con.length && otherShare.state && otherShare.nickname !== "") {
-      let shareInfo = con.find(([from, info]) => from === otherShare.nickname);
-      if (shareInfo) {
-        let info = shareInfo[1];
-        info.pc.getReceivers().forEach((receive: any) => {
-          setShareStream(new MediaStream([receive.track]));
-        });
-      }
-    }
-  }, [connects, otherShare.nickname]);
-
-  // 공유 스트림이 변경되면 공유 ref.srcObject 변경
-  useEffect(() => {
-    if (shareStream && shareStreamRef.current) {
-      shareStreamRef.current.srcObject = shareStream;
-    }
-  }, [shareStream]);
 
   // 다른 사용자가 화면 공유를 시작함
   let otherScreenShare = (from: string) => {
@@ -163,8 +207,36 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
     };
   }, []);
 
+  // 상대가 화면 공유 시작시 상대방의 비디오 트랙을 shareSTream으로 설정
+  useEffect(() => {
+    let con = Object.entries(connects);
+    if (con.length && otherShare.state && otherShare.nickname !== "") {
+      let shareInfo = con.find(([from, info]) => from === otherShare.nickname);
+      if (shareInfo) {
+        let info = shareInfo[1];
+        info.pc.getReceivers().forEach((receive: any) => {
+          setShareStream(new MediaStream([receive.track]));
+        });
+      }
+    }
+  }, [connects, otherShare.nickname]);
+
+  // 공유 스트림이 변경되면 공유 ref.srcObject 변경
+  useEffect(() => {
+    if (shareStream && shareStreamRef.current) {
+      shareStreamRef.current.srcObject = shareStream;
+    }
+  }, [shareStream]);
+
   return (
     <div className="pwf-streamRoom_container">
+      {/* modal */}
+      <Invitation
+        user={user}
+        show={showInvitation}
+        setShow={setShowInvitation}
+        participants={participants}
+      />
       {/* 화면창 */}
       <div className="pwf-screen_container">
         {/* p2p 연결화면들 */}
@@ -240,11 +312,7 @@ export const RoomMain = ({ user, stream, connects }: RoomMainProps) => {
         {/* 비디오 메뉴 */}
         <div className="room_options">
           {/* 방에 친구초대 */}
-          <button
-            onClick={() =>
-              emitter.emit("modal", { type: "invitation", open: true })
-            }
-          >
+          <button onClick={openModal}>
             <i className="fa-solid fa-user-plus"></i>
             <span>초대</span>
           </button>

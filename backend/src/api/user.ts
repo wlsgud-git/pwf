@@ -18,6 +18,7 @@ import {
   loginControl,
   requestFriendWithNickname,
   logoutControl,
+  passwordChange,
 } from "../controller/user";
 import { loginValidate, signupUserValidate } from "../validation/auth";
 
@@ -56,5 +57,8 @@ router.post(
 
 // authcode -------------------------------
 router.post("/send_authcode", sendAuthcodeWithEmail);
+
+// password change
+router.post("/password_change", passwordChange);
 
 module.exports = router;

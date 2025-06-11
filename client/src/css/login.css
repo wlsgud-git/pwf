@@ -117,21 +117,18 @@
   justify-content: center;
 }
 
-/* .login_footer span {
-  line-height: var(--login-footer-height);
-  color: var(--pwf-white);
-  margin: 8px;
-} */
-
-.login_footer a,
 .login_footer span {
+  color: var(--pwf-white);
+  /* margin: 8px; */
+}
+
+.login_footer a {
   font-size: 14px;
   color: var(--pwf-gray);
   margin: 0px 5px;
   cursor: pointer;
 }
 
-.login_footer a:hover,
-.login_footer span:hover {
+.login_footer a:hover {
   text-decoration: underline;
 }

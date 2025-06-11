@@ -30,6 +30,7 @@ export const StreamRoom = () => {
   let [room, setRoom] = useState<Room | null>(null); //방 정보
   let [stream, setStream] = useState<MediaStream | null>(null);
   let [connects, setConnects] = useState<PeerConnects>({});
+  let [invitationModal, setInvitationModal] = useState<boolean>(false);
 
   // 방 입장/퇴장 관련 --------------------------
   let joinRoomHandler = (who: string) => {
@@ -235,7 +236,12 @@ export const StreamRoom = () => {
   return (
     <div className="page streamRoom_page">
       {/* main */}
-      <RoomMain user={user} stream={stream} connects={connects} />
+      <RoomMain
+        user={user}
+        stream={stream}
+        connects={connects}
+        participants={room?.participants}
+      />
 
       {/* menu */}
       <Menu user={user} connects={connects} participants={room?.participants} />

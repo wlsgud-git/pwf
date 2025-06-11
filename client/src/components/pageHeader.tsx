@@ -81,11 +81,7 @@ export const PageHeader = () => {
             className="check_box"
             style={{ display: userOption ? "flex" : "none" }}
           >
-            <button
-              onMouseDown={() =>
-                emitter.emit("modal", { type: "profile", open: true })
-              }
-            >
+            <button onMouseDown={() => navigate(`/profile/${user.email}`)}>
               <i className="fa-solid fa-user"></i>
               <span>프로필</span>
             </button>

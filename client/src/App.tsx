@@ -22,6 +22,7 @@ import { Login } from "./page/login";
 import { Signup } from "./page/signup";
 import { useSelector } from "react-redux";
 import { Modal } from "./page/modal";
+import { Profile } from "./page/profile";
 
 function App() {
   let dispatch = useDispatch<AppDispatch>();
@@ -49,6 +50,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/room/:id" element={<StreamRoom />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/profile/:email" element={<Profile />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="*" element={<Notfound />} />
       </Routes>

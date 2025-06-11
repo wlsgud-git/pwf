@@ -122,6 +122,17 @@ export class userService extends HttpClient {
       throw err;
     }
   }
+
+  async passwordChange(data: FormData) {
+    try {
+      return await this.axiosFetch<string>("/password_change", {
+        method: "post",
+        body: data,
+      });
+    } catch (err) {
+      throw err;
+    }
+  }
 }
 
 export const user_service = new userService();

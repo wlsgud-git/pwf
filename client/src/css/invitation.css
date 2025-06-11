@@ -1,4 +1,4 @@
-@import url("modal.css");
+/* @import url("modal.css"); */
 
 :root {
   --invitation-width: 350px;
@@ -11,8 +11,13 @@
   width: var(--invitation-width);
   height: var(--invitation-height);
   display: flex;
+  background-color: var(--pwf-signiture-color);
   flex-direction: column;
   border-radius: 8px;
+  z-index: 123512;
+  position: absolute;
+  top: calc(50% - var(--invitation-height) / 2);
+  left: calc(50% - var(--invitation-width) / 2);
 }
 
 .invitation_list {
