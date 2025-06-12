@@ -133,6 +133,16 @@ export class userService extends HttpClient {
       throw err;
     }
   }
+
+  async deleteUser(email: string) {
+    try {
+      return await this.axiosFetch<string>(`/delete/${email}`, {
+        method: "delete",
+      });
+    } catch (err) {
+      throw err;
+    }
+  }
 }
 
 export const user_service = new userService();

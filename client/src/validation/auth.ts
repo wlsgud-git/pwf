@@ -1,5 +1,5 @@
 import { Dispatch } from "react";
-import { SignupError } from "../types/auth";
+import { EmailError, PasswordError, NicknameError } from "../types/auth";
 import { user_service } from "../service/userservice";
 import { createFormData } from "../util/form";
 import { errorHandling } from "../error/error";
@@ -9,21 +9,23 @@ import { StateDispatch } from "../types/event";
 
 // 이메일 형태 검증
 export const emailFormValid = (email: string) => {
-  return email
+  let result = email
     .toString()
     .trim()
     .toLowerCase()
     .match(
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
+  return !result ? false : true;
 };
 
 // 비밀번호 형태 검증
 export const passwordFormValid = (password: string) => {
-  return password
+  let result = password
     .trim()
     .toLowerCase()
     .match(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!*?&])[A-Za-z\d@$!%*?&]{8,20}$/);
+  return !result ? false : true;
 };
 
 // 이메일 검증
@@ -33,7 +35,8 @@ export const emailValidate = async (
   overlap: boolean
 ) => {
   try {
-    if (!emailFormValid(email)) throw { type: "email", msg: SignupError.EMAIL };
+    if (!emailFormValid(email))
+      throw { type: "email", msg: EmailError.EMAIL_FORM_ERROR };
     let formdata = createFormData({ email });
     let res = await user_service.emailOverlap(formdata);
 
@@ -76,6 +79,6 @@ export const passwordValidate = (
     set_password((c) => ({
       ...c,
       error: !result ? true : false,
-      error_msg: !result ? SignupError.PASSWORD : "",
+      error_msg: !result ? PasswordError.PASSWORD_FORM_ERROR : "",
     }));
 };

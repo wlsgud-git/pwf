@@ -19,6 +19,7 @@ import {
   requestFriendWithNickname,
   logoutControl,
   passwordChange,
+  deleteController,
 } from "../controller/user";
 import { loginValidate, signupUserValidate } from "../validation/auth";
 
@@ -28,6 +29,7 @@ const router: Router = express.Router();
 router.get("/current", IsAuth, current);
 router.post("/email/overlap", emailOverlapCheck);
 router.post("/nickname/overlap", nicknameOverlapCheck);
+router.delete("/delete/:email", deleteController);
 
 // signup ----------------------------
 router.post("/account", authcodeCheck, accountUser);

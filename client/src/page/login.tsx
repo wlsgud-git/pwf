@@ -1,117 +1,171 @@
-import { useRef, useState } from "react";
+import { act, useEffect, useRef, useState } from "react";
 import "../css/login.css";
 import { Link, useNavigate } from "react-router-dom";
 
 import { FormSubmit, InputChange } from "../types/event";
 import { emailFormValid, passwordFormValid } from "../validation/auth";
-import { LoginError } from "../types/auth";
+import { EmailError, PasswordError } from "../types/auth";
 import { errorHandling } from "../error/error";
 import { user_service } from "../service/userservice";
 import { createFormData } from "../util/form";
 import { emitter } from "../util/event";
 
+// type
+interface LoginInputProps {
+  value: string;
+  error: boolean;
+  error_msg: string;
+  show?: boolean;
+  active: boolean;
+}
+
+interface LoginBtnProps {
+  active: boolean;
+  loading: boolean;
+}
+
 export const Login = () => {
-  let navigate = useNavigate();
-  let [loading, setLoading] = useState<boolean>(false);
-  let emailRef = useRef<HTMLInputElement | null>(null);
-  let passwordRef = useRef<HTMLInputElement | null>(null);
-
-  let [email, setEmail] = useState<string>("");
-  let [password, setPassword] = useState<string>("");
-  let [loginError, setLoginError] = useState<{ error: boolean; msg: string }>({
+  const InputInitState = {
+    value: "",
     error: false,
-    msg: "",
-  });
-  let [showPw, setShowPw] = useState<boolean>(false);
+    error_msg: "",
+    show: false,
+    active: false,
+  };
+  const BtnInitState = { active: false, loading: false };
+  let [email, setEmail] = useState<LoginInputProps>(InputInitState);
+  let [password, setPassword] = useState<LoginInputProps>(InputInitState);
+  let [loginBtn, setLoginBtn] = useState<LoginBtnProps>(BtnInitState);
 
-  // 로그인 에러 핸들
-  const loginErrorHandler = (type: string, msg: string) => {
-    if (type == "email") emailRef.current?.focus();
-    else passwordRef.current?.focus();
-
-    setLoginError((c) => ({ ...c, error: true, msg }));
+  const inputFocus = (type: "email" | "password") => {
+    type == "email"
+      ? setEmail((c) => ({ ...c, active: true, error: false }))
+      : setPassword((c) => ({ ...c, active: true, error: false }));
   };
 
-  // 로그인 정보 보내기
-  const loginSubmit = async (e: FormSubmit) => {
-    e.preventDefault();
+  const inputBlur = (type: "email" | "password") => {
+    let error_state: boolean =
+      type == "email"
+        ? !emailFormValid(email.value) && email.value !== ""
+        : !passwordFormValid(password.value) && password.value !== "";
 
-    if (!emailFormValid(email)) {
-      loginErrorHandler("email", LoginError.EMAIL);
-      return;
+    if (type == "email") {
+      setEmail((c) => ({
+        ...c,
+        active: false,
+        error: error_state,
+        error_msg: EmailError.EMAIL_FORM_ERROR,
+      }));
+    } else {
+      setPassword((c) => ({
+        ...c,
+        active: false,
+        error: error_state,
+        error_msg: PasswordError.PASSWORD_FORM_ERROR,
+      }));
     }
-    if (!passwordFormValid(password)) {
-      loginErrorHandler("password", LoginError.PASSWORD);
-      return;
-    }
-
-    let formdata = createFormData({ email, password });
-    setLoading(true);
-
-    try {
-      let { user, msg } = await user_service.sendLoginInfo(formdata);
-      alert("로그인 되었습니다.");
-      window.location.href = "/";
-    } catch (err) {
-      let { path, msg } = errorHandling(err);
-      loginErrorHandler(path, msg);
-    }
-    setLoading(false);
   };
+
+  useEffect(() => {
+    let status =
+      email.value !== "" &&
+      emailFormValid(email.value) &&
+      password.value !== "" &&
+      passwordFormValid(password.value);
+
+    setLoginBtn((c) => ({ ...c, active: status }));
+  }, [email.value, password.value]);
 
   return (
     <div className="page login_page">
-      <div className="login_container">
-        {/* 로그인 헤더 */}
-        <header className="login_header">
-          <span>PWF</span>
-        </header>
-        {/* 로그인 내용 */}
-        <div className="login_content">
-          {/* 로그인 에러 */}
-          <div
-            className="login_error_box"
-            style={{ display: loginError.error ? "flex" : "none" }}
+      {/* <div className="login_pwf_introduce"></div>
+      <div className="login_info_box">
+        <div></div>
+      </div> */}
+      <div className="login_info_container">
+        <div
+          className="login_input_box"
+          style={{ border: `1px solid ${email.error ? "red" : "gray"}` }}
+          onFocus={() => inputFocus("email")}
+          onBlur={() => inputBlur("email")}
+        >
+          <p
+            style={{
+              top:
+                email.value === "" && email.active == false
+                  ? "calc(50% - var(--placeholder-font-size))"
+                  : "7%",
+            }}
           >
-            {loginError.msg}
-          </div>
-          {/* 로그인 정보 (폼) */}
-          <form action="post" onSubmit={loginSubmit}>
-            {/* 이메일 */}
-            <div>
-              <input
-                type="email"
-                spellCheck={false}
-                placeholder="이메일"
-                ref={emailRef}
-                value={email}
-                onChange={(e: InputChange) => setEmail(e.target.value)}
-              />
-            </div>
-            {/* 비밀번호 */}
-            <div className="password_box">
-              <input
-                type={showPw ? "text" : "password"}
-                value={password}
-                ref={passwordRef}
-                placeholder="비밀번호"
-                onChange={(e: InputChange) => setPassword(e.target.value)}
-              />
-              <button type="button" onClick={() => setShowPw(!showPw)}>
-                <i className={`fa-solid fa-eye${showPw ? "-slash" : ""}`}></i>
-              </button>
-            </div>
-            <button className="login_btn" disabled={loading}>
-              {loading ? "진행중..." : "로그인"}{" "}
-            </button>
-          </form>
+            이메일
+          </p>
+          <input
+            type="text"
+            spellCheck="false"
+            value={email.value}
+            onChange={(e: InputChange) =>
+              setEmail((c) => ({ ...c, value: e.target.value }))
+            }
+          />
         </div>
-        {/* 로그인 풋터 */}
-        <footer className="login_footer">
-          <span>계정이 없다면?</span>
-          <Link to="/signup">회원가입</Link>
-        </footer>
+
+        <div
+          className="login_error"
+          style={{ display: email.error ? "flex" : "none" }}
+        >
+          {email.error_msg}
+        </div>
       </div>
+
+      {/* 비밀번호 */}
+      <div className="login_info_container">
+        <div
+          className="login_input_box"
+          style={{ border: `1px solid ${password.error ? "red" : "gray"}` }}
+          onFocus={() => inputFocus("password")}
+          onBlur={() => inputBlur("password")}
+        >
+          {/* placeholder */}
+          <p
+            style={{
+              top:
+                password.value === "" && !password.active
+                  ? "calc(50% - var(--placeholder-font-size))"
+                  : "7%",
+            }}
+          >
+            비밀번호
+          </p>
+          {/* input */}
+          <input
+            type={password.show ? "text" : "password"}
+            value={password.value}
+            onChange={(e: InputChange) =>
+              setPassword((c) => ({ ...c, value: e.target.value }))
+            }
+          />
+          {/* showing */}
+          <span onClick={() => setPassword((c) => ({ ...c, show: !c.show }))}>
+            <i
+              className={`fa-solid fa-eye${password.show ? "" : "-slash"}`}
+            ></i>
+          </span>
+        </div>
+
+        <div
+          className="login_error"
+          style={{ display: password.error ? "flex" : "none" }}
+        >
+          {password.error_msg}
+        </div>
+      </div>
+
+      <button
+        style={{ color: loginBtn.active ? "blue" : "red" }}
+        disabled={!loginBtn.active}
+      >
+        로그인
+      </button>
     </div>
   );
 };

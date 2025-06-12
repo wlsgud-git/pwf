@@ -8,13 +8,19 @@ import { RootState } from "../context/store";
 import { Friend } from "../components/modal/friend";
 import { StreamRoom } from "../components/modal/streamRoom";
 import { PwFind } from "../components/modal/pwFind";
+import { Delete } from "../components/modal/delete";
 
-export type ModalList = "friend" | "invitation" | "stream" | "password";
+export type ModalList =
+  | "friend"
+  | "invitation"
+  | "stream"
+  | "password"
+  | "delete";
 
 export const Modal = () => {
   let user = useSelector((state: RootState) => state.user);
   let [open, setOpen] = useState<boolean>(false);
-  let [content, setContent] = useState<ModalList>("friend");
+  let [content, setContent] = useState<ModalList>("delete");
 
   // modal control
   useEffect(() => {
@@ -43,6 +49,7 @@ export const Modal = () => {
         <Friend user={user} type={content} />
         <StreamRoom user={user} type={content} />
         <PwFind user={user} type={content} />
+        <Delete user={user} type={content} />
       </div>
     </div>
   );

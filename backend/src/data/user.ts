@@ -111,7 +111,15 @@ export const createUser = async (info: User) => {
   }
 };
 export const updateUser = async () => {};
-export const deleteUser = async () => {};
+export const deleteUser = async (email: string) => {
+  try {
+    let query = `delete from users where email = $1`;
+    let data = [email];
+    return await dbPlay<any>(query, data);
+  } catch (err) {
+    throw err;
+  }
+};
 
 // password change
 export const changePassword = async (email: string, password: string) => {

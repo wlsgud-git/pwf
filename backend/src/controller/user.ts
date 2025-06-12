@@ -3,6 +3,7 @@ import { compareText, hashingText } from "../util/crypto";
 import {
   changePassword,
   createUser,
+  deleteUser,
   getUserByEmail,
   nicknameOverlap,
   requestFriend,
@@ -34,6 +35,16 @@ export const current: RequestHandler = async (req, res) => {
       );
 
     res.status(200).json(user[0]);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
+
+export const deleteController: RequestHandler = async (req, res) => {
+  let { email } = req.params;
+  try {
+    await deleteUser(email);
+    res.status(200).json({ message: `${email} 계정이 삭제되었습니다.` });
   } catch (err) {
     res.status(400).json(err);
   }

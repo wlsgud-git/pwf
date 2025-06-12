@@ -13,8 +13,8 @@ import { User } from "../types/user";
 import { PeerConnects } from "../types/room";
 
 // component
-import { Menu } from "../components/room/menu/menu";
-import { RoomMain } from "../components/room/main/roomMain";
+import { Menu } from "../components/room/menu";
+import { RoomMain } from "../components/room/roomMain";
 
 export const StreamRoom = () => {
   let user = useSelector((state: RootState) => state.user);

@@ -15,7 +15,7 @@ import { errorHandling } from "../error/error";
 import { User } from "../types/user";
 import {
   authErrorProps,
-  SignupError,
+  PasswordError,
   SignupInputProps,
   SignupMessage,
 } from "../types/auth";
@@ -101,7 +101,7 @@ export const Signup = () => {
       ...c,
       value,
       error: !valid,
-      error_msg: valid ? "" : SignupError.PASSWORD_CHECK,
+      error_msg: valid ? "" : PasswordError.PASSWORD_CHECK_ERROR,
     }));
   };
 
