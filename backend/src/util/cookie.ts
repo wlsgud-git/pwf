@@ -3,13 +3,13 @@ import { Response } from "express";
 interface tokenOptions {
   secure: boolean;
   httpOnly: boolean;
-  sameSite: "none" | "strict";
+  sameSite: "none" | "strict" | "lax";
   maxAge?: number;
 }
 
 export const setCookie = <T>(res: Response, info: T): void => {
   let cookieOptions: tokenOptions = {
-    secure: false,
+    secure: true,
     httpOnly: true,
     sameSite: "none",
     maxAge: 3600 * 1000,

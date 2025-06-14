@@ -11,11 +11,11 @@ import {
 } from "../data/user";
 import { redis, redisDelete, redisGet } from "../util/redis";
 
-import { config } from "../../config";
+import { config } from "../config/config";
 
 // types
-import { LoginMessage, SignupMessage } from "../../types/auth";
-import { User } from "../../types/user";
+import { LoginMessage, PasswordError, SignupMessage } from "../types/auth";
+import { User } from "../types/user";
 import { redisSet } from "../util/redis";
 import { onlineUser } from "../util/auth";
 import { reverse } from "dns";
@@ -81,7 +81,8 @@ export const loginControl: RequestHandler = async (req, res) => {
     let result: boolean = await compareText(password, check_password!);
 
     // 비밀번호가 올바르지 않다면
-    if (!result) throw { path: "password", msg: LoginMessage.PASSWORD_UNEQUAL };
+    // if (!result)
+    //   throw { path: "password", msg: PasswordError.PASSWORD_UNEQUAL_ERROR };
 
     // 로그인이 성공한거임
     if (user.nickname)

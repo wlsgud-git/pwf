@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { body, validationResult, Result } from "express-validator";
-import { LoginMessage, SignupError } from "../../types/auth";
+import { LoginMessage } from "../types/auth";
 import { getUserByEmail } from "../data/user";
 
 // 로그인 유저정보 검증

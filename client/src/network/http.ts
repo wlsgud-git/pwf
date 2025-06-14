@@ -1,6 +1,7 @@
 import axios, { Axios, AxiosInstance } from "axios";
 
 import { HttpRequest, HttpResponse } from "../types/http";
+import { AxiosError } from "../error/error";
 // import { config } from "";
 
 export class HttpClient {

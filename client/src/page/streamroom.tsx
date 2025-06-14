@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "../css/room/streamRoom.css";
 import { Form, useNavigate, useParams } from "react-router-dom";
 import { socketClient } from "../util/socket";
-import { stream_service } from "../service/streamservice";
+import { stream_service } from "../service/stream.service";
 import { emitter } from "../util/event";
 import { useSelector } from "react-redux";
 import { RootState } from "../context/store";

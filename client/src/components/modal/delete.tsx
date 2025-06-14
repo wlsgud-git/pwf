@@ -5,7 +5,7 @@ import { emitter } from "../../util/event";
 import { User } from "../../types/user";
 import { ModalList } from "../../page/modal";
 import { useLocation } from "react-router-dom";
-import { user_service } from "../../service/userservice";
+import { user_service } from "../../service/user.service";
 
 interface DeleteProps {
   user: User;

@@ -2,9 +2,9 @@ import "../../css/modal/friend.css";
 import { useState, useEffect, ChangeEvent } from "react";
 import { emitter } from "../../util/event";
 import { FormSubmit, InputChange } from "../../types/event";
-import { user_service } from "../../service/userservice";
+import { user_service } from "../../service/user.service";
 import { createFormData } from "../../util/form";
-import { errorHandling } from "../../error/error";
+import { AxiosError } from "../../error/error";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../context/store";
 import { User, UserComponent } from "../../types/user";
@@ -92,8 +92,8 @@ export const Friend = ({ user, type }: ComponentProps) => {
       alert(`${nickname}에게 친구요청이 전송되었습니다`);
       setNickname("");
     } catch (err) {
-      let { msg } = errorHandling(err);
-      msg = !msg ? "친구이거나 중복된 친구요청입니다." : msg;
+      let { msg } = AxiosError(err);
+      // msg = !msg ? "친구이거나 중복된 친구요청입니다." : msg;
       setError((c) => ({ ...c, state: true, msg }));
     }
   };

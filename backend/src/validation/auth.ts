@@ -1,25 +1,33 @@
 import { Request, Response, NextFunction } from "express";
 import { body, validationResult, Result } from "express-validator";
-import { LoginMessage, SignupError } from "../../types/auth";
+import {
+  EmailError,
+  LoginMessage,
+  NicknameError,
+  PasswordError,
+} from "../types/auth";
 import { getUserByEmail } from "../data/user";
 
 // 이메일 인가
-export const emailValidate = (email: string) => {
-  return email
+export const emailFormValidate = (email: string) => {
+  let result = email
     .toString()
     .trim()
     .toLowerCase()
     .match(
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
+  return !result ? false : true;
 };
 
 // 비밀번호 인가
-export const passwordValidate = (password: string) => {
-  return password
+export const passwordFormValidate = (password: string) => {
+  let result = password
     .trim()
     .toLowerCase()
     .match(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!*?&])[A-Za-z\d@$!%*?&]{8,20}$/);
+
+  return !result ? false : true;
 };
 
 // 회원가입 유저정보 검증
@@ -30,22 +38,19 @@ export const signupUserValidate = [
     .toLowerCase()
     .notEmpty()
     .isEmail()
-    .withMessage(SignupError.EMAIL)
-    .custom((value) => emailValidate(value))
-    .withMessage(SignupError.EMAIL),
+    .withMessage(EmailError.EMAIL_FORM_ERROR)
+    .custom((value) => emailFormValidate(value))
+    .withMessage(EmailError.EMAIL_FORM_ERROR),
   //  닉네임
   body("nickname")
     .trim()
     .toLowerCase()
     .isLength({ min: 2, max: 12 })
-    .withMessage(SignupError.NICKNAME),
+    .withMessage(NicknameError.NICKNAME_FORM_ERROR),
   // 비밀번호 확인
   body("password")
-    .toLowerCase()
-    .isLength({ min: 8, max: 20 })
-    .withMessage(SignupError.PASSWORD)
-    .custom((value) => passwordValidate(value))
-    .withMessage(SignupError.PASSWORD),
+    .custom((value) => passwordFormValidate(value))
+    .withMessage(PasswordError.PASSWORD_FORM_ERROR),
   // .withMessage(
   //   "비밀번호는 영문, 숫자, 특수문자를 최소 1개 이상 포함하여야 합니다"
   // ),
@@ -54,7 +59,7 @@ export const signupUserValidate = [
     .toLowerCase()
     .notEmpty()
     .custom((value, { req }) => value == req.body.password)
-    .withMessage(SignupError.PASSWORD_CHECK),
+    .withMessage(PasswordError.PASSWORD_CHECK_ERROR),
 
   (req: Request, res: Response, next: NextFunction) => {
     const errors: Result = validationResult(req);
@@ -68,28 +73,23 @@ export const signupUserValidate = [
 export const loginValidate = [
   //   이메일
   body("email")
-    .trim()
-    .toLowerCase()
     .notEmpty()
     .isEmail()
-    .withMessage(LoginMessage.EMAIL)
-    .custom((value) => emailValidate(value))
-    .withMessage(LoginMessage.EMAIL)
+    .withMessage(EmailError.EMAIL_FORM_ERROR)
+    .custom((value) => emailFormValidate(value))
+    .withMessage(EmailError.EMAIL_FORM_ERROR)
     .custom(async (val) => {
       let result = await getUserByEmail(val);
-      if (!result.length) throw LoginMessage.EMAIL_UNDEFINED;
+      if (!result.length) throw EmailError.EMAIL_UNDEFINED_ERROR;
       return true;
     }),
   // 비밀번호 확인
   body("password")
     .toLowerCase()
     .isLength({ min: 8, max: 20 })
-    .withMessage(SignupError.PASSWORD)
-    .custom((value) => passwordValidate(value))
-    .withMessage(SignupError.PASSWORD),
-  // .withMessage(
-  //   "비밀번호는 영문, 숫자, 특수문자를 최소 1개 이상 포함하여야 합니다"
-  // ),
+    .withMessage(PasswordError.PASSWORD_FORM_ERROR)
+    .custom((value) => passwordFormValidate(value))
+    .withMessage(PasswordError.PASSWORD_FORM_ERROR),
 
   (req: Request, res: Response, next: NextFunction) => {
     const errors: Result = validationResult(req);

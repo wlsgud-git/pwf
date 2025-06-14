@@ -9,11 +9,11 @@ import https from "https";
 import helmet from "helmet";
 
 // other file
-import { config } from "../config";
+import { config } from "./config/config";
 import { initSocket } from "./util/socket";
 
 // types
-import { corsProps } from "../types/http";
+import { corsProps } from "./types/http";
 
 // option ---------------------------
 const corsOption: corsProps = {

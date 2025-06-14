@@ -3,363 +3,332 @@ import "../css/signup.css";
 import axios from "axios";
 
 // library
-import { Ref, use, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Form, Link, useNavigate } from "react-router-dom";
 
 // other file
 import { createFormData } from "../util/form";
-import { user_service } from "../service/userservice";
-import { errorHandling } from "../error/error";
+import { user_service } from "../service/user.service";
+import { AxiosError } from "../error/error";
 
 // types
 import { User } from "../types/user";
 import {
-  authErrorProps,
-  PasswordError,
-  SignupInputProps,
   SignupMessage,
+  EmailError,
+  PasswordError,
+  NicknameError,
 } from "../types/auth";
 import { InputChange, FormSubmit } from "../types/event";
+import { auth_service } from "../service/auth.service";
 import {
   emailValidate,
   nicknameValidate,
-  passwordValidate,
+  passwordFormValid,
 } from "../validation/auth";
 
+interface SignupInputProps {
+  value: string;
+  error: boolean;
+  error_msg: string;
+  show?: boolean;
+  active: boolean;
+}
+
+interface SignupBtnProps {
+  active: boolean;
+  loading: boolean;
+}
+
+type InputChecker = "email" | "nickname" | "password" | "passwordCheck";
+
 export const Signup = () => {
-  let [loading, setLoading] = useState<boolean>(false);
-  let navigate = useNavigate();
-  const initialState: SignupInputProps = {
+  const InputInitState = {
+    value: "",
     error: false,
     error_msg: "",
-    value: "",
     show: false,
+    active: false,
   };
-  let [SignupStep, setSignupStep] = useState<boolean>(false);
+  const BtnInitState = { active: false, loading: false };
 
   let emailRef = useRef<HTMLInputElement | null>(null);
   let nicknameRef = useRef<HTMLInputElement | null>(null);
   let passwordRef = useRef<HTMLInputElement | null>(null);
   let passwordCheckRef = useRef<HTMLInputElement | null>(null);
 
-  let [email, setEmail] = useState<SignupInputProps>(initialState);
-  let [nickname, setNickname] = useState<SignupInputProps>(initialState);
-  let [password, setPassword] = useState<SignupInputProps>(initialState);
-  let [password_check, setPasswordCheck] =
-    useState<SignupInputProps>(initialState);
+  let [email, setEmail] = useState<SignupInputProps>(InputInitState);
+  let [nickname, setNickname] = useState<SignupInputProps>(InputInitState);
+  let [password, setPassword] = useState<SignupInputProps>(InputInitState);
+  let [passwordCheck, setPasswordCheck] =
+    useState<SignupInputProps>(InputInitState);
 
-  // 인증부분
-  let [authcode, setAuthcode] = useState<string>("");
-  let [authError, setAuthError] = useState<{ error: boolean; msg: string }>({
-    error: false,
-    msg: "",
-  });
-  let AuthInputRef = useRef<HTMLInputElement | null>(null);
+  let [signupBtn, setSignupBtn] = useState<SignupBtnProps>(BtnInitState);
 
-  // 회원가입 버튼 활성화
-  const buttonActive = () => {
-    if (
-      email.value == "" ||
-      email.error ||
-      nickname.value == "" ||
-      nickname.error ||
-      password.value == "" ||
-      password.error ||
-      password_check.value == "" ||
-      password_check.error
-    )
-      return false;
-    return true;
-  };
-
-  // 유저 정보 보내기
-  const submitUserInfo = async (e: FormSubmit) => {
+  const submitLogin = async (e: FormSubmit) => {
     e.preventDefault();
 
-    let formdata = createFormData({
-      email: email.value,
-      nickname: nickname.value,
-      password: password.value,
-      password_check: password_check.value,
-    });
-    setLoading(true);
-
-    try {
-      await user_service.sendUserInfo(formdata);
-      setSignupStep((c) => !c);
-    } catch (err) {
-      alert(err);
-    }
-    setLoading(false);
+    console.log("email error", email.error);
+    console.log("nickname error", nickname.error);
+    console.log("password error", password.error);
+    console.log("passwordCheck error", passwordCheck.error);
   };
 
-  // 비밀번화 확인값 검증
-  const passwordCheckValid = (e: InputChange) => {
-    let value = e.target.value;
-    let valid = password.value === value;
+  const signupError = (path: "email" | "nickname", msg: string) => {
+    if (path == "email")
+      setEmail((c) => ({
+        ...c,
+        error: c.value !== "" ? true : false,
+        error_msg: msg,
+      }));
+    else {
+      setNickname((c) => ({
+        ...c,
+        error: c.value !== "" ? true : false,
+        error_msg: msg,
+      }));
+    }
+  };
+
+  let inputFocus = (type: InputChecker) => {
+    if (type == "email")
+      setEmail((c) => ({ ...c, active: true, error: false }));
+    else if (type == "nickname")
+      setNickname((c) => ({ ...c, active: true, error: false }));
+    else if (type == "password")
+      setPassword((c) => ({ ...c, active: true, error: false }));
+    else setPasswordCheck((c) => ({ ...c, active: true, error: false }));
+  };
+
+  let inputBlur = async (type: InputChecker) => {
+    try {
+      let error_state: boolean = false;
+      if (type == "email") {
+        setEmail((c) => ({ ...c, active: false }));
+        await emailValidate(email.value, false);
+      } else if (type == "nickname") {
+        setNickname((c) => ({ ...c, active: false }));
+        await nicknameValidate(nickname.value);
+      } else
+        setPassword((c) => ({
+          ...c,
+          active: false,
+          error: passwordFormValid(password.value) && password.value !== "",
+          error_msg: PasswordError.PASSWORD_FORM_ERROR,
+        }));
+    } catch (err) {
+      let { path, msg } = AxiosError(err);
+      signupError(path, msg);
+    }
+  };
+
+  useEffect(() => {
+    // if()
+
     setPasswordCheck((c) => ({
       ...c,
-      value,
-      error: !valid,
-      error_msg: valid ? "" : PasswordError.PASSWORD_CHECK_ERROR,
+      error: password.value !== passwordCheck.value,
+      error_msg: PasswordError.PASSWORD_CHECK_ERROR,
     }));
-  };
-
-  // step 2 -----------------------------------
-  // 인증번호 재전송
-  const resendAuthcode = async () => {
-    let formdata = createFormData({ email: email.value });
-
-    try {
-      await user_service.resendAuthcode(formdata);
-      setAuthError((c) => ({ ...c, error: false }));
-      alert("인증번호를 재전송하였습니다.");
-    } catch (err) {
-      alert(err);
-    }
-  };
-
-  // 돌아가기 버튼 클릭시
-  const returnStep = () => {
-    setAuthError((c) => ({ ...c, error: false }));
-    setAuthcode("");
-    setSignupStep((c) => !c);
-  };
-
-  // 인증번호 확인 후 회원가입
-  const authcodeCheck = async (e: FormSubmit) => {
-    e.preventDefault();
-
-    let formdata = createFormData({
-      email: email.value,
-      nickname: nickname.value,
-      password: password.value,
-      authcode,
-    });
-
-    try {
-      let res = await user_service.account(formdata);
-      alert(SignupMessage.SUCCESS);
-      navigate("/login");
-    } catch (err) {
-      let { msg } = errorHandling(err);
-      setAuthError((c) => ({ ...c, error: true, msg }));
-    }
-  };
+  }, [passwordCheck.value]);
 
   return (
     <div className="page signup_page">
-      {SignupStep ? (
-        // 회원가입 이메일 인증
-        <div className="signup_auth_box">
-          {/* header section */}
-          <div className="signup_auth_header">
-            {email.value}로 인증번호가 전송되었습니다
-            <button className="signup_auth_resend_btn" onClick={resendAuthcode}>
-              번호 재전송
-            </button>
-          </div>
-          {/* content section */}
-          <div className="signup_auth_content">
-            {/* error section */}
+      <div className="signup_form_container">
+        <span className="signup_text">회원가입</span>
+
+        <form className="signup_pwf_form" onSubmit={submitLogin}>
+          {/* 이메일 */}
+          <div className="signup_info_container">
             <div
-              className="auth_error_box"
-              style={{ display: authError.error ? "flex" : "none" }}
+              className="signup_input_box"
+              style={{ border: `1px solid ${email.error ? "red" : "gray"}` }}
+              onFocus={() => inputFocus("email")}
+              onBlur={() => inputBlur("email")}
             >
-              {authError.msg}
-            </div>
-            <form method="post" onSubmit={authcodeCheck}>
+              <p
+                style={{
+                  top:
+                    email.value === "" && email.active == false
+                      ? "calc(50% - var(--placeholder-font-size))"
+                      : "7%",
+                }}
+              >
+                이메일
+              </p>
               <input
                 type="text"
-                ref={AuthInputRef}
-                value={authcode}
-                onFocus={() => setAuthError((c) => ({ ...c, error: false }))}
-                placeholder="인증번호를 입력하세요"
-                onChange={(e: InputChange) => setAuthcode(e.target.value)}
+                spellCheck="false"
+                ref={emailRef}
+                value={email.value}
+                onChange={(e: InputChange) =>
+                  setEmail((c) => ({ ...c, value: e.target.value }))
+                }
               />
+            </div>
 
-              <button className="">인증하기</button>
-            </form>
-          </div>
-          <footer className="signup_auth_footer">
-            <button onClick={returnStep}>돌아가기</button>
-          </footer>
-        </div>
-      ) : (
-        // 회원가입 유저정보
-        <div className="signup_container">
-          {/* 로그인 헤더 */}
-          <div className="signup_header">
-            <span>PWF</span>
+            <div
+              className="signup_error"
+              style={{ display: email.error ? "flex" : "none" }}
+            >
+              {email.error_msg}
+            </div>
           </div>
 
-          {/* 로그인 내용 */}
-          <div className="signup_content">
-            <form action="post" onSubmit={submitUserInfo}>
-              {/* 이메일 */}
-              <div className="signup_input_box">
-                <div
-                  style={{
-                    border: `1px solid var(--pwf-${
-                      email.error ? "red" : "gray"
-                    })`,
-                  }}
-                >
-                  <input
-                    type="email"
-                    onFocus={() => setEmail((c) => ({ ...c, error: false }))}
-                    spellCheck={false}
-                    placeholder="이메일"
-                    ref={emailRef}
-                    value={email.value}
-                    onBlur={() => emailValidate(email.value, setEmail, false)}
-                    onChange={(e: InputChange) =>
-                      setEmail((c) => ({ ...c, value: e.target.value }))
-                    }
-                  />
-                </div>
-
-                <span
-                  className="signup_error"
-                  style={{ display: email.error ? "block" : "none" }}
-                >
-                  {email.error_msg}
-                </span>
-              </div>
-              {/* 닉네임 */}
-              <div className="signup_input_box">
-                <div
-                  style={{
-                    border: `1px solid var(--pwf-${
-                      nickname.error ? "red" : "gray"
-                    })`,
-                  }}
-                >
-                  <input
-                    type="text"
-                    placeholder="닉네임"
-                    onFocus={() => setNickname((c) => ({ ...c, error: false }))}
-                    ref={nicknameRef}
-                    spellCheck={false}
-                    value={nickname.value}
-                    onBlur={() => nicknameValidate(nickname.value, setNickname)}
-                    onChange={(e: InputChange) =>
-                      setNickname((c) => ({ ...c, value: e.target.value }))
-                    }
-                  />
-                </div>
-
-                <span
-                  className="signup_error"
-                  style={{ display: nickname.error ? "block" : "none" }}
-                >
-                  {nickname.error_msg}
-                </span>
-              </div>
-              {/* 비밀번호 */}
-              <div className="signup_input_box">
-                <div
-                  style={{
-                    border: `1px solid var(--pwf-${
-                      password.error ? "red" : "gray"
-                    })`,
-                  }}
-                >
-                  <input
-                    type={password.show ? "text" : "password"}
-                    className="signup_password_input"
-                    placeholder="비밀번호"
-                    ref={passwordRef}
-                    value={password.value}
-                    onFocus={() => setPassword((c) => ({ ...c, error: false }))}
-                    onBlur={() => passwordValidate(password.value, setPassword)}
-                    onChange={(e: InputChange) =>
-                      setPassword((c) => ({ ...c, value: e.target.value }))
-                    }
-                  />
-                  <button
-                    type="button"
-                    className="pw_show_btn"
-                    onClick={() =>
-                      setPassword((c) => ({ ...c, show: !c.show }))
-                    }
-                  >
-                    <i
-                      className={`fa-solid fa-eye${
-                        password.show ? "-slash" : ""
-                      }`}
-                    ></i>
-                  </button>
-                </div>
-
-                <span
-                  className="signup_error"
-                  style={{ display: password.error ? "block" : "none" }}
-                >
-                  {password.error_msg}
-                </span>
-              </div>
-              {/* 비밀번호 확인 */}
-              <div className="signup_input_box">
-                <div
-                  style={{
-                    border: `1px solid var(--pwf-${
-                      password_check.error ? "red" : "gray"
-                    })`,
-                    backgroundColor: password.value === "" ? "" : "",
-                  }}
-                >
-                  <input
-                    type={password_check.show ? "text" : "password"}
-                    className="signup_password_input"
-                    placeholder="비밀번호 확인"
-                    ref={passwordCheckRef}
-                    value={password.value !== "" ? password_check.value : ""}
-                    disabled={password.value === "" ? true : false}
-                    onChange={passwordCheckValid}
-                  />
-                  <button
-                    type="button"
-                    className="pw_show_btn"
-                    onClick={() =>
-                      setPasswordCheck((c) => ({ ...c, show: !c.show }))
-                    }
-                  >
-                    <i
-                      className={`fa-solid fa-eye${
-                        password_check.show ? "-slash" : ""
-                      }`}
-                    ></i>
-                  </button>
-                </div>
-
-                <span
-                  className="signup_error"
-                  style={{ display: password_check.error ? "block" : "none" }}
-                >
-                  {password_check.error_msg}
-                </span>
-              </div>
-
-              <button
-                style={{ cursor: buttonActive() ? "pointer" : "not-allowed" }}
-                disabled={buttonActive() && !loading ? false : true}
-                className="signup_btn"
+          {/* 닉네임 */}
+          <div className="signup_info_container">
+            <div
+              className="signup_input_box"
+              style={{ border: `1px solid ${nickname.error ? "red" : "gray"}` }}
+              onFocus={() => inputFocus("nickname")}
+              onBlur={() => inputBlur("nickname")}
+            >
+              <p
+                style={{
+                  top:
+                    nickname.value === "" && nickname.active == false
+                      ? "calc(50% - var(--placeholder-font-size))"
+                      : "7%",
+                }}
               >
-                {loading ? "진행중..." : "회원가입"}
-              </button>
-            </form>
+                닉네임
+              </p>
+              <input
+                type="text"
+                spellCheck="false"
+                ref={nicknameRef}
+                value={nickname.value}
+                onChange={(e: InputChange) =>
+                  setNickname((c) => ({ ...c, value: e.target.value }))
+                }
+              />
+            </div>
+
+            <div
+              className="signup_error"
+              style={{ display: nickname.error ? "flex" : "none" }}
+            >
+              {nickname.error_msg}
+            </div>
           </div>
 
-          {/* 로그인 풋터 */}
-          <div className="signup_footer">
-            <span>계정이 있다면?</span>
-            <Link to="/login" className="login_anchor">
-              로그인
-            </Link>
+          {/* 비밀번호 */}
+          <div className="signup_info_container">
+            <div
+              className="signup_input_box"
+              style={{ border: `1px solid ${password.error ? "red" : "gray"}` }}
+              onFocus={() => inputFocus("password")}
+              onBlur={() => inputBlur("password")}
+            >
+              <p
+                style={{
+                  top:
+                    password.value === "" && !password.active
+                      ? "calc(50% - var(--placeholder-font-size))"
+                      : "7%",
+                }}
+              >
+                비밀번호
+              </p>
+              <input
+                type={password.show ? "text" : "password"}
+                value={password.value}
+                ref={passwordRef}
+                onChange={(e: InputChange) =>
+                  setPassword((c) => ({ ...c, value: e.target.value }))
+                }
+              />
+              <span
+                onClick={() => setPassword((c) => ({ ...c, show: !c.show }))}
+              >
+                <i
+                  className={`fa-solid fa-eye${password.show ? "" : "-slash"}`}
+                ></i>
+              </span>
+            </div>
+
+            <div
+              className="signup_error"
+              style={{ display: password.error ? "flex" : "none" }}
+            >
+              {password.error_msg}
+            </div>
           </div>
+
+          {/* 비밀번호 확인*/}
+          <div className="signup_info_container">
+            <div
+              className="signup_input_box"
+              style={{
+                border: `1px solid ${passwordCheck.error ? "red" : "gray"}`,
+              }}
+              onFocus={() => inputFocus("passwordCheck")}
+              onBlur={() =>
+                setPasswordCheck((c) => ({
+                  ...c,
+                  active: c.value !== "",
+                  error: c.value === "" ? false : password.value !== c.value,
+                }))
+              }
+            >
+              <p
+                style={{
+                  top:
+                    passwordCheck.value === "" && !passwordCheck.active
+                      ? "calc(50% - var(--placeholder-font-size))"
+                      : "7%",
+                }}
+              >
+                비밀번호 확인
+              </p>
+              <input
+                type={passwordCheck.show ? "text" : "password"}
+                value={passwordCheck.value}
+                disabled={password.value == ""}
+                ref={passwordCheckRef}
+                onChange={(e: InputChange) =>
+                  setPasswordCheck((c) => ({ ...c, value: e.target.value }))
+                }
+              />
+              <span
+                onClick={() =>
+                  setPasswordCheck((c) => ({ ...c, show: !c.show }))
+                }
+              >
+                <i
+                  className={`fa-solid fa-eye${
+                    passwordCheck.show ? "" : "-slash"
+                  }`}
+                ></i>
+              </span>
+            </div>
+
+            <div
+              className="signup_error"
+              style={{ display: passwordCheck.error ? "flex" : "none" }}
+            >
+              {passwordCheck.error_msg}
+            </div>
+          </div>
+          {/* 로그인 버튼 */}
+          <button
+            className="signup_btn"
+            style={{
+              backgroundColor: `var(--pwf-${
+                signupBtn.active ? "blue" : "gray"
+              })`,
+            }}
+            disabled={!signupBtn.active}
+          >
+            회원가입
+          </button>
+        </form>
+
+        <div>
+          <Link to="/login">로그인</Link>
+          <span>비밀번호 찾기</span>
         </div>
-      )}
+      </div>
     </div>
   );
 };

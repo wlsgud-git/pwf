@@ -5,13 +5,13 @@ import { nicknameOverlap, emailOverlap } from "../data/user";
 import { transporter, sendAuthcodeMail } from "../util/mail";
 
 // types
-import { User } from "../../types/user";
+import { User } from "../types/user";
 
 import { hashingText } from "../util/crypto";
 import { redisGet, redisSet } from "../util/redis";
-import { AuthcodeError, SignupError } from "../../types/auth";
-import { emailValidate } from "../validation/auth";
-import { RequestQuery } from "../../types/http";
+import { AuthcodeError, EmailError, NicknameError } from "../types/auth";
+import { emailFormValidate } from "../validation/auth";
+import { RequestQuery } from "../types/http";
 import { verifyJwt } from "../util/jwt";
 
 // Authentication Or Authorization --------------------------
@@ -29,11 +29,24 @@ export const IsAuth: RequestHandler = async (req, res, next) => {
 
 //  이메일 중복체크
 export const emailOverlapCheck: RequestHandler = async (req, res) => {
-  let { email } = req.body;
+  let { email, overlap } = req.body;
+  let overlap_state = overlap == "false" ? false : "true";
   try {
-    if (!emailValidate(email)) throw { type: "email", msg: SignupError.EMAIL };
+    if (!emailFormValidate(email))
+      throw { path: "email", msg: EmailError.EMAIL_FORM_ERROR };
+
     let user = await emailOverlap(email);
-    res.status(200).json(user[0]);
+
+    // 겹치는게 있으면 안 됨
+    if (!overlap_state) {
+      if (user.length)
+        throw { path: "email", msg: EmailError.EMAIL_OVERLAP_ERROR };
+    } else {
+      if (!user.length)
+        throw { path: "email", msg: EmailError.EMAIL_UNDEFINED_ERROR };
+    }
+
+    res.status(200).json({ msg: "문제 없음" });
   } catch (error) {
     res.status(400).json(error);
   }
@@ -46,10 +59,10 @@ export const nicknameOverlapCheck: RequestHandler = async (req, res) => {
     let user = await nicknameOverlap(nickname);
     if (user.length)
       throw {
-        type: "nickname",
-        msg: SignupError.NICKNAME_OVERLAP,
+        path: "nickname",
+        msg: NicknameError.NICKNAME_OVERLAP_ERROR,
       };
-    res.status(200).json(user[0]);
+    res.status(200).json({ msg: "문제 없음" });
   } catch (error) {
     res.status(400).json(error);
   }

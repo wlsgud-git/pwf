@@ -2,10 +2,10 @@ import { Socket, Server } from "socket.io";
 import { redisGet } from "./redis";
 
 import { HttpsServer } from "../app";
-import { config } from "../../config";
+import { config } from "../config/config";
 import { NextFunction } from "express";
 
-import { User } from "../../types/user";
+import { User } from "../types/user";
 import { userOnlineFriend } from "./auth";
 import { p2pSignalling } from "../middleware/user";
 

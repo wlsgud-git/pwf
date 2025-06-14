@@ -1,5 +1,5 @@
 import { dbPlay } from "../util/database";
-import { User } from "../../types/user";
+import { User } from "../types/user";
 
 // Authentication OR Authorization ------------------------
 // 유저 정보 얻기 (email)

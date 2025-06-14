@@ -1,5 +1,5 @@
 import pg from "pg";
-import { config } from "../../config";
+import { config } from "../config/config";
 
 const pgClient = new pg.Client({
   user: config.database.user,

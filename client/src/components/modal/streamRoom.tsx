@@ -5,7 +5,7 @@ import { emitter } from "../../util/event";
 // types
 import { User, UserComponent } from "../../types/user";
 import { FormSubmit, InputChange } from "../../types/event";
-import { stream_service } from "../../service/streamservice";
+import { stream_service } from "../../service/stream.service";
 import { createFormData } from "../../util/form";
 
 interface CompoentProps {

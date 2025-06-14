@@ -1,11 +1,8 @@
 import { Dispatch } from "react";
 import { EmailError, PasswordError, NicknameError } from "../types/auth";
-import { user_service } from "../service/userservice";
+import { user_service } from "../service/user.service";
 import { createFormData } from "../util/form";
-import { errorHandling } from "../error/error";
-
-import { SignupInputProps } from "../types/auth";
-import { StateDispatch } from "../types/event";
+import { auth_service } from "../service/auth.service";
 
 // 이메일 형태 검증
 export const emailFormValid = (email: string) => {
@@ -16,7 +13,7 @@ export const emailFormValid = (email: string) => {
     .match(
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
-  return !result ? false : true;
+  return !result ? true : false;
 };
 
 // 비밀번호 형태 검증
@@ -25,60 +22,33 @@ export const passwordFormValid = (password: string) => {
     .trim()
     .toLowerCase()
     .match(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!*?&])[A-Za-z\d@$!%*?&]{8,20}$/);
-  return !result ? false : true;
+  return !result ? true : false;
 };
 
 // 이메일 검증
-export const emailValidate = async (
-  email: string,
-  set_email: StateDispatch<SignupInputProps>,
-  overlap: boolean
-) => {
+export const emailValidate = async (email: string, overlap: boolean) => {
   try {
-    if (!emailFormValid(email))
-      throw { type: "email", msg: EmailError.EMAIL_FORM_ERROR };
-    let formdata = createFormData({ email });
-    let res = await user_service.emailOverlap(formdata);
+    if (emailFormValid(email))
+      throw { path: "email", msg: EmailError.EMAIL_FORM_ERROR };
+    let formdata = createFormData({ email, overlap });
+    await auth_service.emailOverlap(formdata);
 
-    if (overlap) {
-      if (typeof res == "string")
-        throw { type: "email", msg: "존재하지 않는 이메일입니다." };
-    } else {
-      if (typeof res == "object")
-        throw { type: "email", msg: "이미 존재하는 이메일입니다." };
-    }
-    set_email((c) => ({ ...c, error: false }));
+    return false;
   } catch (err) {
-    let { type, msg } = errorHandling(err);
-    set_email((c) => ({ ...c, error: true, error_msg: msg }));
+    console.log(err);
+    throw err;
   }
 };
 
-// 닉네임 검증
-export const nicknameValidate = async (
-  nickname: string,
-  set_nickname: StateDispatch<SignupInputProps>
-) => {
+// 닉네임 검정
+export const nicknameValidate = async (nickname: string) => {
   try {
+    if (nickname.length < 2 || nickname.length > 12)
+      throw { path: "nickname", msg: NicknameError.NICKNAME_FORM_ERROR };
     let formdata = createFormData({ nickname });
-    let res = await user_service.nicknameOverlap(formdata);
-    set_nickname((c) => ({ ...c, error: false }));
+    await auth_service.nicknameOverlap(formdata);
+    return false;
   } catch (err) {
-    let { type, msg } = errorHandling(err);
-    set_nickname((c) => ({ ...c, error: true, error_msg: msg }));
+    throw err;
   }
-};
-
-// 비밀번호 인가
-export const passwordValidate = (
-  password: string,
-  set_password: StateDispatch<SignupInputProps>
-) => {
-  let result = passwordFormValid(password);
-  if (!result)
-    set_password((c) => ({
-      ...c,
-      error: !result ? true : false,
-      error_msg: !result ? PasswordError.PASSWORD_FORM_ERROR : "",
-    }));
 };

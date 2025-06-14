@@ -1,5 +1,5 @@
 import { getIo } from "../util/socket";
-import { User } from "../../types/user";
+import { User } from "../types/user";
 import { Socket } from "socket.io";
 
 import { userOnlineFriend } from "../util/auth";

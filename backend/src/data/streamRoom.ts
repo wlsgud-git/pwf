@@ -1,6 +1,6 @@
 import { dbPlay } from "../util/database";
-import { User } from "../../types/user";
-import { Room } from "../../types/streamroom";
+import { User } from "../types/user";
+import { Room } from "../types/streamroom";
 
 // Authentication OR Authorization ------------------------
 export const getStreamRoomData = async (id: number) => {

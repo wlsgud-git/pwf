@@ -1,5 +1,5 @@
 // import { getUser } from "../reducer/userSlice";
-import { userService } from "../../service/userservice";
+import { userService } from "../../service/user.service";
 // import { AppDispatch } from "";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 // types
 // import { UserAction, UserActionTypes } from "../../types/user";
 import { User } from "../../types/user";
-import { errorHandling } from "../../error/error";
 import { HttpResponse } from "../../types/http";
 
 class UserAction extends userService {

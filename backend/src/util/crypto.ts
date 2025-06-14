@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { config } from "../../config";
+import { config } from "../config/config";
 
 export const hashingText = async (text: string) => {
   try {

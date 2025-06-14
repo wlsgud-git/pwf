@@ -6,8 +6,8 @@ import { ModalList } from "../../page/modal";
 import { emitter } from "../../util/event";
 import { FormEvent, useState } from "react";
 import { InputChange } from "../../types/event";
-import { emailValidate, passwordValidate } from "../../validation/auth";
-import { user_service } from "../../service/userservice";
+import { emailValidate } from "../../validation/auth";
+import { user_service } from "../../service/user.service";
 import { createFormData } from "../../util/form";
 
 interface PwFindProps {
@@ -101,7 +101,7 @@ export const PwFind = ({ user, type }: PwFindProps) => {
                   setPassword((c) => ({ ...c, value: e.target.value }))
                 }
                 onFocus={() => setPassword((c) => ({ ...c, error: false }))}
-                onBlur={() => passwordValidate(password.value, setPassword)}
+                // onBlur={() => passwordValidate(password.value, setPassword)}
               />
               <button
                 type="button"

@@ -9,9 +9,9 @@ import { userInit } from "../context/reducer/userReducer";
 import { emitter } from "../util/event";
 import { useSelector } from "react-redux";
 import { AppDispatch, persistor, RootState } from "../context/store";
-import { user_service } from "../service/userservice";
 import { socketClient } from "../util/socket";
 import { useDispatch } from "react-redux";
+import { auth_service } from "../service/auth.service";
 
 export const PageHeader = () => {
   let navigate = useNavigate();
@@ -21,7 +21,7 @@ export const PageHeader = () => {
 
   const logout = async () => {
     try {
-      await user_service.logout();
+      await auth_service.logout();
       dispatch(userInit());
       await persistor.purge();
       socketClient.disconnect();

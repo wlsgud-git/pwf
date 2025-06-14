@@ -1,15 +1,3 @@
-export interface authErrorProps {
-  state: boolean;
-  message?: string;
-}
-
-export interface SignupInputProps {
-  error: boolean;
-  value: string;
-  error_msg: string;
-  show?: boolean;
-}
-
 export enum EmailError {
   EMAIL_FORM_ERROR = "이메일 형식이 올바르지 않습니다.",
   EMAIL_OVERLAP_ERROR = "이미 가입된 이메일입니다.",
