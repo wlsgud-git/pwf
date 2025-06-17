@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkclient=self.webpackChunkclient||[]).push([[867],{867:(s,a,e)=>{e.r(a),e.d(a,{StreamRoomLi:()=>i});var r=e(462),t=e(579);const i=s=>{let{data:a}=s;return(0,t.jsx)("li",{className:"stream_room_li",children:(0,t.jsxs)(r.N_,{to:`room/${a.id}`,children:[(0,t.jsx)("h2",{className:"stream_room_name",children:a.room_name}),(0,t.jsxs)("span",{className:"stream_room_participant",children:[(0,t.jsx)("i",{className:"fa-solid fa-user"}),a.participants&&a.participants.length]})]})})}}}]);
-//# sourceMappingURL=867.e31cc2ac.chunk.js.map

@@ -26,6 +26,8 @@ import {
   nicknameValidate,
   passwordFormValid,
 } from "../validation/auth";
+import { Authcode } from "../components/modal/authcode";
+import { emitter } from "../util/event";
 
 interface SignupInputProps {
   value: string;
@@ -43,6 +45,7 @@ interface SignupBtnProps {
 type InputChecker = "email" | "nickname" | "password" | "passwordCheck";
 
 export const Signup = () => {
+  let navigate = useNavigate();
   const InputInitState = {
     value: "",
     error: false,
@@ -65,29 +68,73 @@ export const Signup = () => {
 
   let [signupBtn, setSignupBtn] = useState<SignupBtnProps>(BtnInitState);
 
-  const submitLogin = async (e: FormSubmit) => {
-    e.preventDefault();
+  // authcode
+  let [show, setShow] = useState<boolean>(false);
 
-    console.log("email error", email.error);
-    console.log("nickname error", nickname.error);
-    console.log("password error", password.error);
-    console.log("passwordCheck error", passwordCheck.error);
-  };
-
-  const signupError = (path: "email" | "nickname", msg: string) => {
+  const signupError = (path: InputChecker, msg: string) => {
     if (path == "email")
       setEmail((c) => ({
         ...c,
-        error: c.value !== "" ? true : false,
+        error: true,
         error_msg: msg,
       }));
-    else {
+    else if (path == "nickname") {
       setNickname((c) => ({
         ...c,
-        error: c.value !== "" ? true : false,
+        error: true,
         error_msg: msg,
       }));
+    } else if (path == "password") {
+      setPassword((c) => ({
+        ...c,
+        error: true,
+        error_msg: PasswordError.PASSWORD_FORM_ERROR,
+      }));
+    } else {
+      setPasswordCheck((c) => ({
+        ...c,
+        erorr: true,
+        error_msg: PasswordError.PASSWORD_CHECK_ERROR,
+      }));
     }
+  };
+
+  const account = async () => {
+    try {
+      await user_service.account(
+        createFormData({
+          email: email.value,
+          nickname: nickname.value,
+          password: password.value,
+        })
+      );
+      window.location.href = "/login";
+    } catch (err) {
+      alert(err);
+    }
+  };
+
+  const submitSignup = async (e: FormSubmit) => {
+    e.preventDefault();
+    setSignupBtn((c) => ({ ...c, loading: true }));
+
+    try {
+      let formdata = createFormData({
+        email: email.value,
+        nickname: nickname.value,
+        password: password.value,
+        password_check: passwordCheck.value,
+      });
+
+      await user_service.accountUser(formdata);
+
+      emitter.emit("modal", { open: true, type: "authcode" });
+      setShow(true);
+    } catch (err) {
+      let { path, msg } = AxiosError(err);
+      signupError(path, msg);
+    }
+    setSignupBtn((c) => ({ ...c, loading: false }));
   };
 
   let inputFocus = (type: InputChecker) => {
@@ -102,29 +149,25 @@ export const Signup = () => {
 
   let inputBlur = async (type: InputChecker) => {
     try {
-      let error_state: boolean = false;
       if (type == "email") {
         setEmail((c) => ({ ...c, active: false }));
         await emailValidate(email.value, false);
       } else if (type == "nickname") {
         setNickname((c) => ({ ...c, active: false }));
         await nicknameValidate(nickname.value);
-      } else
-        setPassword((c) => ({
-          ...c,
-          active: false,
-          error: passwordFormValid(password.value) && password.value !== "",
-          error_msg: PasswordError.PASSWORD_FORM_ERROR,
-        }));
+      } else if (type == "password") {
+        setPassword((c) => ({ ...c, active: false }));
+        if (passwordFormValid(password.value))
+          throw { path: "password", msg: PasswordError.PASSWORD_FORM_ERROR };
+      }
     } catch (err) {
       let { path, msg } = AxiosError(err);
       signupError(path, msg);
     }
   };
 
+  // 비밀번호 확인값 검증
   useEffect(() => {
-    // if()
-
     setPasswordCheck((c) => ({
       ...c,
       error: password.value !== passwordCheck.value,
@@ -132,12 +175,37 @@ export const Signup = () => {
     }));
   }, [passwordCheck.value]);
 
+  // 값이 변할때 회원가입 버튼 활성화
+  useEffect(() => {
+    let check =
+      email.value !== "" &&
+      !email.error &&
+      nickname.value !== "" &&
+      !nickname.error &&
+      password.value !== "" &&
+      !password.error &&
+      passwordCheck.value !== "" &&
+      passwordCheck.value === password.value;
+    if (check)
+      setSignupBtn((c) => ({
+        ...c,
+        active: true,
+      }));
+  }, [email.value, nickname.value, password.value, passwordCheck.value]);
+
   return (
     <div className="page signup_page">
+      <Authcode
+        show={show}
+        setShow={setShow}
+        email={email.value}
+        callback={account}
+      />
+
       <div className="signup_form_container">
         <span className="signup_text">회원가입</span>
 
-        <form className="signup_pwf_form" onSubmit={submitLogin}>
+        <form className="signup_pwf_form" onSubmit={submitSignup}>
           {/* 이메일 */}
           <div className="signup_info_container">
             <div
@@ -310,7 +378,7 @@ export const Signup = () => {
               {passwordCheck.error_msg}
             </div>
           </div>
-          {/* 로그인 버튼 */}
+          {/* 회원가입 버튼 */}
           <button
             className="signup_btn"
             style={{
@@ -318,15 +386,15 @@ export const Signup = () => {
                 signupBtn.active ? "blue" : "gray"
               })`,
             }}
-            disabled={!signupBtn.active}
+            disabled={!signupBtn.active || signupBtn.loading}
           >
-            회원가입
+            {signupBtn.loading ? "...진행중" : "회원가입"}
           </button>
         </form>
 
-        <div>
-          <Link to="/login">로그인</Link>
-          <span>비밀번호 찾기</span>
+        <div className="signup_support_box">
+          <span>계정이 있다면?</span>
+          <Link to={"/login"}>로그인</Link>{" "}
         </div>
       </div>
     </div>

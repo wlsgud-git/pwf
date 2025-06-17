@@ -39,7 +39,7 @@
 .signup_info_container {
   display: flex;
   flex-direction: column;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   align-items: start;
   width: var(--signup-input-width);
 }
@@ -95,6 +95,25 @@
   font-weight: 600;
   transition: all 0.3s ease;
   color: var(--pwf-red);
+}
+
+.signup_support_box {
+  display: flex;
+  margin-top: 15px;
+  justify-content: center;
+}
+
+.signup_support_box span {
+  color: var(--pwf-white);
+  margin-right: 8px;
+}
+
+.signup_support_box a {
+  color: var(--pwf-blue);
+}
+
+.signup_support_box a:hover {
+  text-decoration: underline;
 }
 
 @media screen and (max-width: 874px) {

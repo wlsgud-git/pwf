@@ -5,6 +5,10 @@
   flex-direction: column;
 }
 
+.test {
+  color: white;
+}
+
 .home_anchor {
   font-weight: 600;
   color: var(--pwf-white);

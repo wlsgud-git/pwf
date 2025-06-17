@@ -73,7 +73,6 @@ export const Invitation = ({
         }
         if (pusher) list.push(user.friends![i]);
       }
-    console.log(list);
     setInvitationList(list.map((val) => val));
   }, [participants]);
 

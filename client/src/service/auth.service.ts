@@ -31,7 +31,18 @@ export class authService extends HttpClient {
   // 인증코드  ----------------
   async resendAuthcode(data: FormData) {
     try {
-      return await this.axiosFetch<boolean>("/send_authcode", {
+      return await this.axiosFetch<boolean>("/authcode/resend", {
+        method: "post",
+        body: data,
+      });
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async checkAuthcode(data: FormData) {
+    try {
+      return await this.axiosFetch<boolean>("/authcode/check", {
         method: "post",
         body: data,
       });

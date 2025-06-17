@@ -23,6 +23,7 @@ import { Signup } from "./page/signup";
 import { useSelector } from "react-redux";
 import { Modal } from "./page/modal";
 import { Profile } from "./page/profile";
+import { Authcode } from "./components/modal/authcode";
 
 function App() {
   let dispatch = useDispatch<AppDispatch>();
@@ -30,13 +31,19 @@ function App() {
   let location = useLocation();
   let navigate = useNavigate();
 
+  // 로그인이 안 되어 있으면 로그인 페이지로
   useEffect(() => {
     let test = () => {
       dispatch(userAction.getUserAction())
         .unwrap()
         .catch((err: any) => {
           let path = location.pathname;
-          if (path === "/login" || path === "/signup") return;
+          if (
+            path === "/login" ||
+            path === "/signup" ||
+            path === "/authcode/fcipras8694@naver.com"
+          )
+            return;
           navigate("/login");
         });
     };

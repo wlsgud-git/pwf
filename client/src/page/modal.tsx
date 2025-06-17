@@ -15,12 +15,13 @@ export type ModalList =
   | "invitation"
   | "stream"
   | "password"
-  | "delete";
+  | "delete"
+  | "authcode";
 
 export const Modal = () => {
   let user = useSelector((state: RootState) => state.user);
   let [open, setOpen] = useState<boolean>(false);
-  let [content, setContent] = useState<ModalList>("delete");
+  let [content, setContent] = useState<ModalList>("authcode");
 
   // modal control
   useEffect(() => {

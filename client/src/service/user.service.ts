@@ -64,9 +64,9 @@ export class userService extends HttpClient {
     }
   }
   //회원가입 유저정보 보내기
-  async sendUserInfo(data: FormData) {
+  async accountUser(data: FormData) {
     try {
-      return await this.axiosFetch<User>(`/user_info`, {
+      return await this.axiosFetch<User>(`/account/user`, {
         method: "post",
         body: data,
       });

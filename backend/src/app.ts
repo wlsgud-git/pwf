@@ -8,24 +8,13 @@ import cookieParser from "cookie-parser";
 import https from "https";
 import helmet from "helmet";
 
+// config
+import { config } from "./config/env.config";
+import { corsOption } from "./config/cors.config";
+import { httpsOption } from "./config/app.config";
+
 // other file
-import { config } from "./config/config";
-import { initSocket } from "./util/socket";
-
-// types
-import { corsProps } from "./types/http";
-
-// option ---------------------------
-const corsOption: corsProps = {
-  credentials: true,
-  optionsSuccessStatus: 200,
-  origin: config.https.host,
-};
-
-const httpsOption = {
-  key: fs.readFileSync(path.resolve(__dirname, "./cert/key.pem")),
-  cert: fs.readFileSync(path.resolve(__dirname, "./cert/cert.pem")),
-};
+import { initSocket } from "./util/socket.util";
 
 const app: Application = express();
 export const HttpsServer = https.createServer(httpsOption, app);
@@ -38,14 +27,16 @@ app.use(helmet());
 app.use(cors(corsOption));
 app.use(express.static(path.join(__dirname, "../../client/build")));
 
-const UserApi = require("./api/user");
-const StreamRoomApi = require("./api/streamRoom");
+// Routes ---------------
+const UserRoutes = require("./routes/user.routes");
+const AuthRoutes = require("./routes/auth.routes");
+const StreamRoomRoutes = require("./routes/streamRoom.routes");
 
-app.use("/", UserApi);
-app.use("/", StreamRoomApi);
+app.use("/", UserRoutes);
+app.use("/", StreamRoomRoutes);
+app.use("/", AuthRoutes);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-  console.log("hi");
   next();
 });
 

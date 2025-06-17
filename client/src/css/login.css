@@ -118,6 +118,25 @@
   color: var(--pwf-red);
 }
 
+.login_support_box {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.login_support_box a,
+.login_support_box span {
+  color: var(--pwf-gray);
+  margin: 0px 4px;
+  cursor: pointer;
+}
+
+.login_support_box a:hover,
+.login_support_box span:hover {
+  text-decoration: underline;
+}
+
 @media screen and (max-width: 874px) {
   .login_pwf_introduce {
     display: none;

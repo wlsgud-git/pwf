@@ -8,6 +8,7 @@ import { EmailError, PasswordError } from "../types/auth";
 import { createFormData } from "../util/form";
 import { auth_service } from "../service/auth.service";
 import { AxiosError } from "../error/error";
+import { emitter } from "../util/event";
 
 // type
 interface LoginInputProps {
@@ -24,6 +25,7 @@ interface LoginBtnProps {
 }
 
 export const Login = () => {
+  let navigate = useNavigate();
   const InputInitState = {
     value: "",
     error: false,
@@ -41,13 +43,9 @@ export const Login = () => {
   let [loginBtn, setLoginBtn] = useState<LoginBtnProps>(BtnInitState);
 
   const loginError = (path: "email" | "password", msg: string) => {
-    if (path == "email") {
-      if (emailRef.current) emailRef.current.focus();
+    if (path == "email")
       setEmail((c) => ({ ...c, error: true, error_msg: msg }));
-    } else {
-      if (passwordRef.current) passwordRef.current.focus();
-      setPassword((c) => ({ ...c, error: true, error_msg: msg }));
-    }
+    else setPassword((c) => ({ ...c, error: true, error_msg: msg }));
   };
 
   const submitLogin = async (e: FormSubmit) => {
@@ -58,7 +56,7 @@ export const Login = () => {
         email: email.value,
         password: password.value,
       });
-      let res = await auth_service.login(formdata);
+      await auth_service.login(formdata);
       window.location.href = "/";
     } catch (err) {
       let { path, msg } = AxiosError(err);
@@ -207,7 +205,7 @@ export const Login = () => {
           </button>
         </form>
 
-        <div>
+        <div className="login_support_box">
           <Link to="/signup">회원가입</Link>
           <span>비밀번호 찾기</span>
         </div>
