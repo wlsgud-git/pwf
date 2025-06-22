@@ -6,6 +6,7 @@ import { RootState } from "../context/store";
 import { emitter } from "../util/event";
 import { useEffect, useRef, useState } from "react";
 import { InputChange } from "../types/event";
+import { PwFind } from "../components/modal/pwFind";
 
 export const Profile = () => {
   let user = useSelector((state: RootState) => state.user);
@@ -15,6 +16,7 @@ export const Profile = () => {
 
   // state
   let [profileSrc, setProfileSrc] = useState<any>("");
+  let [show, setShow] = useState<boolean>(false);
 
   useEffect(() => {
     setProfileSrc(user.profile_img!);
@@ -37,10 +39,17 @@ export const Profile = () => {
     reader.readAsDataURL(file_value);
   };
 
+  const showingModal = () => {
+    emitter.emit("modal", { type: "password", open: true });
+    setShow(true);
+  };
+
   return (
     <div className="page profile_page">
       {/* header */}
       <PageHeader />
+
+      <PwFind email={user.email!} show={show} setshow={setShow} />
 
       {/* content */}
       <div className="profile_content_container">
@@ -116,13 +125,7 @@ export const Profile = () => {
             비밀번호는 도난방지, 보안설정을 위하여 3개월~6개월 사이에 주기적으로
             변경하는 것이 안전합니다.
           </div>
-          <button
-            onClick={() =>
-              emitter.emit("modal", { type: "password", open: true })
-            }
-          >
-            비밀번호 변경
-          </button>
+          <button onClick={showingModal}>비밀번호 변경</button>
         </div>
         <div className="profile_side_box account_delete_alert">
           <div>회원 탈퇴시 기존 결제 및 정보는 모두 없어지게 됩니다.</div>

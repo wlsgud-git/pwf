@@ -194,11 +194,7 @@ export const Login = () => {
           {/* 로그인 버튼 */}
           <button
             className="login_btn"
-            style={{
-              backgroundColor: `var(--pwf-${
-                loginBtn.active ? "blue" : "gray"
-              })`,
-            }}
+            style={{ opacity: loginBtn.active ? 1 : 0.5 }}
             disabled={!loginBtn.active}
           >
             로그인
@@ -207,7 +203,7 @@ export const Login = () => {
 
         <div className="login_support_box">
           <Link to="/signup">회원가입</Link>
-          <span>비밀번호 찾기</span>
+          <Link to="/password/reset">비밀번호 찾기</Link>
         </div>
       </div>
     </div>

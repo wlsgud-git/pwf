@@ -1,5 +1,5 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 // css
 import "../../css/modal/authcode.css";
 
@@ -26,11 +26,14 @@ interface AuthcodeProps {
 export const Authcode = ({ show, setShow, email, callback }: AuthcodeProps) => {
   let [authcode, setAuthcode] = useState<string>("");
   let [time, setTime] = useState<number>(180);
+  let intervalRef = useRef<any>(null);
 
   // 모달 닫을때 해야될 것
   const reset = () => {
     setShow(false);
     setAuthcode("");
+    breakTime();
+    setTime(180);
     emitter.emit("modal", { type: "authcode" });
   };
 
@@ -53,11 +56,32 @@ export const Authcode = ({ show, setShow, email, callback }: AuthcodeProps) => {
         createFormData({ email })
       );
       alert(message);
-      setTime(180);
+      restartTime();
     } catch (err) {
       console.log(err);
     }
   };
+
+  // authcode 타이머
+
+  function spendTime() {
+    // if (intervalRef.current) return;
+    intervalRef.current = setInterval(() => {
+      setTime((c) => c - 1);
+    }, 1000);
+  }
+
+  const restartTime = () => {
+    breakTime();
+    setTime(180);
+    spendTime();
+  };
+
+  const breakTime = () => clearInterval(intervalRef.current);
+
+  useEffect(() => {
+    if (show) spendTime();
+  }, [show]);
 
   return (
     <div className="authcode_modal" style={{ display: show ? "flex" : "none" }}>
@@ -89,7 +113,16 @@ export const Authcode = ({ show, setShow, email, callback }: AuthcodeProps) => {
               placeholder="인증번호"
               onChange={(e: InputChange) => setAuthcode(e.target.value)}
             />
-            <span>03 : 00</span>
+
+            <span className="test">
+              {Math.floor(time / 60) < 10
+                ? `0${Math.floor(time / 60)}`
+                : `${Math.floor(time / 60)}`}
+              :
+              {Math.floor(time % 60) < 10
+                ? `0${Math.floor(time % 60)}`
+                : `${Math.floor(time % 60)}`}
+            </span>
           </div>
           <button className="authcode_btn">인증번호 확인</button>
         </form>

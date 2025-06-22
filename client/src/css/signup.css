@@ -86,7 +86,7 @@
   color: var(--pwf-white);
   border: none;
   outline: none;
-  /* border: ; */
+  background-color: var(--pwf-blue);
 }
 
 .signup_error {

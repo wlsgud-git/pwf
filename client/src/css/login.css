@@ -107,6 +107,7 @@
   color: var(--pwf-white);
   border: none;
   outline: none;
+  background-color: var(--pwf-blue);
   /* border: ; */
 }
 
@@ -125,15 +126,13 @@
   font-size: 15px;
 }
 
-.login_support_box a,
-.login_support_box span {
+.login_support_box a {
   color: var(--pwf-gray);
   margin: 0px 4px;
   cursor: pointer;
 }
 
-.login_support_box a:hover,
-.login_support_box span:hover {
+.login_support_box a:hover {
   text-decoration: underline;
 }
 

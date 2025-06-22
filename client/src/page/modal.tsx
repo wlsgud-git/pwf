@@ -49,7 +49,6 @@ export const Modal = () => {
         {/* 모달 콘텐츠 부분 */}
         <Friend user={user} type={content} />
         <StreamRoom user={user} type={content} />
-        <PwFind user={user} type={content} />
         <Delete user={user} type={content} />
       </div>
     </div>

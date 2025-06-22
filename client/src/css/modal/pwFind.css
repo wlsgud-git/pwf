@@ -8,7 +8,10 @@
 .pw_find_modal {
   width: var(--pw-find-width);
   display: flex;
+  z-index: 123512;
+  background-color: var(--pwf-signiture-color);
   flex-direction: column;
+  position: absolute;
 }
 
 .pw_find_box {

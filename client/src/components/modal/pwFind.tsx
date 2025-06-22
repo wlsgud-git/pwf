@@ -11,8 +11,10 @@ import { user_service } from "../../service/user.service";
 import { createFormData } from "../../util/form";
 
 interface PwFindProps {
-  user: User;
-  type: ModalList;
+  show: boolean;
+  setshow: any;
+  email: string;
+  callback?: () => void;
 }
 
 interface InputProps {
@@ -22,7 +24,7 @@ interface InputProps {
   show?: boolean;
 }
 
-export const PwFind = ({ user, type }: PwFindProps) => {
+export const PwFind = ({ show, setshow, email, callback }: PwFindProps) => {
   let initState = {
     error: false,
     error_msg: "",
@@ -31,6 +33,13 @@ export const PwFind = ({ user, type }: PwFindProps) => {
   };
   let [password, setPassword] = useState<InputProps>(initState);
   let [passwordCheck, setPasswordCheck] = useState<InputProps>(initState);
+
+  let reset = () => {
+    setPassword(initState);
+    setPasswordCheck(initState);
+    emitter.emit("modal", { type: "pwfind" });
+    setshow(false);
+  };
 
   let submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -46,20 +55,15 @@ export const PwFind = ({ user, type }: PwFindProps) => {
     }
     try {
       let res = await user_service.passwordChange(
-        createFormData({ email: user.email, password: password.value })
+        createFormData({ email, password: password.value })
       );
 
       alert(res.message);
       reset();
+      if (callback) callback();
     } catch (err) {
       console.log(err);
     }
-  };
-
-  let reset = () => {
-    setPassword(initState);
-    setPasswordCheck(initState);
-    emitter.emit("modal", { type });
   };
 
   // 비밀번호 확인값 검증
@@ -75,10 +79,7 @@ export const PwFind = ({ user, type }: PwFindProps) => {
   };
 
   return (
-    <div
-      className="pw_find_modal"
-      style={{ display: type == "password" ? "flex" : "none" }}
-    >
+    <div className="pw_find_modal" style={{ display: show ? "flex" : "none" }}>
       <header className="modal_header">
         <button onClick={reset}>X</button>
       </header>

@@ -20,6 +20,7 @@ import { nicknameOverlap } from "../data/auth.data";
 // types
 import { SignupMessage } from "../types/auth.types";
 import { onlineUser } from "../util/auth.util";
+import { requestFriendError } from "../error/reqeustFriend.error";
 
 export const deleteController: RequestHandler = async (req, res) => {
   let { email } = req.params;
@@ -54,21 +55,24 @@ export const accountUser: RequestHandler = async (req, res, next) => {
 // 닉네임으로 친구요청
 export const requestFriendWithNickname: RequestHandler = async (req, res) => {
   let { res_nickname, req_nickname, state } = req.body;
+
   try {
     // 본인에게 보내버림
-    if (res_nickname == req_nickname) throw { msg: "잘못된 친구요청입니다." };
-
-    // 없는 닉네임
-    let user = await nicknameOverlap(res_nickname);
-    if (!user.length) throw { msg: "존재하지 않은 닉네임입니다." };
+    if (res_nickname === req_nickname)
+      throw { msg: "본인에게 친구요청을 보낼 수 없습니다." };
 
     let response = await requestFriend(res_nickname, req_nickname, state);
+
+    if (!response.length)
+      throw { msg: "이미 친구이거나 친구요청이 전송되어 있는 상태입니다." };
 
     res
       .status(200)
       .json({ msg: `${res_nickname}에게 친구요청이 전송되었습니다.` });
-  } catch (err) {
-    res.status(400).json(err);
+  } catch (err: any) {
+    res
+      .status(400)
+      .json(err.code == "23503" ? { msg: "존재하지 않는 유저입니다." } : err);
   }
 };
 

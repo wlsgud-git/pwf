@@ -23,7 +23,7 @@ import { Signup } from "./page/signup";
 import { useSelector } from "react-redux";
 import { Modal } from "./page/modal";
 import { Profile } from "./page/profile";
-import { Authcode } from "./components/modal/authcode";
+import { PasswordReset } from "./page/passwordReset";
 
 function App() {
   let dispatch = useDispatch<AppDispatch>();
@@ -59,6 +59,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/profile/:email" element={<Profile />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/password/reset" element={<PasswordReset />} />
         <Route path="*" element={<Notfound />} />
       </Routes>
     </div>

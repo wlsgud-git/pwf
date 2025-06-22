@@ -28,6 +28,7 @@ import {
 } from "../validation/auth";
 import { Authcode } from "../components/modal/authcode";
 import { emitter } from "../util/event";
+import { emit } from "process";
 
 interface SignupInputProps {
   value: string;
@@ -381,11 +382,7 @@ export const Signup = () => {
           {/* 회원가입 버튼 */}
           <button
             className="signup_btn"
-            style={{
-              backgroundColor: `var(--pwf-${
-                signupBtn.active ? "blue" : "gray"
-              })`,
-            }}
+            style={{ opacity: signupBtn.active ? 1 : 0.5 }}
             disabled={!signupBtn.active || signupBtn.loading}
           >
             {signupBtn.loading ? "...진행중" : "회원가입"}

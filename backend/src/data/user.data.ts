@@ -49,11 +49,24 @@ export const requestFriend = async (
   state: boolean
 ) => {
   try {
-    let query = `insert into requestFriend values($1, $2, $3) where not exists ( select 1 from requestFriend )`;
-    let data = [res_nickname, req_nickname, state];
+    let query = `insert into requestFriend (res_nickname, req_nickname, state)
+select $1, $2 , $3 
+where not exists ( 
+	select 1 from requestFriend re
+	where (re.res_nickname = $4 and re.req_nickname = $5) 
+	or (re.res_nickname = $6 and req_nickname = $7) 
+) returning *`;
+    let data = [
+      res_nickname,
+      req_nickname,
+      state,
+      res_nickname,
+      req_nickname,
+      req_nickname,
+      res_nickname,
+    ];
     return await dbPlay<null>(query, data);
   } catch (err) {
-    console.log(err);
     throw err;
   }
 };
