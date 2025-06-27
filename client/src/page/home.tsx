@@ -46,7 +46,7 @@ export const Home = () => {
             방만들기
           </button>
 
-          {/* {Object.entries(test).map(([id, info]))} */}
+          {/* {Object.entries(test).map([id, info])} */}
         </ul>
         {/* 내 친구 리스트 */}
         <Suspense fallback={<div>loading...</div>}>

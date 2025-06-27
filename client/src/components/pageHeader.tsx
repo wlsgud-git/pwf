@@ -1,5 +1,4 @@
 // css
-import { profile } from "console";
 import "../css/pageheader.css";
 
 import React, { memo, useEffect, useState } from "react";

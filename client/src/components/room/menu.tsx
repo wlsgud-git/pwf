@@ -11,67 +11,50 @@ import { Participants } from "./participants";
 import { User } from "../../types/user";
 import { Room } from "../../types/room";
 
-interface MenuProps {
-  user: User;
-  connects: object;
-  participants: Room["participants"];
-}
-
-export const Menu = ({ user, connects, participants }: MenuProps) => {
-  let [menu, setMenu] = useState<{
-    state: boolean;
-    content: "participants" | "chat";
-  }>({ state: false, content: "participants" });
-
-  // menu 열고 닫기
-  useEffect(() => {
-    const handler = (state: boolean) => setMenu((c) => ({ ...c, state }));
-    emitter.on("room menu", handler);
-
-    return () => {
-      emitter.off("room menu", handler);
-    };
-  }, []);
-
+export const Menu = () => {
+  let [menu, setMenu] = useState<boolean>(false);
   return (
-    <div
-      className="menu_container"
-      style={{ display: menu.state ? "flex" : "none" }}
-    >
-      <button
-        className="menu_close_btn"
-        onClick={() => setMenu((c) => ({ ...c, state: false }))}
-      ></button>
-      <div className="pwf-streamRoom_menu">
-        <div className="pwf-streamRoom_menu_btn_container">
-          <div className="pwf-streamRoom_menu_btn_box">
-            <button
-              onClick={() =>
-                setMenu((c) => ({ ...c, content: "participants" }))
-              }
-            >
-              참가자
-            </button>
-            <button onClick={() => setMenu((c) => ({ ...c, content: "chat" }))}>
-              채팅
-            </button>
-          </div>
-        </div>
-        <ul className="pwf-streamRoom_menu_content">
-          {/* 참가자 채팅창 */}
+    <div className="pwf-stream_menu">
+      <button className="stream_menu_btn" onClick={() => setMenu(!menu)}>
+        <i className={`fa-solid fa-chevron-${menu ? "right" : "left"}`}></i>
+      </button>
 
-          <Chat
-            user={user}
-            connects={connects}
-            state={menu.content == "chat"}
-          />
-          <Participants
-            user={user}
-            state={menu.content == "participants"}
-            participants={participants}
-          />
-        </ul>
-      </div>
+      <ul
+        className="stream_menu_content"
+        style={{ width: menu ? "var(--stream-menu-size)" : "0px" }}
+      >
+        <button title="오디오">
+          <i className="fa-solid fa-microphone-lines"></i>
+        </button>
+        {/* 비디오 */}
+        <button title="비디오">
+          <i className="fa-solid fa-video"></i>
+        </button>
+        {/* 방에 친구초대 */}
+        <button title="초대">
+          <i className="fa-solid fa-user-plus"></i>
+        </button>
+        {/* 화면공유 */}
+        <button title="화면공유">
+          <i className="fa-brands fa-creative-commons-share"></i>
+        </button>
+        {/* 내 미디어 변경 */}
+        <button title="내 미디어">
+          <i className="fa-solid fa-desktop"></i>
+        </button>
+        {/* 채팅 */}
+        <button title="채팅">
+          <i className="fa-solid fa-comments"></i>
+        </button>
+        <button title="참가자">
+          <i className="fa-solid fa-user"></i>
+        </button>
+
+        {/* 방 나가기 */}
+        <button className="room_exit" title="방 나가기">
+          <i className="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </ul>
     </div>
   );
 };

@@ -2,19 +2,15 @@
 :root {
   /* room main */
 
-  --video-screen-width: 280px;
-  --video-screen-height: 180px;
+  --video-screen-width: 330px;
+  --video-screen-height: 230px;
 
   --video-share-screen-width: 160px;
   --video-share-screen-height: 95px;
   --video-share-screen-padding: 25px;
 
-  /* footer */
-  --streamroom-footer-height: 60px;
-
   /* menu */
-  --streamroom-menu-width: 350px;
-  --streamroom-menu-btnbox-height: 100px;
+  --stream-menu-size: 55px;
 
   /* menu chat */
   --chat-form-height: 45px;
@@ -23,4 +19,66 @@
 
 .streamRoom_page {
   display: flex;
+}
+
+/* 메뉴 */
+.pwf-stream_menu {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  z-index: 123512;
+  transform: translate(-0%, -50%);
+  /* box-shadow: ; */
+}
+
+.stream_menu_btn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translate(-100%, -50%);
+  padding: 12px 5px;
+  border-radius: 10px 0 0 10px;
+  border: 1px solid var(--pwf-light-gray);
+  border-right: none;
+  color: var(--pwf-gray);
+  background-color: inherit;
+}
+
+/* content */
+.stream_menu_content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid var(--pwf-light-gray);
+  border-right: none;
+  overflow: hidden;
+  border-radius: 10px 0 0 10px;
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+.stream_menu_content button {
+  display: flex;
+  border: none;
+  outline: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  height: var(--stream-menu-size);
+  width: 100%;
+  font-size: 18px;
+  background-color: inherit;
+  font-weight: bold;
+}
+
+.stream_menu_content button:not(:last-child) {
+  color: var(--pwf-gray);
+}
+
+.stream_menu_content button:hover {
+  background-color: var(--pwf-background-transparent-light);
+}
+
+.room_exit {
+  color: red;
 }
