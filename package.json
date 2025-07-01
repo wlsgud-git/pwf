@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@livekit/components-styles": "^1.1.6",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/pg": "^8.11.11",
     "jsonwebtoken": "^9.0.2",

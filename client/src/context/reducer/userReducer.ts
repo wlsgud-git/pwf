@@ -6,6 +6,7 @@ import { userAction } from "../actions/userAction";
 // type
 import { FriendOnlineStatus, User } from "../../types/user";
 import { Room } from "../../types/room";
+import { userSocket } from "../../util/socket";
 
 interface userReducer {
   // getUser(state: User, info: PayloadAction<User>): void;
@@ -61,8 +62,6 @@ const userSlice = createSlice({
         stream_room,
       } = action.payload;
 
-      console.log("in reducer get user:", action.payload);
-
       state.id = id;
       state.email = email;
       state.profile_img = profile_img;
@@ -74,7 +73,8 @@ const userSlice = createSlice({
         state.friends = friends.map((val: User) => val);
       if (stream_room && stream_room.length)
         state.stream_room = stream_room.map((val: Room) => val);
-      return state;
+      userSocket();
+      // return state;
     });
 
     // 친구요청에 대한 결과

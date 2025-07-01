@@ -11,6 +11,7 @@ export class streamService extends HttpClient {
     }
   }
 
+  // 방 만들기
   async createStreamRoom(data: FormData) {
     try {
       return await this.axiosFetch<Room>("/room", {
@@ -22,9 +23,22 @@ export class streamService extends HttpClient {
     }
   }
 
+  // 방 삭제
   async deleteStreamRoom(data: FormData) {
     try {
       return;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async roomAccessToken(data: FormData) {
+    try {
+      let res = await this.axiosFetch<Room>("/room/token", {
+        method: "post",
+        body: data,
+      });
+      return res.token;
     } catch (err) {
       throw err;
     }

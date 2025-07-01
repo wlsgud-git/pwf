@@ -4,6 +4,7 @@
   "private": true,
   "proxy": "https://localhost:3000",
   "dependencies": {
+    "@livekit/components-react": "^2.9.12",
     "@reduxjs/toolkit": "^2.6.1",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -20,6 +21,8 @@
     "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
     "ioredis": "^5.6.0",
+    "livekit-client": "^2.14.0",
+    "mediasoup-client": "^3.12.1",
     "mitt": "^3.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

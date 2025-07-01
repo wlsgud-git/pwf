@@ -14,21 +14,18 @@ export const socketClient: Socket = io(process.env.REACT_APP_BASEURL, {
   },
 });
 
-export const userSocket = (
-  socket: Socket,
-  dispatch: AppDispatch,
-  user: User
-) => {
-  socketClient.auth = {
-    user,
-  };
+export const userSocket = (user?: User) => {
+  console.log(`hi ${user}`);
+  // socketClient.auth = {
+  //   user,
+  // };
   socketClient.connect();
 
   // 친구의 온라인 오프라인 상태
-  socket.on("online friend", (data: User) => dispatch(onlineUpdate(data)));
+  // socket.on("online friend", (data: User) => dispatch(onlineUpdate(data)));
 
-  // 요청자가 친구추가를 받아줬을때
-  socket.on("receiver data", (receiver: User) => {
-    dispatch(insertReceiver(receiver));
-  });
+  // // 요청자가 친구추가를 받아줬을때
+  // socket.on("receiver data", (receiver: User) => {
+  //   dispatch(insertReceiver(receiver));
+  // });
 };
