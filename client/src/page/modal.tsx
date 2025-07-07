@@ -2,7 +2,7 @@ import "../css/modal/modal.css";
 import { useEffect, useState } from "react";
 import { emitter } from "../util/event";
 import { useSelector } from "react-redux";
-import { RootState } from "../context/store";
+import { RootState } from "../redux/store";
 
 // modal component
 import { Friend } from "../components/modal/friend";

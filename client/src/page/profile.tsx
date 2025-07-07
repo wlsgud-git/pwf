@@ -2,7 +2,7 @@ import "../css/profile.css";
 
 import { PageHeader } from "../components/pageHeader";
 import { useSelector } from "react-redux";
-import { RootState } from "../context/store";
+import { RootState } from "../redux/store";
 import { emitter } from "../util/event";
 import { useEffect, useRef, useState } from "react";
 import { InputChange } from "../types/event";

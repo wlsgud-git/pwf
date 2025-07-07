@@ -6,9 +6,9 @@ import { user_service } from "../../service/user.service";
 import { createFormData } from "../../util/form";
 import { AxiosError } from "../../error/error";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "../../context/store";
+import { RootState, AppDispatch } from "../../redux/store";
 import { User, UserComponent } from "../../types/user";
-import { userAction } from "../../context/actions/userAction";
+import { userAction } from "../../redux/actions/userAction";
 
 interface ComponentProps {
   user: User;

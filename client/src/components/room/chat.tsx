@@ -1,15 +1,14 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FormSubmit, InputChange } from "../../types/event";
-import { emitter } from "../../util/event";
 
 import "../../css/room/chat.css";
 import { User } from "../../types/user";
-
-interface ChatProps {
-  user: User;
-  connects: object;
-  state: boolean;
-}
+import { emitter } from "../../util/event";
+import { useContextSelector } from "use-context-selector";
+import { StreamContext } from "../../context/stream.context";
+import { LocalParticipant, RemoteParticipant } from "livekit-client";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 interface ChatingInterface {
   user: User;
@@ -38,70 +37,71 @@ const ChatLi = ({ user, content, me }: ChatingInterface) => {
   );
 };
 
-export const Chat = ({ user, connects, state }: ChatProps) => {
+export const Chat = () => {
+  // console.log("chat rerender");
+  let user = useSelector((state: RootState) => state.user);
+  let room = useContextSelector(StreamContext, (ctx) => ctx.room);
+
+  let [chatList, setChatList] = useState<any>([]);
   let [input, setInput] = useState<string>("");
-  let [conversation, setConversation] = useState<ChatingInterface[]>([]);
 
-  let sendChat = async (e: FormSubmit) => {
+  // 채팅 받기
+  const onDataReceived = (
+    payload: Uint8Array,
+    participant: RemoteParticipant | LocalParticipant
+  ) => {
+    const text = new TextDecoder().decode(payload);
+    const sender = participant.identity;
+    setChatList((c: any) => [...c, { sender, text }]);
+  };
+
+  // 채팅 보내기
+  const sendChat = async (e: FormSubmit) => {
     e.preventDefault();
-    let connect_list = Object.entries(connects);
 
-    if (input == "" || !connect_list.length) return;
+    if (input == "") return;
 
-    // 내 인풋 전송하기
-    connect_list.forEach(([from, info]) => {
-      info.channel.send(JSON.stringify({ user, content: input }));
-    });
+    const encoded = new TextEncoder().encode(input);
+    await room.localParticipant.publishData(encoded, { reliable: true });
 
-    setConversation((c) => [...c, { user, content: input }]);
+    setChatList((c: any) => [...c, { sender: user.nickname, text: input }]);
     setInput("");
   };
 
-  // 상대방 채팅 인지
   useEffect(() => {
-    const handler = ({ user, content }: ChatingInterface) => {
-      setConversation((c) => [...c, { user, content }]);
-    };
+    if (!room) return;
 
-    emitter.on("menu chat", handler);
+    room.on("dataReceived", onDataReceived);
 
     return () => {
-      emitter.off("menu chat", handler);
+      room.off("dataReceived", onDataReceived);
     };
-  }, []);
+  }, [room]);
 
   return (
-    <div
-      className="menu_chat_container"
-      style={{ display: state ? "flex" : "none" }}
-    >
-      <ul className="chat_conversations">
-        {conversation.length
-          ? conversation.map((val: ChatingInterface) => (
-              <ChatLi
-                user={val.user}
-                content={val.content}
-                me={val.user.nickname == user.nickname}
-              />
-            ))
-          : ""}
-      </ul>
-      {/* 채팅입력부분 */}
-      <div className="chat_form_container">
-        <form className="chat_form" onSubmit={sendChat}>
-          <input
-            type="text"
-            className="chat_input"
-            spellCheck="false"
-            placeholder="채팅을 입력하세요."
-            value={input}
-            onChange={(e: InputChange) => setInput(e.target.value)}
-          />
-          <button className="chat_btn">
-            <i className="fa-solid fa-paper-plane"></i>
-          </button>
-        </form>
+    <div className="pwf-chat_container">
+      {/* 윗부분 */}
+      <div className="menu_type">
+        <span>채팅</span>
+        <button
+          onClick={() => emitter.emit("menu", { state: false, type: "chat" })}
+        >
+          X
+        </button>
       </div>
+      {/* 채팅 리스트 */}
+      <ul className="chat_lists"></ul>
+      {/* 채팅인풋 */}
+      <form action="" className="pwf-chat_form" onSubmit={sendChat}>
+        <input
+          type="text"
+          value={input}
+          onChange={(e: InputChange) => setInput(e.target.value)}
+        />
+        <button>
+          <i className="fa-solid fa-paper-plane"></i>
+        </button>
+      </form>
     </div>
   );
 };

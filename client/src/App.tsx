@@ -10,9 +10,9 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import { userAction } from "./context/actions/userAction";
+import { userAction } from "./redux/actions/userAction";
 import { useDispatch } from "react-redux";
-import { AppDispatch, RootState } from "./context/store";
+import { AppDispatch, RootState } from "./redux/store";
 
 // page
 import { Home } from "./page/home";
@@ -24,6 +24,7 @@ import { useSelector } from "react-redux";
 import { Modal } from "./page/modal";
 import { Profile } from "./page/profile";
 import { PasswordReset } from "./page/passwordReset";
+import { StreamProvider } from "./context/stream.context";
 
 function App() {
   let dispatch = useDispatch<AppDispatch>();
@@ -55,7 +56,14 @@ function App() {
       <Modal />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/room/:id" element={<StreamRoom />} />
+        <Route
+          path="/room/:id"
+          element={
+            <StreamProvider>
+              <StreamRoom />
+            </StreamProvider>
+          }
+        />
         <Route path="/login" element={<Login />} />
         <Route path="/profile/:email" element={<Profile />} />
         <Route path="/signup" element={<Signup />} />

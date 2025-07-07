@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import "../css/myfriends.css";
-import { RootState } from "../context/store";
+import { RootState } from "../redux/store";
 import { useEffect } from "react";
 
 import { User, UserComponent } from "../types/user";

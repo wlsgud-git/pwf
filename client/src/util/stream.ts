@@ -7,6 +7,7 @@ import {
   LocalVideoTrack,
   LocalTrack,
   LocalAudioTrack,
+  createLocalScreenTracks,
 } from "livekit-client";
 
 // 방 연결
@@ -29,6 +30,10 @@ export let getStream = async (audio: boolean, video: boolean) => {
     console.log(err);
   }
 };
+
+// export let getTrackWithId = async (id: string)=>{
+
+// }
 
 // 트랙 스트림 가져오기
 export let getMediaStream = (tracks: LocalTrack<Track.Kind>[]) =>
@@ -53,7 +58,7 @@ export let getMyMedia = async () => {
 // 화면 공유 미디어 가져오기
 export let getShareMedia = async () => {
   try {
-    let devices = await navigator.mediaDevices.enumerateDevices();
+    let devices = await createLocalScreenTracks();
     return devices;
   } catch (err) {
     console.log(err);

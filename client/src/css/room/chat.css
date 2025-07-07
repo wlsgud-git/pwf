@@ -1,103 +1,66 @@
-/* @import url("../streamRoom.css"); */
-/* menu chat section */
-.menu_chat_container {
-  width: 100%;
-  height: 100%;
-  flex-direction: column;
+@import url("menu.css");
+
+:root {
+  --menu-text-chat: 43px;
+  --menu-chat-input-height: 42px;
 }
 
-.chat_conversations {
+.pwf-chat_container {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  height: calc(100% - var(--chat-form-height));
-  overflow-y: auto;
-}
-
-.chat_conversations::-webkit-scrollbar {
-  width: var(--scroll-size);
-}
-
-.chat_conversations::-webkit-scrollbar-track {
-  background-color: inherit;
-  border-radius: 4px;
-}
-
-.chat_conversations::-webkit-scrollbar-thumb {
-  background-color: var(--pwf-gray);
-  border-radius: 10px;
-}
-
-.chat_form_container {
-  width: 100%;
-  height: var(--chat-form-height);
-  border-top: 1px solid var(--pwf-white);
-}
-
-.chat_form {
-  display: flex;
-  width: 100%;
-  height: 100%;
-}
-
-.chat_input,
-.chat_btn {
-  height: 100%;
-  align-items: center;
-  background-color: inherit;
+  align-items: start;
   color: var(--pwf-white);
+}
+
+.menu_type {
+  width: 100%;
+  height: var(--menu-text-chat);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 8px;
+  font-weight: bold;
+  border-bottom: 1px solid var(--pwf-light-gray);
+}
+
+.menu_type button {
+  padding: 6px;
+  background-color: transparent;
   border: none;
   outline: none;
+  font-weight: bold;
+  color: var(--pwf-white);
+  font-size: 17px;
 }
 
-.chat_input {
-  width: calc(100% - var(--chat-btn-width));
+.chat_lists {
+  width: 100%;
+  height: calc(100% - var(--menu-text-chat) - var(--menu-chat-input-height));
+}
+
+.pwf-chat_form {
+  width: 100%;
+  border-top: 1px solid var(--pwf-light-gray);
+  height: var(--menu-chat-input-height);
+  display: flex;
+}
+
+.pwf-chat_form input,
+.pwf-chat_form button {
+  height: 100%;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  color: var(--pwf-white);
+}
+
+.pwf-chat_form input {
+  flex: 1;
   padding: 0px 8px;
 }
 
-.chat_btn {
-  width: var(--chat-btn-width);
-  border-left: 1px solid var(--pwf-white);
-}
-
-/* 채팅 리스트 -----------*/
-.chat_container {
-  width: 100%;
-}
-
-.chat_li {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 4px;
-  padding: 6px;
-}
-
-.chat_user_profile {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 1px solid var(--pwf-white);
-  overflow: hidden;
-  margin: 0px 6px 6px 0px;
-}
-
-.chat_user_profile img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.chat_user_nickname {
-  color: var(--pwf-white);
-  font-weight: 600;
-}
-
-.chat_content {
-  max-width: 150px;
-  text-align: start;
-  border-radius: 10px;
-  padding: 7px 6px;
-  font-weight: 600;
-  font-size: 14px;
-  background-color: var(--pwf-white);
+.pwf-chat_form button {
+  width: 40px;
 }

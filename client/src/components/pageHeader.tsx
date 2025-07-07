@@ -3,11 +3,11 @@ import "../css/pageheader.css";
 
 import React, { memo, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { userInit } from "../context/reducer/userReducer";
+import { userInit } from "../redux/reducer/userReducer";
 
 import { emitter } from "../util/event";
 import { useSelector } from "react-redux";
-import { AppDispatch, persistor, RootState } from "../context/store";
+import { AppDispatch, persistor, RootState } from "../redux/store";
 import { socketClient } from "../util/socket";
 import { useDispatch } from "react-redux";
 import { auth_service } from "../service/auth.service";

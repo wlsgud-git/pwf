@@ -1,13 +1,9 @@
+import React from "react";
 import { useEffect } from "react";
 import "../../css/room/participants.css";
 import { Room } from "../../types/room";
 import { User } from "../../types/user";
-
-interface ParticipantsProps {
-  user: User;
-  state?: boolean;
-  participants?: Room["participants"];
-}
+// import { setUseStream } from "../../context/stream.context";
 
 const ParticipantLi = ({ user }: any) => {
   return (
@@ -20,25 +16,14 @@ const ParticipantLi = ({ user }: any) => {
   );
 };
 
-export const Participants = ({
-  user,
-  state,
-  participants,
-}: ParticipantsProps) => {
+export const Participants = () => {
+  // console.log("participants rerender");
+  // let { p };
+
   return (
     <div
-      className="menu_participants_list"
-      style={{ display: state ? "flex" : "none" }}
-    >
-      {participants?.length
-        ? participants?.map((val: any) => {
-            return val.nickname !== user.nickname ? (
-              <ParticipantLi user={val} />
-            ) : (
-              ""
-            );
-          })
-        : ""}
-    </div>
+      className="pwf-participants_container"
+      style={{ display: "none" }}
+    ></div>
   );
 };

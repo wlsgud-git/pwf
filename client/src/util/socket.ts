@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { User } from "../types/user";
-import { AppDispatch } from "../context/store";
-import { insertReceiver, onlineUpdate } from "../context/reducer/userReducer";
+import { AppDispatch } from "../redux/store";
+import { insertReceiver, onlineUpdate } from "../redux/reducer/userReducer";
 
 export const socketClient: Socket = io(process.env.REACT_APP_BASEURL, {
   reconnection: true,

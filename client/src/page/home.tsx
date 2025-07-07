@@ -3,9 +3,9 @@ import "../css/home.css";
 
 import { emitter } from "../util/event";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { AppDispatch, RootState } from "../context/store";
+import { AppDispatch, RootState } from "../redux/store";
 import { useDispatch, useSelector } from "react-redux";
-import { userAction } from "../context/actions/userAction";
+import { userAction } from "../redux/actions/userAction";
 import { socketClient, userSocket } from "../util/socket";
 
 // component
