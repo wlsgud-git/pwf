@@ -1,10 +1,23 @@
 import { combineReducers } from "@reduxjs/toolkit";
 
 import UserReducer from "./userReducer";
+import FriendReducer from "./friendReducer";
+import RoomReducer from "./roomReducer";
+import storage from "redux-persist/lib/storage";
 
-const rootReducer = combineReducers({
+const appReducer = combineReducers({
   user: UserReducer,
+  friend: FriendReducer,
+  room: RoomReducer,
 });
 
-export type RootState = ReturnType<typeof rootReducer>;
+const rootReducer = (state: any, action: any) => {
+  if (action.type == "RESET_ALL_STATE") {
+    storage.removeItem("persist:root");
+    return appReducer(undefined, action);
+  }
+  return appReducer(state, action);
+};
+
+export type RootState = ReturnType<typeof appReducer>;
 export default rootReducer;

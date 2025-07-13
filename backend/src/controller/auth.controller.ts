@@ -1,6 +1,4 @@
-import { RequestHandler } from "express";
-
-import { onlineUser } from "../util/auth.util";
+import { RequestHandler, Request, Response } from "express";
 
 // config
 import { config } from "../config/env.config";
@@ -19,22 +17,23 @@ import {
   AuthcodeError,
   PasswordError,
 } from "../types/auth.types";
-import { compareText } from "../util/crypto.util";
+import { compareText, hashingText } from "../util/crypto.util";
 import { sendAuthcodeMail } from "../util/mail.util";
+import { AuthRequest } from "../types/http.types";
+// import "../types/express/express";
 
 // 현재 유저
-export const current: RequestHandler = async (req, res) => {
+export const current: AuthRequest = async (req, res) => {
   try {
-    let email = await redisGet(req.cookies["session_id"]);
-    if (!email) throw { message: "로그인 필요" };
-    let user = await getUserByEmail(email);
+    if (!req.user) throw { message: "로그인 필요" };
 
-    if (user[0].friends)
-      user[0].friends = await Promise.all(
-        user[0].friends?.map(async (val: User) => await onlineUser(val))
-      );
+    // req.user = user[0];
+    // if (user[0].friends)
+    //   user[0].friends = await Promise.all(
+    //     user[0].friends?.map(async (val: User) => await onlineUser(val))
+    //   );
 
-    res.status(200).json(user[0]);
+    res.status(200).json({ user: req.user });
   } catch (err) {
     res.status(400).json(err);
   }
@@ -55,11 +54,19 @@ export const loginControl: RequestHandler = async (req, res) => {
     if (!result)
       throw { path: "password", msg: PasswordError.PASSWORD_UNEQUAL_ERROR };
 
+    let sessionId = await hashingText(email);
+    delete user["password"];
+
     // 로그인이 성공한거임
-    await redisSet(user.nickname!, email, config.session.session_expire);
+    await redisSet(
+      sessionId,
+      JSON.stringify(user),
+      config.session.session_expire
+    );
     let csrf_token = await createJwt({ email: user.email }, "refresh");
+
     // cookie section
-    res.cookie("session_id", user.nickname, {
+    res.cookie("session_id", sessionId, {
       secure: true,
       httpOnly: true,
       sameSite: "lax",

@@ -17,6 +17,7 @@
   align-items: center;
   height: 100%;
   position: relative;
+  flex-wrap: wrap;
 }
 
 /* 참가자 비디오 리스트 */
@@ -37,14 +38,12 @@
   display: flex;
   height: 100%;
   flex-wrap: wrap;
-  border: 1px solid red;
   overflow-x: auto;
   justify-content: center;
   align-items: center;
 }
 
 .participant_stream_container li {
-  border: 1px solid red;
   margin: 5px;
   width: 600px;
   height: 200px;
@@ -54,17 +53,38 @@
 
 /* 참가자 비디오 */
 .participant_track_box {
-  max-width: 300px;
-  max-height: 200px;
+  width: 300px;
+  height: 200px;
+  min-width: 170px;
+  min-height: 130px;
   border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   position: relative;
+  margin: 5px;
+}
+
+.video_user_nickname {
+  z-index: 123;
+  overflow: hidden;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--pwf-white);
 }
 
 .participant_track_box video {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.participant_track_box p {
+  font-weight: 600;
+  color: white;
 }
 
 .participant_infomation {
@@ -135,7 +155,7 @@
 .pwf-stream_footer .my_media_container {
   border: none;
   flex: 1;
-  width: 100%;
+  width: 99%;
   outline: none;
   display: flex;
   flex-direction: column;

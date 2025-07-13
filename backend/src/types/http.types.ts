@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { User } from "./user.types";
 
 export interface corsProps {
   credentials: boolean;
@@ -6,23 +7,21 @@ export interface corsProps {
   origin: string;
 }
 
-export interface requestHandler {}
-
-export type ExpressHandler<T = any, U = any> = (
-  req: Request<T>,
-  res: Response<U>
-) => void;
-
-export interface HttpResponse<T> {
-  status?: number;
-  data: T | undefined;
-}
-
 export interface HttpRequest {
   headers?: HttpHeaders;
   body?: FormData;
   method: string;
 }
+
+interface AuthencateRequest extends Request {
+  user?: User;
+}
+
+export type AuthRequest = (
+  req: AuthencateRequest,
+  res: Response,
+  next: NextFunction
+) => void;
 
 export interface RequestQuery<T> {
   (

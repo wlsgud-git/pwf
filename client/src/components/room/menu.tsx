@@ -34,9 +34,7 @@ export const Menu = () => {
       className="pwf-stream_room_menu"
       style={{ display: menu.state ? "flex" : "none" }}
     >
-      <Chat />
-      {/* 참가자들 */}
-      <Participants />
+      {menu.type == "chat" ? <Chat /> : <Participants />}
     </div>
   );
 };

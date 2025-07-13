@@ -5,8 +5,11 @@ import { emitter } from "../../util/event";
 // types
 import { User, UserComponent } from "../../types/user";
 import { FormSubmit, InputChange } from "../../types/event";
-import { stream_service } from "../../service/stream.service";
 import { createFormData } from "../../util/form";
+import { useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
+import { roomAction } from "../../redux/actions/roomAction";
+import { useSelector } from "react-redux";
 
 interface CompoentProps {
   user: User;
@@ -55,6 +58,9 @@ export const LiFriend = ({ user }: { [user: string]: User }) => {
 
 // 방 만들기 모달
 export const StreamRoom = ({ user, type }: CompoentProps) => {
+  let dispatch = useDispatch<AppDispatch>();
+
+  let { friends } = useSelector((state: RootState) => state.friend);
   let formRef = useRef<HTMLFormElement>(null);
   let [inviteUsers, setInviteUsers] = useState<User[]>([]);
 
@@ -107,7 +113,11 @@ export const StreamRoom = ({ user, type }: CompoentProps) => {
       let participants = inviteUsers.map((val) => val.id);
       participants.push(user.id);
       let formdata = createFormData({ room_name: roomname, participants });
-      let { msg, room } = await stream_service.createStreamRoom(formdata);
+      dispatch(roomAction.createRoom(formdata))
+        .unwrap()
+        .catch((err: any) => {
+          console.log("방 만들기 에러");
+        });
       resetModal();
     } catch (err) {
       alert(err);
@@ -158,8 +168,8 @@ export const StreamRoom = ({ user, type }: CompoentProps) => {
           <div className="friends_invite_box">
             <label htmlFor="friends_list">친구목록</label>
             <ul className="friends_list">
-              {user.friends && user.friends.length ? (
-                user.friends.map((val) => <LiFriend user={val} />)
+              {friends ? (
+                friends.map((val) => <LiFriend user={val} />)
               ) : (
                 <p>초대할 친구가 없습니다.</p>
               )}

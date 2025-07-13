@@ -47,7 +47,7 @@ export const Modal = () => {
     <div className="modal_box" style={{ display: open ? "flex" : "none" }}>
       <div className="modal_content">
         {/* 모달 콘텐츠 부분 */}
-        <Friend user={user} type={content} />
+        <Friend type={content} />
         <StreamRoom user={user} type={content} />
         <Delete user={user} type={content} />
       </div>

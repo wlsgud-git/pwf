@@ -6,7 +6,7 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { AppDispatch, RootState } from "../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { userAction } from "../redux/actions/userAction";
-import { socketClient, userSocket } from "../util/socket";
+import { socketClient } from "../util/socket";
 
 // component
 import { PageHeader } from "../components/pageHeader";
@@ -23,8 +23,7 @@ const StreamRoomLi = lazy(() =>
 );
 
 export const Home = () => {
-  let dispatch = useDispatch<AppDispatch>();
-  let user = useSelector((state: RootState) => state.user);
+  let room = useSelector((state: RootState) => state.room);
 
   return (
     <div className="page home_page">
@@ -35,9 +34,10 @@ export const Home = () => {
       <div className="pwf_content">
         {/* 내가 참가자인 방 모음 */}
         <ul className="stream_room_lists">
-          {user.stream_room && user.stream_room.length
-            ? user.stream_room.map((val) => <StreamRoomLi data={val} />)
-            : ""}
+          {room.map((val: any) => (
+            <StreamRoomLi data={val} />
+          ))}
+
           <button
             onClick={() =>
               emitter.emit("modal", { type: "stream", open: true })

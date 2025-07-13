@@ -9,9 +9,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../redux/store";
 import { User, UserComponent } from "../../types/user";
 import { userAction } from "../../redux/actions/userAction";
+import { socketClient } from "../../util/socket";
+import {
+  friendReqeustHandle,
+  friendRequest,
+} from "../../redux/reducer/friendReducer";
+import { friendAction } from "../../redux/actions/friendAction";
 
 interface ComponentProps {
-  user: User;
   type: string;
 }
 
@@ -32,7 +37,7 @@ export const RequestFriendLi = ({ receiver, sender }: RequestFriendProps) => {
         sender,
         response,
       });
-      dispatch(userAction.requestFriendHandle(formdata));
+      dispatch(friendAction.requestFriendHandle(formdata));
     } catch (err) {
       alert(err);
     }
@@ -65,7 +70,11 @@ export const RequestFriendLi = ({ receiver, sender }: RequestFriendProps) => {
 };
 
 // 친구 관련 모달
-export const Friend = ({ user, type }: ComponentProps) => {
+export const Friend = ({ type }: ComponentProps) => {
+  let dispatch = useDispatch<AppDispatch>();
+  let user = useSelector((state: RootState) => state.user);
+  let { request_friends } = useSelector((state: RootState) => state.friend);
+
   let [error, setError] = useState<{ state: boolean; msg: string }>({
     state: false,
     msg: "",
@@ -74,6 +83,7 @@ export const Friend = ({ user, type }: ComponentProps) => {
 
   function resetModal() {
     setNickname("");
+    setError((c) => ({ ...c, state: false }));
     emitter.emit("modal", { type });
   }
 
@@ -84,10 +94,8 @@ export const Friend = ({ user, type }: ComponentProps) => {
     try {
       let formdata = createFormData({
         res_nickname: nickname,
-        req_nickname: user.nickname,
-        state: false,
+        req_user: JSON.stringify(user),
       });
-      console.log("request sending");
       let res = await user_service.requestFriend(formdata);
       alert(`${nickname}에게 친구요청이 전송되었습니다`);
       setNickname("");
@@ -97,6 +105,15 @@ export const Friend = ({ user, type }: ComponentProps) => {
       setError((c) => ({ ...c, state: true, msg }));
     }
   };
+
+  useEffect(() => {
+    socketClient.on("friend_request", (data) => dispatch(friendRequest(data)));
+    socketClient.on("friend_request_handle", (data) =>
+      dispatch(friendReqeustHandle(data))
+    );
+
+    return () => {};
+  }, []);
 
   return (
     <div
@@ -136,8 +153,8 @@ export const Friend = ({ user, type }: ComponentProps) => {
         <div className="friend_request_box">
           <label>친구요청</label>
           <ul className="request_friends">
-            {user.request_friends && user.request_friends.length ? (
-              user.request_friends.map((val) => (
+            {request_friends && request_friends.length ? (
+              request_friends.map((val) => (
                 <RequestFriendLi receiver={user} sender={val} />
               ))
             ) : (

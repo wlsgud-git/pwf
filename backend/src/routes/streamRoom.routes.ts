@@ -6,6 +6,7 @@ import express, { Router } from "express";
 import {
   createRoom,
   getRoom,
+  inviteRoom,
   roomAccessToken,
 } from "../controller/streamRoom.controller";
 import { streamRoomValidate } from "../validation/streamroom.validate";
@@ -19,5 +20,6 @@ const router: Router = express.Router();
 router.get("/room/:id", IsAuth, getRoom);
 router.post("/room", IsAuth, csrfProtection, streamRoomValidate, createRoom);
 router.post("/room/token", IsAuth, csrfProtection, roomAccessToken);
+router.post("/room/invite", IsAuth, csrfProtection, inviteRoom);
 
 module.exports = router;

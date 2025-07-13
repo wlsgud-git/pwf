@@ -12,17 +12,17 @@ import { HttpResponse } from "../../types/http";
 
 class UserAction extends userService {
   // 친구요청 수락 or 거절
-  requestFriendHandle = createAsyncThunk(
-    "request/friend",
-    async (data: FormData): Promise<any> => {
-      try {
-        let res = await this.handleRequestFriend(data);
-        return await res!;
-      } catch (error) {
-        alert(error);
-      }
-    }
-  );
+  // requestFriendHandle = createAsyncThunk(
+  //   "request/friend",
+  //   async (data: FormData): Promise<any> => {
+  //     try {
+  //       let res = await this.handleRequestFriend(data);
+  //       return await res!;
+  //     } catch (error) {
+  //       alert(error);
+  //     }
+  //   }
+  // );
 
   // 유저 정보 불러오기
   getUserAction = createAsyncThunk(
@@ -30,7 +30,7 @@ class UserAction extends userService {
     async (_, { rejectWithValue }): Promise<any> => {
       try {
         let res = await this.getUser();
-        return await res!;
+        return res;
       } catch (error: any) {
         return rejectWithValue(error.response!.data || "unknown error");
       }

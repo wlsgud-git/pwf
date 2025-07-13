@@ -11,28 +11,27 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 
 interface ChatingInterface {
-  user: User;
-  content: string;
-  me?: boolean;
+  value: any;
+  me: boolean;
 }
 
-const ChatLi = ({ user, content, me }: ChatingInterface) => {
+const ChatLi = ({ value, me }: ChatingInterface) => {
   return (
-    <div className="chat_container">
-      <li
-        className="chat_li"
-        style={{
-          float: me ? "right" : "left",
-        }}
-      >
-        <div className="chat_user" style={{ display: me ? "none" : "flex" }}>
-          <span className="chat_user_profile">
-            <img src={user.profile_img} />
-          </span>
-          <span className="chat_user_nickname">{user.nickname}</span>
+    <div className="chat_container" style={{ alignSelf: me ? "end" : "start" }}>
+      {!me && (
+        <span className="chat_user_profile_circle">
+          <img src={value.profile_img} />
+        </span>
+      )}
+      <div className="chat_content_box">
+        {!me && <span className="chat_user_nickname">{value.nickname}</span>}
+        <div
+          className="chat_content"
+          style={{ backgroundColor: me ? "yellow" : "white" }}
+        >
+          {value.value}
         </div>
-        <span className="chat_content">{content}</span>
-      </li>
+      </div>
     </div>
   );
 };
@@ -46,13 +45,9 @@ export const Chat = () => {
   let [input, setInput] = useState<string>("");
 
   // 채팅 받기
-  const onDataReceived = (
-    payload: Uint8Array,
-    participant: RemoteParticipant | LocalParticipant
-  ) => {
-    const text = new TextDecoder().decode(payload);
-    const sender = participant.identity;
-    setChatList((c: any) => [...c, { sender, text }]);
+  const onDataReceived = (payload: Uint8Array) => {
+    let info = JSON.parse(new TextDecoder().decode(payload));
+    setChatList((c: any) => [...c, info]);
   };
 
   // 채팅 보내기
@@ -60,11 +55,19 @@ export const Chat = () => {
     e.preventDefault();
 
     if (input == "") return;
+    let sendInfo = {
+      value: input,
+      nickname: user.nickname,
+      profile_img: user.profile_img,
+    };
 
-    const encoded = new TextEncoder().encode(input);
-    await room.localParticipant.publishData(encoded, { reliable: true });
+    let encoded = new TextEncoder().encode(JSON.stringify(sendInfo));
 
-    setChatList((c: any) => [...c, { sender: user.nickname, text: input }]);
+    await room.localParticipant.publishData(encoded, {
+      reliable: true,
+    });
+
+    setChatList((c: any) => [...c, sendInfo]);
     setInput("");
   };
 
@@ -90,12 +93,17 @@ export const Chat = () => {
         </button>
       </div>
       {/* 채팅 리스트 */}
-      <ul className="chat_lists"></ul>
+      <ul className="chat_lists">
+        {chatList.map((val: any) => (
+          <ChatLi value={val} me={val.nickname == user.nickname} />
+        ))}
+      </ul>
       {/* 채팅인풋 */}
       <form action="" className="pwf-chat_form" onSubmit={sendChat}>
         <input
           type="text"
           value={input}
+          placeholder="채팅"
           onChange={(e: InputChange) => setInput(e.target.value)}
         />
         <button>

@@ -23,6 +23,17 @@ export class streamService extends HttpClient {
     }
   }
 
+  async inviteStreamRoom(data: FormData) {
+    try {
+      return await this.axiosFetch("/room/invite", {
+        method: "post",
+        body: data,
+      });
+    } catch (err) {
+      throw err;
+    }
+  }
+
   // 방 삭제
   async deleteStreamRoom(data: FormData) {
     try {

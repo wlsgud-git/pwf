@@ -19,8 +19,8 @@ import { nicknameOverlap } from "../data/auth.data";
 
 // types
 import { SignupMessage } from "../types/auth.types";
-import { onlineUser } from "../util/auth.util";
 import { requestFriendError } from "../error/reqeustFriend.error";
+import { User } from "../types/user.types";
 
 export const deleteController: RequestHandler = async (req, res) => {
   let { email } = req.params;
@@ -54,17 +54,20 @@ export const accountUser: RequestHandler = async (req, res, next) => {
 // 친구요청 관련 ------------------------------------
 // 닉네임으로 친구요청
 export const requestFriendWithNickname: RequestHandler = async (req, res) => {
-  let { res_nickname, req_nickname, state } = req.body;
+  let io = getIo();
+  let { res_nickname, req_user } = req.body;
+  let from: User = JSON.parse(req_user);
 
   try {
     // 본인에게 보내버림
-    if (res_nickname === req_nickname)
+    if (res_nickname === from.nickname)
       throw { msg: "본인에게 친구요청을 보낼 수 없습니다." };
 
-    let response = await requestFriend(res_nickname, req_nickname, state);
-
+    let response = await requestFriend(res_nickname, from.nickname);
     if (!response.length)
       throw { msg: "이미 친구이거나 친구요청이 전송되어 있는 상태입니다." };
+
+    io.to(`user:${res_nickname}`).emit("friend_request", { from });
 
     res
       .status(200)
@@ -79,26 +82,30 @@ export const requestFriendWithNickname: RequestHandler = async (req, res) => {
 // 친구요청 결과
 export const handleRequestFriend: RequestHandler = async (req, res) => {
   try {
-    let soc = getIo();
+    let io = getIo();
     let { receiver, sender, response } = req.body;
     receiver = JSON.parse(receiver);
     sender = JSON.parse(sender);
     response = response == "true" ? true : false;
 
-    // 데이터 베이스 친구요청 업데이트
+    // // 데이터 베이스 친구요청 업데이트
     await requestFriendhandle(receiver.nickname, sender.nickname, response);
 
-    if (response) {
-      receiver.online = true;
-      // 현재 sender가 접속중인지 확인
-      await onlineUser(sender);
+    // if (response) {
+    //   receiver.online = true;
+    //   // 현재 sender가 접속중인지 확인
+    //   // await onlineUser(sender);
 
-      if (sender.online)
-        soc.to(`online:${sender.nickname}`).emit("receiver data", receiver);
-    }
+    //   if (sender.online)
+    //     soc.to(`online:${sender.nickname}`).emit("receiver data", receiver);
+    // }
+
+    if (response)
+      io.to(`user:${sender.nickname}`).emit("friend_request_handle", receiver);
 
     res.status(200).json({
       sender,
+      response,
       msg: `${sender.nickname}의 요청을 ${
         response ? "수락하였습니다." : "거절하였습니다."
       }`,

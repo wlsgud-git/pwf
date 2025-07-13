@@ -13,6 +13,7 @@ import {
   createLocalAudioTrack,
   createLocalVideoTrack,
   attachToElement,
+  LocalParticipant,
 } from "livekit-client";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
@@ -26,45 +27,52 @@ import {
 } from "../../util/stream";
 import { TrackProps, UserTrackProps } from "../../types/stream.types";
 import { useContextSelector } from "use-context-selector";
+import { current } from "@reduxjs/toolkit";
+import { Invitation } from "../modal/invitation";
 
 interface ParticipantProps {
   nickname: string;
-  trackInfo: TrackProps;
+  audio: TrackProps;
+  video: TrackProps;
 }
 
-const ParticipantVideo = React.memo(
-  ({ nickname, trackInfo }: ParticipantProps) => {
-    let videoRef = useRef<HTMLVideoElement | null>(null);
+const UserVideo = React.memo(({ nickname, audio, video }: ParticipantProps) => {
+  let videoRef = useRef<HTMLVideoElement | null>(null);
 
-    useEffect(() => {
-      if (!videoRef.current) return;
-      trackInfo.audio_track?.attach(videoRef.current);
-      trackInfo.video_track?.attach(videoRef.current);
-    }, [trackInfo.audio_track, trackInfo.video_track]);
-    return (
-      <div className="participant_track_box">
-        <video ref={videoRef} autoPlay></video>
-        <div className="participant_infomation">
-          <span>
-            <i
-              className={`fa-solid fa-microphone${
-                trackInfo.audio_state ? "" : "-slash"
-              }`}
-            ></i>
-          </span>
-          <span>
-            <i
-              className={`fa-solid fa-video${
-                trackInfo.video_state ? "" : "-slash"
-              }`}
-            ></i>
-          </span>
-          <span>{nickname}</span>
-        </div>
+  useEffect(() => {
+    if (!videoRef.current) return;
+    video.track?.attach(videoRef.current);
+    audio.track?.attach(videoRef.current);
+  }, [video, audio]);
+
+  return (
+    <div
+      className="participant_track_box"
+      style={{
+        border: `2px solid var(--pwf-${audio.active ? "blue" : "light-gray"})`,
+      }}
+    >
+      <video ref={videoRef} autoPlay></video>
+      <span
+        className="video_user_nickname"
+        style={{ display: video.state ? "none" : "flex" }}
+      >
+        {nickname}
+      </span>
+      <div className="participant_infomation">
+        <span>
+          <i
+            className={`fa-solid fa-microphone${audio.state ? "" : "-slash"}`}
+          ></i>
+        </span>
+        <span>
+          <i className={`fa-solid fa-video${video.state ? "" : "-slash"}`}></i>
+        </span>
+        <span>{nickname}</span>
       </div>
-    );
-  }
-);
+    </div>
+  );
+});
 
 export const Stream = () => {
   let user = useSelector((state: RootState) => state.user);
@@ -77,7 +85,10 @@ export const Stream = () => {
 
   // 참가자 참가
   let joinParticipant = (who: string) =>
-    setParticipants((c: UserTrackProps) => ({ ...c, [who]: {} }));
+    setParticipants((c: UserTrackProps) => ({
+      ...c,
+      [who]: { audio: {}, video: {} },
+    }));
 
   // 룸이 연결되었으면 내트랙과 이벤트 설정
   useEffect(() => {
@@ -99,84 +110,76 @@ export const Stream = () => {
             audio: [...c["audio"], { id: val.deviceId, label: val.label }],
           }));
       });
-
-      // 새 참가자 관련
-      room.on("participantConnected", (participant: RemoteParticipant) => {
-        let identity = participant.identity;
-        joinParticipant(identity);
-        participant.on("trackMuted", (track) =>
-          changeTrackState(identity, track, false)
-        );
-        participant.on("trackUnmuted", (track) =>
-          changeTrackState(identity, track, true)
-        );
-      });
-      //   // 기준 참가자 관련
-      room.remoteParticipants.forEach((participant: RemoteParticipant) => {
-        let identity = participant.identity;
-        joinParticipant(identity);
-
-        participant.trackPublications.forEach((pub: TrackPublication) => {
-          if (pub.isSubscribed && pub.track)
-            setParticipantTrack(identity, pub.track);
-          if (pub.source == "screen_share" && shareVideoRef.current) {
-            shareState(pub.track as Track, true, identity);
-          }
-        });
-        participant.on("trackMuted", (track) =>
-          changeTrackState(identity, track, false)
-        );
-        participant.on("trackUnmuted", (track) =>
-          changeTrackState(identity, track, false)
-        );
-      });
-
-      // 구독시작
-      room.on(
-        "trackSubscribed",
-        (
-          track: Track,
-          pub: TrackPublication,
-          participant: RemoteParticipant
-        ) => {
-          console.log("소스:", pub.source);
-          if (pub.isSubscribed && pub.track)
-            setParticipantTrack(participant.identity, track);
-          if (pub.source == "screen_share" && shareVideoRef.current)
-            shareState(pub.track as Track, true, participant.identity);
-        }
-      );
-
-      // 구독종료
-      room.on(
-        "trackUnsubscribed",
-        (
-          track: Track,
-          pub: TrackPublication,
-          participant: RemoteParticipant
-        ) => {
-          if (pub.source == "screen_share" && shareVideoRef.current)
-            shareState(pub.track as Track, false, participant.identity);
-        }
-      );
     };
     start();
+
+    // 새 참가자 관련
+    room.on("participantConnected", (participant: RemoteParticipant) => {
+      let identity = participant.identity;
+      joinParticipant(identity);
+      participant.on("trackMuted", (track) =>
+        changeTrackState(identity, track, false)
+      );
+      participant.on("trackUnmuted", (track) =>
+        changeTrackState(identity, track, true)
+      );
+    });
+    //   // 기준 참가자 관련
+    room.remoteParticipants.forEach((participant: RemoteParticipant) => {
+      let identity = participant.identity;
+      joinParticipant(identity);
+
+      participant.trackPublications.forEach((pub: TrackPublication) => {
+        if (pub.isSubscribed && pub.track)
+          setParticipantTrack(identity, pub.track);
+        if (pub.source == "screen_share" && shareVideoRef.current) {
+          shareState(pub.track as Track, true, identity);
+        }
+      });
+      participant.on("trackMuted", (track) =>
+        changeTrackState(identity, track, false)
+      );
+      participant.on("trackUnmuted", (track) =>
+        changeTrackState(identity, track, true)
+      );
+    });
+
+    // 구독시작
+    room.on(
+      "trackSubscribed",
+      (track: Track, pub: TrackPublication, participant: RemoteParticipant) => {
+        if (pub.isSubscribed && pub.track)
+          setParticipantTrack(participant.identity, track);
+        if (pub.source == "screen_share" && shareVideoRef.current)
+          shareState(pub.track as Track, true, participant.identity);
+      }
+    );
+
+    // 구독종료
+    room.on(
+      "trackUnsubscribed",
+      (track: Track, pub: TrackPublication, participant: RemoteParticipant) => {
+        if (pub.source == "screen_share" && shareVideoRef.current)
+          shareState(pub.track as Track, false, participant.identity);
+      }
+    );
+    // 볼륨 활성화
+    room.on("activeSpeakersChanged", handleSpeak);
+
+    return () => {
+      room.off("activeSpeakersChanged", handleSpeak);
+    };
   }, [room]);
 
   // 트랙 --------------------------------------
-  let localRef = useRef<HTMLVideoElement | null>(null);
-  let videoTrack = useRef<LocalVideoTrack | null>(null);
-  let audioTrack = useRef<LocalAudioTrack | null>(null);
 
-  let [audio, setAudio] = useState<boolean>(true);
-  let [video, setVideo] = useState<boolean>(true);
-
-  let trackboxRef = useRef<HTMLDivElement | null>(null);
-  let [track, setTrack] = useState<{ video: any; audio: any }>({
-    video: "",
-    audio: "",
+  let [audio, setAudio] = useState<TrackProps>({
+    state: true,
+    active: false,
   });
+  let [video, setVideo] = useState<TrackProps>({ state: true });
 
+  let devicesRef = useRef<HTMLDivElement | null>(null);
   let [devices, setDevices] = useState<{
     show: boolean;
     video: { id: string; label: string }[];
@@ -187,28 +190,31 @@ export const Stream = () => {
     audio: [],
   });
 
+  useEffect(() => {}, [audio]);
+
+  // 내 트랙관련 -------------------------------
+
+  // 내 비디오 / 오디오 트랙세팅
+  const setLocalTrack = async (track: Track, type: "audio" | "video") => {
+    let source =
+      type == "audio" ? Track.Source.Microphone : Track.Source.Camera;
+    try {
+      let id = track.mediaStreamTrack.getSettings().deviceId;
+      await room.localParticipant.publishTrack(track, { source });
+      type == "video"
+        ? setVideo((c) => ({ ...c, track: track as LocalVideoTrack, id }))
+        : setAudio((c) => ({ ...c, track: track as LocalAudioTrack, id }));
+    } catch (err) {
+      console.log(err);
+    }
+  };
   // 내 트랙 설정
   const setMyTracks = async () => {
     try {
-      const tracks = await getStream(audio, video);
-      videoTrack.current = getTrack(tracks!, "video") as LocalVideoTrack;
-      audioTrack.current = getTrack(tracks!, "audio") as LocalAudioTrack;
-      if (videoTrack.current && localRef.current) {
-        await room.localParticipant.publishTrack(videoTrack.current);
-        videoTrack.current.attach(localRef.current);
-        setTrack((c) => ({
-          ...c,
-          video: videoTrack.current?.mediaStreamTrack.getSettings().deviceId,
-        }));
-      }
-      if (audioTrack.current && localRef.current) {
-        await room.localParticipant.publishTrack(audioTrack.current);
-        audioTrack.current.attach(localRef.current);
-        setTrack((c) => ({
-          ...c,
-          audio: audioTrack.current?.mediaStreamTrack.getSettings().deviceId,
-        }));
-      }
+      const tracks = await getStream(audio.state, video.state);
+
+      setLocalTrack(getTrack(tracks!, "video") as Track, "video");
+      setLocalTrack(getTrack(tracks!, "audio") as Track, "audio");
     } catch (err) {
       console.log(err);
     }
@@ -226,25 +232,14 @@ export const Stream = () => {
       if (track) {
         localParticipant.unpublishTrack(track);
         track?.stop();
-        // videoTrack.current;
       }
 
-      // 오디오 변경
-      if (type == "audio") {
-        let newTrack = await createLocalAudioTrack({ deviceId });
-        await localParticipant.publishTrack(newTrack, { source });
-        setTrack((c) => ({ ...c, audio: deviceId }));
-        audioTrack.current = newTrack;
-        audioTrack.current?.attach(localRef.current!);
-      }
-      // 비디오 변경
-      else {
-        let newTrack = await createLocalVideoTrack({ deviceId });
-        await localParticipant.publishTrack(newTrack, { source });
-        setTrack((c) => ({ ...c, video: deviceId }));
-        videoTrack.current = newTrack;
-        videoTrack.current?.attach(localRef.current!);
-      }
+      let newTrack =
+        type == "audio"
+          ? await createLocalAudioTrack({ deviceId })
+          : await createLocalVideoTrack({ deviceId });
+
+      setLocalTrack(newTrack, type);
     } catch (err) {
       console.log(err);
     }
@@ -252,40 +247,57 @@ export const Stream = () => {
 
   // 트랙 상태 변경
   const toggleTrack = (type: "audio" | "video") => {
-    if (!localRef.current) return;
-    if (type == "video") {
-      if (!videoTrack.current) return;
-
-      video ? videoTrack.current.mute() : videoTrack.current.unmute();
-      setVideo((c) => !c);
+    if (type == "audio") {
+      let track = audio.track as LocalAudioTrack;
+      audio.state ? track.mute() : track.unmute();
+      setAudio((c) => ({ ...c, state: !c.state }));
     } else {
-      if (!audioTrack.current) return;
-
-      audio ? audioTrack.current.mute() : audioTrack.current.unmute();
-      setAudio((c) => !c);
+      let track = video.track as LocalVideoTrack;
+      video.state ? track.mute() : track.unmute();
+      setVideo((c) => ({ ...c, state: !c.state }));
     }
   };
 
-  // 다른 참가자 트랙관련 ------
-  let setParticipantTrack = (who: string, track: Track) => {
-    track.kind == "video"
-      ? setParticipants((c: UserTrackProps) => ({
-          ...c,
-          [who]: {
-            ...c[who],
-            video_state: true,
-            video_track: track as RemoteVideoTrack,
-          },
-        }))
-      : setParticipants((c: UserTrackProps) => ({
-          ...c,
-          [who]: {
-            ...c[who],
-            audio_state: true,
-            audio_track: track as RemoteAudioTrack,
-          },
-        }));
+  // 오디오 활성화 조절
+  const handleSpeak = () => {
+    const currentActive = new Set(
+      room.activeSpeakers.map((p: any) => {
+        return p.identity;
+      })
+    );
+
+    setAudio((c) => ({ ...c, active: currentActive.has(user.nickname!) }));
+
+    setParticipants((prev: UserTrackProps) => {
+      let newMap: UserTrackProps = {};
+      for (const [key, value] of Object.entries(prev)) {
+        let speaking: boolean = currentActive.has(key);
+        newMap[key] =
+          speaking === value.audio.active
+            ? value
+            : { ...value, audio: { ...value.audio, active: speaking } };
+      }
+      return newMap;
+    });
   };
+
+  // 다른 참가자 트랙관련 ------------------------------
+  let setParticipantTrack = (who: string, track: Track) =>
+    setParticipants((c: UserTrackProps) => ({
+      ...c,
+      [who]: {
+        ...c[who],
+        [track.kind == "audio" ? "audio" : "video"]: {
+          ...c[who][track.kind == "audio" ? "audio" : "video"],
+          state: true,
+          active: false,
+          track:
+            track.kind == "audio"
+              ? (track as RemoteAudioTrack)
+              : (track as RemoteVideoTrack),
+        },
+      },
+    }));
 
   // 유저 트랙상태 변경
   let changeTrackState = (
@@ -297,15 +309,13 @@ export const Stream = () => {
       ...c,
       [who]: {
         ...c[who],
-        video_state: track.kind == "video" ? state : c[who].video_state,
-        audio_state: track.kind == "audio" ? state : c[who].audio_state,
+        [track.kind == "audio" ? "audio" : "video"]: {
+          ...c[who][track.kind == "audio" ? "audio" : "video"],
+          state,
+        },
       },
     }));
   };
-
-  useEffect(() => {
-    if (devices.show) trackboxRef.current?.focus();
-  }, [devices]);
 
   // 화면 공유 ------------------------------
   const [share, setShare] = useState<{ nickname: string; state: boolean }>({
@@ -346,8 +356,11 @@ export const Stream = () => {
     }
   };
 
+  let [invitation, setInvitation] = useState<boolean>(false);
+
   return (
     <div className="pwf-stream_container">
+      <Invitation user={user} show={invitation} setShow={setInvitation} />
       {/* 참가자들 화면 부분들 */}
       <div className="pwf-stream_screen_section">
         {/* 참가자 화면 리스트 */}
@@ -355,25 +368,15 @@ export const Stream = () => {
           className="participant_stream_container"
           style={{ flexDirection: share.state ? "row" : "column" }}
         >
-          {/* 내 비디오 */}
-          <div className="participant_track_box">
-            <video ref={localRef} autoPlay></video>
-            <div className="participant_infomation">
-              <span>
-                <i
-                  className={`fa-solid fa-microphone${audio ? "" : "-slash"}`}
-                ></i>
-              </span>
-              <span>
-                <i className={`fa-solid fa-video${video ? "" : "-slash"}`}></i>
-              </span>
-              <span>{user.nickname}</span>
-            </div>
-          </div>
+          <UserVideo nickname={user.nickname!} audio={audio} video={video} />
 
           {Object.entries(participants as UserTrackProps).map(
             ([nickname, value]) => (
-              <ParticipantVideo nickname={nickname} trackInfo={value} />
+              <UserVideo
+                nickname={nickname}
+                audio={value.audio}
+                video={value.video}
+              />
             )
           )}
         </ul>
@@ -392,16 +395,18 @@ export const Stream = () => {
       <footer className="pwf-stream_footer">
         {/* 오디오 */}
         <button title="오디오" onClick={() => toggleTrack("audio")}>
-          <i className={`fa-solid fa-microphone${audio ? "" : "-slash"}`}></i>
+          <i
+            className={`fa-solid fa-microphone${audio.state ? "" : "-slash"}`}
+          ></i>
           <span>오디오</span>
         </button>
         {/* 비디오 */}
         <button title="비디오" onClick={() => toggleTrack("video")}>
-          <i className={`fa-solid fa-video${video ? "" : "-slash"}`}></i>
+          <i className={`fa-solid fa-video${video.state ? "" : "-slash"}`}></i>
           <span>비디오</span>
         </button>
         {/* 방에 친구초대 */}
-        <button title="초대">
+        <button title="초대" onClick={() => setInvitation(true)}>
           <i className="fa-solid fa-user-plus"></i>
           <span>초대</span>
         </button>
@@ -415,7 +420,7 @@ export const Stream = () => {
           <div
             tabIndex={0}
             style={{ display: devices.show ? "flex" : "none" }}
-            ref={trackboxRef}
+            ref={devicesRef}
             onBlur={() => setDevices((c) => ({ ...c, show: false }))}
             className="my_media_box"
           >
@@ -431,7 +436,7 @@ export const Stream = () => {
                 title={val.label}
                 onMouseDown={() => switchTrack("video", val.id)}
               >
-                {track.video == val.id && <i className="fa-solid fa-check"></i>}
+                {video.id == val.id && <i className="fa-solid fa-check"></i>}
                 {val.label}
               </li>
             ))}
@@ -447,7 +452,7 @@ export const Stream = () => {
                 title={val.label}
                 onMouseDown={() => switchTrack("audio", val.id)}
               >
-                {track.audio == val.id && <i className="fa-solid fa-check"></i>}
+                {audio.id == val.id && <i className="fa-solid fa-check"></i>}
                 {val.label}
               </li>
             ))}
@@ -469,7 +474,12 @@ export const Stream = () => {
           <span>채팅</span>
         </button>
         {/* 참가자 */}
-        <button title="참가자">
+        <button
+          title="참가자"
+          onClick={() =>
+            emitter.emit("menu", { state: true, type: "participants" })
+          }
+        >
           <i className="fa-solid fa-user"></i>
           <span>참가자</span>
         </button>

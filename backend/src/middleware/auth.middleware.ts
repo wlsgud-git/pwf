@@ -12,16 +12,18 @@ import { hashingText } from "../util/crypto.util";
 import { redisGet, redisSet } from "../util/redis.util";
 import { AuthcodeError, EmailError, NicknameError } from "../types/auth.types";
 import { emailFormValidate } from "../validation/auth.validate";
-import { RequestQuery } from "../types/http.types";
+import { AuthRequest, RequestQuery } from "../types/http.types";
 import { verifyJwt } from "../util/jwt.util";
 
 // Authentication Or Authorization --------------------------
 // 유저 인가
-export const IsAuth: RequestHandler = async (req, res, next) => {
+export const IsAuth: AuthRequest = async (req, res, next) => {
   let session_id = req.cookies["session_id"];
 
   try {
-    if (!session_id) throw { message: "로그인 필요" };
+    let user = await redisGet(session_id);
+    if (!user) throw { message: "로그인 필요" };
+    req.user = JSON.parse(user);
     next();
   } catch (err) {
     res.status(400).json(err);

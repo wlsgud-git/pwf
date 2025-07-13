@@ -9,7 +9,7 @@ export const redisSet = async (key: string, value: string, expire: number) => {
   }
 };
 
-export const redisGet = async (key: string): Promise<string | null> => {
+export const redisGet = async (key: string): Promise<any> => {
   try {
     let code = await redis.get(key);
     return code;
@@ -18,7 +18,7 @@ export const redisGet = async (key: string): Promise<string | null> => {
   }
 };
 
-export const redisDelete = async (key: string): Promise<boolean> => {
+export const redisDelete = async (key: string): Promise<any> => {
   try {
     await redis.del(key);
     return true;

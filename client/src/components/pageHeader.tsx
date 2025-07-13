@@ -11,18 +11,21 @@ import { AppDispatch, persistor, RootState } from "../redux/store";
 import { socketClient } from "../util/socket";
 import { useDispatch } from "react-redux";
 import { auth_service } from "../service/auth.service";
+import { resetAllstate } from "../redux/actions/root.action";
 
 export const PageHeader = () => {
   let navigate = useNavigate();
   let user = useSelector((state: RootState) => state.user);
+  let { request_friends, friends } = useSelector(
+    (state: RootState) => state.friend
+  );
   let dispatch = useDispatch<AppDispatch>();
   let [userOption, setUserOption] = useState<boolean>(false);
 
   const logout = async () => {
     try {
       await auth_service.logout();
-      dispatch(userInit());
-      await persistor.purge();
+      dispatch(resetAllstate());
       socketClient.disconnect();
       navigate("/login");
     } catch (err) {
@@ -55,13 +58,11 @@ export const PageHeader = () => {
             className="friend_add_number"
             style={{
               display:
-                user.request_friends && user.request_friends.length
-                  ? "flex"
-                  : "none",
+                request_friends && request_friends.length ? "flex" : "none",
             }}
           >
-            {user.request_friends && user.request_friends.length
-              ? user.request_friends.length
+            {request_friends && request_friends.length
+              ? request_friends.length
               : ""}
           </span>
         </div>

@@ -29,11 +29,12 @@ export const MyFriendLi = ({ user }: UserComponent) => {
 // 내 친구들리스트
 export const MyFriends = () => {
   let user = useSelector((state: RootState) => state.user);
+  let { friends } = useSelector((state: RootState) => state.friend);
 
   return (
     <ul className="pwf-my_friends">
-      {user.friends && user.friends.length
-        ? user.friends.map((val) => <MyFriendLi user={val} />)
+      {friends && friends.length
+        ? friends.map((val) => <MyFriendLi user={val} />)
         : ""}
     </ul>
   );

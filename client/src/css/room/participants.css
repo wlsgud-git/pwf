@@ -1,36 +1,34 @@
-/* @import url("../streamRoom.css"); */
-/* participants section */
-.menu_participants_list {
+.pwf-participants_container {
   width: 100%;
   height: 100%;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
 
-.participant_li {
+.menu_type {
   width: 100%;
-  height: 40px;
+  height: var(--menu-text-chat);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0px 8px;
-  border-bottom: 1px solid var(--pwf-white);
-}
-
-.participant_img_box {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  overflow: hidden;
-  margin-right: 12px;
-}
-
-.participant_img_box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.participant_nickname {
+  font-weight: bold;
   color: var(--pwf-white);
+  border-bottom: 1px solid var(--pwf-light-gray);
+}
+
+.menu_type button {
+  padding: 6px;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  font-weight: bold;
+  color: var(--pwf-light-gray);
+  font-size: 17px;
+}
+
+.participants_container {
+  width: 100%;
+  height: calc(100% - var(--menu-text-chat));
+  padding: 7px;
 }

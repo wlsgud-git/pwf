@@ -6,15 +6,18 @@ import {
 } from "livekit-client";
 
 export interface TrackProps {
-  video_state?: boolean;
-  audio_state?: boolean;
-  video_track?: RemoteVideoTrack;
-  audio_track?: RemoteAudioTrack;
-  stream?: MediaStream;
+  active?: boolean;
+  state: boolean;
+  track?:
+    | RemoteAudioTrack
+    | RemoteVideoTrack
+    | LocalAudioTrack
+    | LocalVideoTrack;
+  id?: string;
 }
 
 export interface UserTrackProps {
-  [nickname: string]: TrackProps;
+  [nickname: string]: { audio: TrackProps; video: TrackProps };
 }
 
 export type LocalTrackProps = LocalAudioTrack | LocalVideoTrack;

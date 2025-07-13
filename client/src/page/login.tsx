@@ -8,8 +8,7 @@ import { EmailError, PasswordError } from "../types/auth";
 import { createFormData } from "../util/form";
 import { auth_service } from "../service/auth.service";
 import { AxiosError } from "../error/error";
-import { emitter } from "../util/event";
-import { userSocket } from "../util/socket";
+import { socketConnect } from "../util/socket";
 
 // type
 interface LoginInputProps {
@@ -57,7 +56,7 @@ export const Login = () => {
         email: email.value,
         password: password.value,
       });
-      await auth_service.login(formdata);
+      let { user } = await auth_service.login(formdata);
       window.location.href = "/";
     } catch (err) {
       let { path, msg } = AxiosError(err);
@@ -94,11 +93,7 @@ export const Login = () => {
   };
 
   useEffect(() => {
-    let status =
-      email.value !== "" &&
-      !email.error &&
-      password.value !== "" &&
-      !password.error;
+    let status = email.value !== "" && password.value !== "";
 
     setLoginBtn((c) => ({ ...c, active: status }));
   }, [email.value, password.value]);

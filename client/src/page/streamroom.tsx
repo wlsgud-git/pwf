@@ -2,64 +2,35 @@ import "../css/room/streamRoom.css";
 
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { socketClient } from "../util/socket";
 import { stream_service } from "../service/stream.service";
-import { emitter } from "../util/event";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
-import {
-  Track,
-  Room,
-  RemoteParticipant,
-  RemoteTrackPublication,
-  createLocalTracks,
-  LocalVideoTrack,
-  LocalAudioTrack,
-  RemoteVideoTrack,
-  RemoteAudioTrack,
-  RemoteTrack,
-  LocalTrack,
-  TrackPublication,
-} from "livekit-client";
 
 // type
-// import { Room } from "../types/room";
-import { User } from "../types/user";
-import { PeerConnects } from "../types/room";
 
 // component
 import { createFormData } from "../util/form";
-import {
-  connectRoom,
-  getMediaStream,
-  getStream,
-  getTrack,
-} from "../util/stream";
-import {
-  LocalTrackProps,
-  RemoteTrackProps,
-  TrackProps,
-  UserTrackProps,
-} from "../types/stream.types";
+import { connectRoom } from "../util/stream";
 import { Menu } from "../components/room/menu";
 import { Stream } from "../components/room/stream";
 import { useSetStream, StreamContext } from "../context/stream.context";
 import { useContextSelector } from "use-context-selector";
+import { Invitation } from "../components/modal/invitation";
 
 export const StreamRoom = () => {
   let { id } = useParams();
-  let navigate = useNavigate();
   // using
   let user = useSelector((state: RootState) => state.user);
-  let room = useContextSelector(StreamContext, (ctx) => ctx.room);
+  let roomInfo = useContextSelector(StreamContext, (ctx) => ctx.roomInfo);
 
-  let { setRoom, setParticipants, setShare } = useSetStream();
-
-  let [token, setToken] = useState<string>("");
+  let { setRoom, setRoomInfo } = useSetStream();
 
   // 방 연결
   let roomConnect = async () => {
     try {
+      let token = await stream_service.roomAccessToken(
+        createFormData({ room: `room${id}`, identity: user.nickname })
+      );
       let room = await connectRoom(token);
       setRoom(room);
     } catch (err) {
@@ -68,13 +39,12 @@ export const StreamRoom = () => {
   };
 
   // init ------------------------------------------
+  // 방 정보 가져오기
   useEffect(() => {
     let start = async () => {
       try {
-        let token = await stream_service.roomAccessToken(
-          createFormData({ room: `room${id}`, identity: user.nickname })
-        );
-        setToken(token);
+        let info = await stream_service.getStreamRoomData(id!);
+        setRoomInfo(info.room);
       } catch (err) {
         console.log(err);
       }
@@ -82,11 +52,11 @@ export const StreamRoom = () => {
     start();
   }, []);
 
-  // token으로 room 연결
+  // 방 연결
   useEffect(() => {
-    if (token == "") return;
+    if (!roomInfo) return;
     roomConnect();
-  }, [token]);
+  }, [roomInfo]);
 
   return (
     <div className="page streamRoom_page">

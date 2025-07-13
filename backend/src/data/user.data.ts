@@ -16,7 +16,7 @@ end as stream_room
 		join users ru on ru.nickname = rf.req_nickname
 		where rf.state = false and rf.res_nickname = u.nickname
 	) rf_data
-) as request_friend_list
+) as request_friends
 , (
     select json_agg(distinct f_data)
 	from (
@@ -45,21 +45,19 @@ group by u.id`;
 // 친구요청
 export const requestFriend = async (
   res_nickname: string,
-  req_nickname: string,
-  state: boolean
+  req_nickname: string
 ) => {
   try {
     let query = `insert into requestFriend (res_nickname, req_nickname, state)
-select $1, $2 , $3 
+select $1, $2, false
 where not exists ( 
 	select 1 from requestFriend re
-	where (re.res_nickname = $4 and re.req_nickname = $5) 
-	or (re.res_nickname = $6 and req_nickname = $7) 
+	where (re.res_nickname = $3 and re.req_nickname = $4) 
+	or (re.res_nickname = $5 and req_nickname = $6) 
 ) returning *`;
     let data = [
       res_nickname,
       req_nickname,
-      state,
       res_nickname,
       req_nickname,
       req_nickname,
