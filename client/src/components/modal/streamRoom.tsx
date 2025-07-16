@@ -10,6 +10,8 @@ import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { roomAction } from "../../redux/actions/roomAction";
 import { useSelector } from "react-redux";
+import { keyboard } from "@testing-library/user-event/dist/keyboard";
+import { stream_service } from "../../service/stream.service";
 
 interface CompoentProps {
   user: User;
@@ -113,11 +115,7 @@ export const StreamRoom = ({ user, type }: CompoentProps) => {
       let participants = inviteUsers.map((val) => val.id);
       participants.push(user.id);
       let formdata = createFormData({ room_name: roomname, participants });
-      dispatch(roomAction.createRoom(formdata))
-        .unwrap()
-        .catch((err: any) => {
-          console.log("방 만들기 에러");
-        });
+      await stream_service.createStreamRoom(formdata);
       resetModal();
     } catch (err) {
       alert(err);
@@ -168,8 +166,10 @@ export const StreamRoom = ({ user, type }: CompoentProps) => {
           <div className="friends_invite_box">
             <label htmlFor="friends_list">친구목록</label>
             <ul className="friends_list">
-              {friends ? (
-                friends.map((val) => <LiFriend user={val} />)
+              {Object.entries(friends).length ? (
+                Object.entries(friends).map(([key, val]) => (
+                  <LiFriend user={val} />
+                ))
               ) : (
                 <p>초대할 친구가 없습니다.</p>
               )}

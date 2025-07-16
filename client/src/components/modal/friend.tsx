@@ -15,6 +15,7 @@ import {
   friendRequest,
 } from "../../redux/reducer/friendReducer";
 import { friendAction } from "../../redux/actions/friendAction";
+import { keyboard } from "@testing-library/user-event/dist/keyboard";
 
 interface ComponentProps {
   type: string;
@@ -112,7 +113,14 @@ export const Friend = ({ type }: ComponentProps) => {
       dispatch(friendReqeustHandle(data))
     );
 
-    return () => {};
+    return () => {
+      socketClient.off("friend_request", (data) =>
+        dispatch(friendRequest(data))
+      );
+      socketClient.off("friend_request_handle", (data) =>
+        dispatch(friendReqeustHandle(data))
+      );
+    };
   }, []);
 
   return (
@@ -153,9 +161,9 @@ export const Friend = ({ type }: ComponentProps) => {
         <div className="friend_request_box">
           <label>친구요청</label>
           <ul className="request_friends">
-            {request_friends && request_friends.length ? (
-              request_friends.map((val) => (
-                <RequestFriendLi receiver={user} sender={val} />
+            {Object.entries(request_friends).length ? (
+              Object.entries(request_friends).map(([key, value]) => (
+                <RequestFriendLi receiver={user} sender={value} />
               ))
             ) : (
               <p>친구요청이 없습니다.</p>

@@ -1,19 +1,18 @@
 import "../../css/modal/invitation.css";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { emitter } from "../../util/event";
 
 // type
 import { User } from "../../types/user";
-import { Room } from "../../types/room";
-import { useContextSelector } from "use-context-selector";
-import { StreamContext } from "../../context/stream.context";
 import { createFormData } from "../../util/form";
 import { stream_service } from "../../service/stream.service";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { useParams } from "react-router-dom";
 
 interface InvitationProps {
-  user: User;
   show: boolean;
   setShow: any;
 }
@@ -50,14 +49,20 @@ const InvitationLi = ({ user }: { [nickname: string]: User }) => {
 };
 
 // 친구 관련 모달
-export const Invitation = ({ user, show, setShow }: InvitationProps) => {
-  let roomInfo = useContextSelector(StreamContext, (ctx) => ctx.roomInfo);
+export const Invitation = ({ show, setShow }: InvitationProps) => {
+  let { id } = useParams();
+  let { friends } = useSelector((state: RootState) => state.friend);
+  let user = useSelector((state: RootState) => state.user);
+  let room = useSelector((state: RootState) => state.room);
+
+  // 초기화
   function reset() {
     setShow(false);
+    setInvitationList([]);
     emitter.emit("modal", { type: "invitation" });
   }
 
-  let [inUser, setInUser] = useState<{ [nick: string]: true }>({});
+  let [inUser, setInUser] = useState<{ [nick: string]: User }>({});
   let [invitationList, setInvitationList] = useState<User[]>([]);
 
   useEffect(() => {
@@ -77,21 +82,22 @@ export const Invitation = ({ user, show, setShow }: InvitationProps) => {
   });
 
   useEffect(() => {
-    let newMap: { [nick: string]: true } = {};
-    if (roomInfo) {
-      roomInfo.participants.map((val: User) => {
-        let nick = val.nickname!;
-        if (nick !== user.nickname) newMap[nick] = true;
+    if (id) {
+      let newMap: { [nick: string]: User } = {};
+      room[parseInt(id)].participants?.map((val) => {
+        if (val.nickname !== user.nickname) newMap[val.nickname!] = val;
       });
       setInUser(newMap);
     }
-  }, [roomInfo]);
+  }, [room]);
 
+  // 친구초대
   const invite = async () => {
     try {
-      let inviteList = invitationList.map((val) => val.id);
-      let formdata = createFormData({ id: roomInfo.id, inviteList });
+      let inviteList = invitationList.map((val) => val);
+      let formdata = createFormData({ room: room[parseInt(id!)], inviteList });
       let { msg } = await stream_service.inviteStreamRoom(formdata);
+      reset();
     } catch (err) {
       console.log(err);
     }
@@ -132,8 +138,8 @@ export const Invitation = ({ user, show, setShow }: InvitationProps) => {
         </ul>
         {/* 내가 초대할 친구목록 */}
         <ul className="invitation_friend_list">
-          {user.friends?.map((val) =>
-            inUser[val.nickname!] ? "" : <InvitationLi user={val} />
+          {Object.entries(friends).map(([key, value]) =>
+            !inUser[value.nickname!] ? <InvitationLi user={value} /> : ""
           )}
         </ul>
         <div className="invitation_btn_box">

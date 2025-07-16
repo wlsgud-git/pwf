@@ -19,17 +19,6 @@ class RoomAction extends streamService {
   //       }
   //     }
   //   );
-  createRoom = createAsyncThunk(
-    "create/room",
-    async (data: FormData): Promise<any> => {
-      try {
-        let room = await this.createStreamRoom(data);
-        return room;
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  );
 }
 
 export let roomAction = new RoomAction();

@@ -33,9 +33,9 @@ export const MyFriends = () => {
 
   return (
     <ul className="pwf-my_friends">
-      {friends && friends.length
-        ? friends.map((val) => <MyFriendLi user={val} />)
-        : ""}
+      {Object.entries(friends).map(([key, value]) => (
+        <MyFriendLi user={value} />
+      ))}
     </ul>
   );
 };

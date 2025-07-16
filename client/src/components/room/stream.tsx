@@ -360,7 +360,7 @@ export const Stream = () => {
 
   return (
     <div className="pwf-stream_container">
-      <Invitation user={user} show={invitation} setShow={setInvitation} />
+      <Invitation show={invitation} setShow={setInvitation} />
       {/* 참가자들 화면 부분들 */}
       <div className="pwf-stream_screen_section">
         {/* 참가자 화면 리스트 */}

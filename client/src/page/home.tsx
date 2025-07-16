@@ -34,9 +34,11 @@ export const Home = () => {
       <div className="pwf_content">
         {/* 내가 참가자인 방 모음 */}
         <ul className="stream_room_lists">
-          {room.map((val: any) => (
-            <StreamRoomLi data={val} />
-          ))}
+          {Object.entries(room).length
+            ? Object.entries(room).map(([key, value]) => (
+                <StreamRoomLi data={value} />
+              ))
+            : ""}
 
           <button
             onClick={() =>

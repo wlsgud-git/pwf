@@ -10,7 +10,7 @@ export function createFormData(data: any): FormData {
     if (vt == "object") {
       // 배열
       if (Array.isArray(value))
-        value.map((val) => formdata.append(`${key}[]`, val));
+        value.map((val) => formdata.append(`${key}[]`, JSON.stringify(val)));
       else if (value instanceof File) formdata.append(key, value);
       else formdata.append(key, JSON.stringify(value));
     }

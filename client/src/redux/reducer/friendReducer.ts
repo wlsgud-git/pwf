@@ -7,9 +7,14 @@ import { userAction } from "../actions/userAction";
 import { User } from "../../types/user";
 import { friendAction } from "../actions/friendAction";
 
-const initialState: User = {
-  request_friends: [],
-  friends: [],
+interface FriendProps {
+  request_friends: { [id: number]: User };
+  friends: { [id: number]: User };
+}
+
+const initialState: FriendProps = {
+  request_friends: {},
+  friends: {},
 };
 
 const friendSlice = createSlice({
@@ -17,11 +22,15 @@ const friendSlice = createSlice({
   initialState, // reducer
   reducers: {
     friendRequest: (state: any, data: any) => {
-      state.request_friends.push(data.payload.from);
+      state.request_friends[data.payload.from.id] = data.payload.from;
     },
 
     friendReqeustHandle: (state: any, data: any) => {
-      state.friends.push(data.payload);
+      state.friends[data.payload.id] = data.payload;
+    },
+
+    friendOnlineUpdate: (state: any, data: any) => {
+      state.friends[data.payload.who.id].online = data.payload.online;
     },
     init: (current) => (current = initialState),
   },
@@ -33,9 +42,11 @@ const friendSlice = createSlice({
       let { request_friends, friends } = action.payload.user;
 
       if (request_friends && request_friends.length)
-        state.request_friends = request_friends.map((val: User) => val);
+        request_friends.map(
+          (val: User) => (state.request_friends[val.id!] = val)
+        );
       if (friends && friends.length)
-        state.friends = friends.map((val: User) => val);
+        friends.map((val: User) => (state.friends[val.id!] = val));
     });
 
     // 친구요청에 대한 결과
@@ -43,15 +54,13 @@ const friendSlice = createSlice({
       friendAction.requestFriendHandle.fulfilled,
       (state, action) => {
         let { sender, response } = action.payload;
-        state.request_friends = state.request_friends!.filter((val) => {
-          if (val.nickname == sender.nickname && response)
-            state.friends?.push(sender);
-          return val.nickname != sender.nickname;
-        });
+        delete state.request_friends[sender.id];
+        if (response) state.friends[sender.id] = sender;
       }
     );
   },
 });
 
-export const { friendRequest, friendReqeustHandle } = friendSlice.actions;
+export const { friendRequest, friendReqeustHandle, friendOnlineUpdate } =
+  friendSlice.actions;
 export default friendSlice.reducer;

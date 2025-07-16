@@ -13,6 +13,7 @@ const initialState: User = {
   nickname: "",
   profile_img: "",
   email: "",
+  online: false,
 };
 
 const userSlice = createSlice({
@@ -45,6 +46,7 @@ const userSlice = createSlice({
       state.email = email;
       state.profile_img = profile_img;
       state.nickname = nickname;
+      state.online = true;
 
       socketConnect(action.payload.user);
     });

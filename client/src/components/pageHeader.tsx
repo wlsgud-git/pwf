@@ -57,12 +57,11 @@ export const PageHeader = () => {
           <span
             className="friend_add_number"
             style={{
-              display:
-                request_friends && request_friends.length ? "flex" : "none",
+              display: Object.entries(request_friends).length ? "flex" : "none",
             }}
           >
-            {request_friends && request_friends.length
-              ? request_friends.length
+            {Object.entries(request_friends).length
+              ? Object.entries(request_friends).length
               : ""}
           </span>
         </div>
