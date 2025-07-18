@@ -8,4 +8,4 @@ backend/node_moudle
 backend/.env
 
 # ignore
-.gitignore
+./gitignore
