@@ -15,7 +15,7 @@ interface MenuType {
 
 export const Menu = () => {
   // console.log("menu rerender");
-  let [menu, setMenu] = useState<MenuType>({ state: false, type: "chat" });
+  let [menu, setMenu] = useState<MenuType>({ state: true, type: "chat" });
 
   useEffect(() => {
     const handler = ({ state, type }: MenuType) => {

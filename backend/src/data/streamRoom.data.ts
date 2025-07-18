@@ -22,7 +22,16 @@ export const getStreamRoomData = async (id: number) => {
 export const createStreamRoom = async (info: Room) => {
   try {
     let { room_name, participants } = info;
-    let query = `insert into StreamingRoom values(default, $1, $2, now()) returning *`;
+    let query = `with inserted as (
+	insert into streamingRoom 
+	(room_name, participants, create_at)
+	select $1, $2, now()
+	returning *
+)
+select i.id, i.room_name, json_agg(distinct u.*) as participants
+from inserted i 
+join users u on u.id = any(i.participants)
+group by i.id, i.room_name`;
     let data = [room_name, participants];
     return await dbPlay<Room>(query, data);
   } catch (err) {
@@ -30,15 +39,22 @@ export const createStreamRoom = async (info: Room) => {
   }
 };
 
-export const inviteStreamRoom = async (id: number, list: string[]) => {
+export const inviteStreamRoom = async (id: number, list: number[]) => {
   try {
     let query = `
-    update streamingRoom 
+    with updateded as (
+update streamingRoom 
     set participants = ( 
     select array(
       select distinct unnest(participants || $1 )) order by 1 
     )
-    where id = $2`;
+    where id = $2
+    returning *
+)
+select up.id, up.room_name, json_agg(distinct u.*) as participants
+from updateded up 
+join users u on u.id = any(up.participants)
+group by up.id, up.room_name`;
     let data = [list, id];
     return await dbPlay(query, data);
   } catch (err) {

@@ -8,7 +8,7 @@ import { redisGet, redisSet, redisDelete } from "../util/redis.util";
 import { createJwt } from "../util/jwt.util";
 
 // data
-import { getUserByEmail } from "../data/user.data";
+import { getMyFriends, getUserByEmail } from "../data/user.data";
 
 // type
 import { User } from "../types/user.types";
@@ -20,6 +20,8 @@ import {
 import { compareText, hashingText } from "../util/crypto.util";
 import { sendAuthcodeMail } from "../util/mail.util";
 import { AuthRequest } from "../types/http.types";
+import { getIo } from "../util/socket.util";
+import { getOnlineState } from "../event/friend.event";
 // import "../types/express/express";
 
 // 현재 유저
@@ -27,11 +29,13 @@ export const current: AuthRequest = async (req, res) => {
   try {
     if (!req.user) throw { message: "로그인 필요" };
 
-    // req.user = user[0];
-    // if (user[0].friends)
-    //   user[0].friends = await Promise.all(
-    //     user[0].friends?.map(async (val: User) => await onlineUser(val))
-    //   );
+    // 친구들 온라인 상태확인
+    req.user.friends = req.user.friends?.map((val) => {
+      return {
+        ...val,
+        online: getOnlineState(val.nickname),
+      };
+    });
 
     res.status(200).json({ user: req.user });
   } catch (err) {

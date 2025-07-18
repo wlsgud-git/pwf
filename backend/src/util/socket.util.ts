@@ -12,7 +12,7 @@ import { config } from "../config/env.config";
 
 // types
 import { User } from "../types/user.types";
-import { initFriendSocketEvent } from "../event/friend.event";
+import { initFriendSocketEvent, onlineState } from "../event/friend.event";
 
 let io: any = null;
 let socketCors = {
@@ -43,15 +43,11 @@ export function initSocket() {
     // // 로그인하면 online인걸 친구들한테 보내줘야 함
     socket.join(`user:${user.nickname}`);
 
-    initFriendSocketEvent(socket, user); //친구 이벤트
-    // userOnlineFriend(user.friends, true, user);
-    // // 로그아웃하면 offline인걸 친구들한테 보내줘야함
-    // socket.on("disconnect", async () => {
-    //   setTimeout(async () => {
-    //     let onlineState = await redisGet(user.nickname);
-    //     if (!onlineState) userOnlineFriend(user.friends, false, user);
-    //   }, 2000);
-    // });
+    initFriendSocketEvent(user); //친구 이벤트
+
+    socket.on("disconnect", async () => {
+      onlineState(user, false);
+    });
   });
 }
 

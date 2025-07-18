@@ -14,6 +14,7 @@ import {
   createLocalVideoTrack,
   attachToElement,
   LocalParticipant,
+  Participant,
 } from "livekit-client";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
@@ -29,6 +30,7 @@ import { TrackProps, UserTrackProps } from "../../types/stream.types";
 import { useContextSelector } from "use-context-selector";
 import { current } from "@reduxjs/toolkit";
 import { Invitation } from "../modal/invitation";
+import { useNavigate } from "react-router-dom";
 
 interface ParticipantProps {
   nickname: string;
@@ -75,6 +77,8 @@ const UserVideo = React.memo(({ nickname, audio, video }: ParticipantProps) => {
 });
 
 export const Stream = () => {
+  let navigate = useNavigate();
+
   let user = useSelector((state: RootState) => state.user);
   let room = useContextSelector(StreamContext, (ctx) => ctx.room);
   let participants = useContextSelector(
@@ -90,27 +94,50 @@ export const Stream = () => {
       [who]: { audio: {}, video: {} },
     }));
 
+  let start = async () => {
+    await setMyTracks();
+    let devices = await getMyMedia();
+
+    await devices?.map((val) => {
+      if (val.kind == "videoinput")
+        setDevices((c) => ({
+          ...c,
+          video: [...c["video"], { id: val.deviceId, label: val.label }],
+        }));
+      else if (val.kind == "audioinput")
+        setDevices((c) => ({
+          ...c,
+          audio: [...c["audio"], { id: val.deviceId, label: val.label }],
+        }));
+    });
+  };
+
+  // 트랙구독
+  let subscribeTrack = async (
+    track: Track,
+    pub: TrackPublication,
+    participant: RemoteParticipant
+  ) => {
+    if (pub.isSubscribed && pub.track)
+      setParticipantTrack(participant.identity, track);
+    if (pub.source == "screen_share" && shareVideoRef.current)
+      shareState(pub.track as Track, true, participant.identity);
+  };
+
+  // 트랙구독 종료
+  let unSubscribeTrack = async (
+    track: Track,
+    pub: TrackPublication,
+    participant: RemoteParticipant
+  ) => {
+    if (pub.source == "screen_share" && shareVideoRef.current)
+      shareState(pub.track as Track, false, participant.identity);
+  };
+
   // 룸이 연결되었으면 내트랙과 이벤트 설정
   useEffect(() => {
     if (!room) return;
 
-    let start = async () => {
-      await setMyTracks();
-      let devices = await getMyMedia();
-
-      await devices?.map((val) => {
-        if (val.kind == "videoinput")
-          setDevices((c) => ({
-            ...c,
-            video: [...c["video"], { id: val.deviceId, label: val.label }],
-          }));
-        else if (val.kind == "audioinput")
-          setDevices((c) => ({
-            ...c,
-            audio: [...c["audio"], { id: val.deviceId, label: val.label }],
-          }));
-      });
-    };
     start();
 
     // 새 참가자 관련
@@ -145,31 +172,30 @@ export const Stream = () => {
     });
 
     // 구독시작
-    room.on(
-      "trackSubscribed",
-      (track: Track, pub: TrackPublication, participant: RemoteParticipant) => {
-        if (pub.isSubscribed && pub.track)
-          setParticipantTrack(participant.identity, track);
-        if (pub.source == "screen_share" && shareVideoRef.current)
-          shareState(pub.track as Track, true, participant.identity);
-      }
-    );
-
+    room.on("trackSubscribed", subscribeTrack);
     // 구독종료
-    room.on(
-      "trackUnsubscribed",
-      (track: Track, pub: TrackPublication, participant: RemoteParticipant) => {
-        if (pub.source == "screen_share" && shareVideoRef.current)
-          shareState(pub.track as Track, false, participant.identity);
-      }
-    );
+    room.on("trackUnsubscribed", unSubscribeTrack);
     // 볼륨 활성화
     room.on("activeSpeakersChanged", handleSpeak);
+    // 다른 참가자 방 나감
+    room.on("participantDisconnected", userDisconnect);
 
     return () => {
       room.off("activeSpeakersChanged", handleSpeak);
+      room.off("activeSpeakersChanged", handleSpeak);
+      room.off("participantDisconnected", userDisconnect);
+      room.off("trackSubscribed", subscribeTrack);
+      room.off("trackUnsubscribed", unSubscribeTrack);
     };
   }, [room]);
+
+  const userDisconnect = (p: Participant) => {
+    setParticipants((c: any) => {
+      const newDict = { ...c };
+      delete newDict[p.identity];
+      return newDict;
+    });
+  };
 
   // 트랙 --------------------------------------
 
@@ -358,6 +384,16 @@ export const Stream = () => {
 
   let [invitation, setInvitation] = useState<boolean>(false);
 
+  let roomLeave = async () => {
+    if (!room) return;
+    try {
+      await room.disconnect();
+      navigate("/");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className="pwf-stream_container">
       <Invitation show={invitation} setShow={setInvitation} />
@@ -485,7 +521,7 @@ export const Stream = () => {
         </button>
 
         {/* 방 나가기 */}
-        <button className="room_exit" title="방 나가기">
+        <button className="room_exit" title="방 나가기" onClick={roomLeave}>
           <i className="fa-solid fa-right-from-bracket"></i>
         </button>
       </footer>

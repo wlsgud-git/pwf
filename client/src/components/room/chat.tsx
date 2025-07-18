@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { FormSubmit, InputChange } from "../../types/event";
 
 import "../../css/room/chat.css";
@@ -36,13 +36,16 @@ const ChatLi = ({ value, me }: ChatingInterface) => {
   );
 };
 
-export const Chat = () => {
-  // console.log("chat rerender");
+export const Chat = React.memo(() => {
   let user = useSelector((state: RootState) => state.user);
   let room = useContextSelector(StreamContext, (ctx) => ctx.room);
 
   let [chatList, setChatList] = useState<any>([]);
   let [input, setInput] = useState<string>("");
+
+  // let chatLi = useMemo(() => {
+  //   () => ({ chatList });
+  // }, [chatList]);
 
   // 채팅 받기
   const onDataReceived = (payload: Uint8Array) => {
@@ -112,4 +115,4 @@ export const Chat = () => {
       </form>
     </div>
   );
-};
+});

@@ -21,7 +21,6 @@ const roomSlice = createSlice({
 
     insertUser: (state: any, data: any) => {
       let { id, new_users } = data.payload;
-      let aa = state[id].participants.concat(new_users);
 
       state[id].participants = state[id].participants.concat(new_users);
     },

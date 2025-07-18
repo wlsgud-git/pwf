@@ -1,34 +1,36 @@
 import { Socket } from "socket.io";
 import { User } from "../types/user.types";
 import { getIo } from "../util/socket.util";
+import { getMyFriends } from "../data/user.data";
 
 // 친구 소켓 이벤트 초기화
-export const initFriendSocketEvent = async (socket: Socket, user: User) => {
-  let io = getIo();
-  console.log("in friendSocket event:", user.nickname);
+export const initFriendSocketEvent = async (user: User) => {
   try {
-    // socket.to(`${user.nickname}`).on("friend_request", (from: User) => {
-    //   console.log(`${user.nickname}에게 ${from.nickname} 친구 요청이 옴`);
-    // });
+    await onlineState(user, true);
   } catch (err) {}
 };
 
-// // 유저 온라인/오프라인 상태확인
-// export const onlineUser = async (user: User) => {
-//   const state: null | string = await redisGet(user.nickname!);
-//   user.online = state ? true : false;
-//   return user;
-// };
+// 친구요청 받은 유저에게 소켓 이벤트
+export const getFriendRequest = (sender_nick: string, receiver: User) =>
+  getIo().to(`user:${sender_nick}`).emit("friend_request_handle", receiver);
 
-// // 온라인/오프라인시 친구들한테 알리기
-// export function userOnlineFriend(friends: User[], online: boolean, user: User) {
-//   let io = getIo();
+// 내 온라인/오프라인 상태를 친구들에게 보냄
+export const onlineState = async (who: User, state: boolean) => {
+  try {
+    let my_friends = await getMyFriends(who);
+    let friends: User[] = my_friends[0].friends;
+    if (!friends) return;
+    friends.map((val) => {
+      getIo().to(`user:${val.nickname}`).emit("update_friend_online", {
+        who,
+        online: state,
+      });
+    });
+  } catch (err) {
+    throw err;
+  }
+};
 
-//   if (friends && io)
-//     friends.map((val) => {
-//       io.to(`online:${val.nickname}`).emit("online friend", {
-//         nickname: user.nickname,
-//         online,
-//       });
-//     });
-// }
+// 유저 온라인 상태 가져오기
+export const getOnlineState = (nick: string) =>
+  getIo().sockets.adapter.rooms.get(`user:${nick}`) ? true : false;

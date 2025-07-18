@@ -4,11 +4,16 @@ import { User } from "../types/user.types";
 // 유저 정보 얻기 (email)
 export const getUserByEmail = async (email: string) => {
   try {
-    let query = `select u.*,
-case
-  when count(str.*) = 0 then null
-  else jsonb_agg(distinct to_jsonb(str)) 
-end as stream_room
+    let query = `
+    select u.*,
+(
+    select json_agg(distinct str_data)
+	from (
+		select str.id, str.room_name, jsonb_agg(distinct to_jsonb(sru)) as participants from streamingRoom str
+		join users sru on sru.id = any(str.participants)
+		group by str.id
+	) str_data
+) as stream_room
 , (
     select json_agg(distinct rf_data)
 	from (
@@ -31,11 +36,37 @@ end as stream_room
 	) f_data
 ) as friends
 from users u
-left join streamingRoom str on u.id = any(str.participants)
+-- left join streamingRoom str on u.id = any(str.participants)
 where u.email = $1
 group by u.id`;
     let data = [email];
     return await dbPlay<User>(query, data);
+  } catch (err) {
+    throw err;
+  }
+};
+
+export let getMyFriends = async (user: User) => {
+  try {
+    let query = `
+    select (
+    select json_agg(distinct f_data)
+	from (
+		select fu.id, fu.nickname, fu.email, fu.profile_img 
+		from requestFriend ff
+		join users fu on
+		case 
+		  when ff.res_nickname = u.nickname then ff.req_nickname = fu.nickname
+		  else ff.res_nickname = fu.nickname
+		end
+		where ff.state = true and (ff.res_nickname = u.nickname or ff.req_nickname = u.nickname)
+	) f_data
+) as friends
+from users u
+where u.id = $1
+group by u.id`;
+    let data = [user.id];
+    return dbPlay<any>(query, data);
   } catch (err) {
     throw err;
   }

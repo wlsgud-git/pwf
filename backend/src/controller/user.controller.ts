@@ -21,6 +21,7 @@ import { nicknameOverlap } from "../data/auth.data";
 import { SignupMessage } from "../types/auth.types";
 import { requestFriendError } from "../error/reqeustFriend.error";
 import { User } from "../types/user.types";
+import { getOnlineState } from "../event/friend.event";
 
 export const deleteController: RequestHandler = async (req, res) => {
   let { email } = req.params;
@@ -91,17 +92,11 @@ export const handleRequestFriend: RequestHandler = async (req, res) => {
     // // 데이터 베이스 친구요청 업데이트
     await requestFriendhandle(receiver.nickname, sender.nickname, response);
 
-    // if (response) {
-    //   receiver.online = true;
-    //   // 현재 sender가 접속중인지 확인
-    //   // await onlineUser(sender);
-
-    //   if (sender.online)
-    //     soc.to(`online:${sender.nickname}`).emit("receiver data", receiver);
-    // }
-
-    if (response)
+    if (response) {
+      receiver.online = getOnlineState(receiver.nickname);
       io.to(`user:${sender.nickname}`).emit("friend_request_handle", receiver);
+      sender.online = getOnlineState(sender.nickname);
+    }
 
     res.status(200).json({
       sender,
