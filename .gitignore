@@ -1,14 +1,13 @@
 # client
-client/.env
 client/node_modules/
 
 # backend
 backend/db.sql
-backend/node_moudle
+backend/node_modules/
 backend/.env
 
 # ignore
-./gitignore
+.gitignore
 
 # 환경파일
 *.env

@@ -12,6 +12,29 @@ export class userService extends HttpClient {
     }
   }
 
+  async changeNickname(data: FormData) {
+    try {
+      return await this.axiosFetch<User>("/update/nickname", {
+        method: "post",
+        body: data,
+      });
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async changeProfileImg(data: FormData) {
+    try {
+      return await this.axiosFetch<User>("/update/profile_img", {
+        method: "post",
+        body: data,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+    } catch (err) {
+      throw err;
+    }
+  }
+
   async deleteUser(email: string) {
     try {
       return await this.axiosFetch<string>(`/delete/${email}`, {

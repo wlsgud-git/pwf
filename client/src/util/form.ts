@@ -6,6 +6,7 @@ export function createFormData(data: any): FormData {
   for (const key in data) {
     let value: any = data[key];
     let vt = typeof value;
+    console.log(value, vt);
     // object 형식
     if (vt == "object") {
       // 배열

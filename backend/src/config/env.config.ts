@@ -25,6 +25,13 @@ export let config = {
     client_url: required("SOCKET_CLIENT_URL"),
   },
 
+  aws: {
+    region: required("AWS_REGION"),
+    access_key: required("AWS_ACCESS_KEY"),
+    secret_key: required("AWS_SECRET_KEY"),
+    profile_bucket: required("AWS_PROFILE_BUCKET"),
+  },
+
   secure: {
     salt: parseInt(required("SALT")),
   },

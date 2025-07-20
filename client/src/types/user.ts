@@ -12,6 +12,7 @@ export interface User {
   stream_room?: Room[];
   request_friends?: User[];
   online?: boolean;
+  img_key?: string | null;
 }
 
 export interface FriendOnlineStatus {

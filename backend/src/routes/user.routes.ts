@@ -10,15 +10,28 @@ import {
   requestFriendWithNickname,
   passwordChange,
   deleteController,
+  updateNickname,
+  updateProfileImg,
 } from "../controller/user.controller";
 
 // validate
 import { signupUserValidate } from "../validation/auth.validate";
 import { sendAuthcodeController } from "../controller/auth.controller";
+import { upload } from "../util/multer.util";
 
 const router: Router = express.Router();
 
 // user 관련 -------------------------------------------------
+// 닉네임 변경
+router.post("/update/nickname", IsAuth, csrfProtection, updateNickname);
+// 이미지 변경
+router.post(
+  "/update/profile_img",
+  IsAuth,
+  csrfProtection,
+  upload.single("profile_img"),
+  updateProfileImg
+);
 // 유저 삭제
 router.delete("/delete/:email", deleteController);
 

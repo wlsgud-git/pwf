@@ -64,6 +64,11 @@
   display: flex;
 }
 
+.profile_content_nick {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
 .profile_content_inputbox input {
   border: 1px solid var(--pwf-gray);
   background-color: inherit;
@@ -80,6 +85,12 @@
 
 .profile_content_inputbox input[type="button"]:hover {
   text-decoration: underline;
+}
+
+.profile_nick_error {
+  margin-top: 5px;
+  font-size: 14px;
+  color: var(--pwf-red);
 }
 
 .profile_img_box {

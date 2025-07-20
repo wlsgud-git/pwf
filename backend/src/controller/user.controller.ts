@@ -9,7 +9,9 @@ import { getIo } from "../util/socket.util";
 
 // data
 import {
+  changeNick,
   changePassword,
+  changeProfile,
   createUser,
   deleteUser,
   requestFriend,
@@ -22,12 +24,42 @@ import { SignupMessage } from "../types/auth.types";
 import { requestFriendError } from "../error/reqeustFriend.error";
 import { User } from "../types/user.types";
 import { getOnlineState } from "../event/friend.event";
+import { s3FileDelete, s3FileUpload } from "../util/aws.util";
+import { lutimesSync } from "fs";
 
 export const deleteController: RequestHandler = async (req, res) => {
   let { email } = req.params;
   try {
     await deleteUser(email);
     res.status(200).json({ message: `${email} 계정이 삭제되었습니다.` });
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
+
+// 이미지 변경
+export const updateProfileImg: RequestHandler = async (req, res) => {
+  let { id, key } = req.body;
+  let newkey = `user/${id}/${new Date().getTime()}/img`;
+  try {
+    await s3FileDelete({ key, bucket: config.aws.profile_bucket });
+    let url = await s3FileUpload({
+      key: newkey,
+      bucket: config.aws.profile_bucket,
+      file: req.file,
+    });
+    await changeProfile(id, url, newkey);
+    res.status(200).json({ msg: "이미지가 변경되었습니다.", key: newkey, url });
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
+
+export const updateNickname: RequestHandler = async (req, res) => {
+  let { id, nickname } = req.body;
+  try {
+    await changeNick(id, nickname);
+    res.status(200).json({ msg: "닉네임이 변경되었습니다" });
   } catch (err) {
     res.status(400).json(err);
   }

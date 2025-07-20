@@ -46,6 +46,40 @@ group by u.id`;
   }
 };
 
+// 닉네임 변경
+export const changeNick = async (id: string, nick: string) => {
+  try {
+    let query = `update users set nickname = $1 where id = $2`;
+    let data = [nick, id];
+    return dbPlay<null>(query, data);
+  } catch (err) {
+    throw err;
+  }
+};
+
+// 이미지 변경
+export const changeProfile = async (id: string, url: string, key: string) => {
+  try {
+    let query = `update users as u set profile_img = $1, img_key=$2 where id = $3 returning *`;
+    let data = [url, key, id];
+    return dbPlay<null>(query, data);
+  } catch (err) {
+    throw err;
+  }
+};
+
+// 유저 삭제
+export const deleteUser = async (email: string) => {
+  try {
+    let query = `delete from users where email = $1`;
+    let data = [email];
+    return await dbPlay<any>(query, data);
+  } catch (err) {
+    throw err;
+  }
+};
+
+// 내 친구정보 얻기
 export let getMyFriends = async (user: User) => {
   try {
     let query = `
@@ -124,21 +158,9 @@ export const requestFriendhandle = async (
 export const createUser = async (info: User) => {
   let { email, nickname, password } = info;
   try {
-    let query = `insert into users values(default, $1, default, $2,  $3, now())`;
+    let query = `insert into users values(default, $1, default, $2,  $3, now(), default)`;
     let data = [nickname, email, password];
     return await dbPlay<User>(query, data);
-  } catch (err) {
-    throw err;
-  }
-};
-
-export const updateUser = async () => {};
-
-export const deleteUser = async (email: string) => {
-  try {
-    let query = `delete from users where email = $1`;
-    let data = [email];
-    return await dbPlay<any>(query, data);
   } catch (err) {
     throw err;
   }

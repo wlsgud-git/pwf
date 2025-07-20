@@ -216,7 +216,9 @@ export const Stream = () => {
     audio: [],
   });
 
-  useEffect(() => {}, [audio]);
+  useEffect(() => {
+    if (devicesRef.current && devices.show) devicesRef.current.focus();
+  }, [devices]);
 
   // 내 트랙관련 -------------------------------
 

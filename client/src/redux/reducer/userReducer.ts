@@ -14,12 +14,18 @@ const initialState: User = {
   profile_img: "",
   email: "",
   online: false,
+  img_key: null,
 };
 
 const userSlice = createSlice({
   name: "user",
   initialState, // reducer
   reducers: {
+    changeProfileImg: (state: any, data: any) => {
+      let { key, url } = data.payload;
+      state.profile_img = url;
+      state.img_key = key;
+    },
     // onlineUpdate: (current: any, data: PayloadAction<User>) => {
     //   let { nickname, online } = data.payload;
     //   return {
@@ -40,12 +46,13 @@ const userSlice = createSlice({
   extraReducers: (builder) => {
     // 세션으로 유저 정보 가져오기
     builder.addCase(userAction.getUserAction.fulfilled, (state, action) => {
-      let { id, email, nickname, profile_img } = action.payload.user;
+      let { id, email, nickname, profile_img, img_key } = action.payload.user;
 
       state.id = id;
       state.email = email;
       state.profile_img = profile_img;
       state.nickname = nickname;
+      state.img_key = img_key;
       state.online = true;
 
       socketConnect(action.payload.user);
@@ -69,5 +76,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { userInit } = userSlice.actions;
+export const { userInit, changeProfileImg } = userSlice.actions;
 export default userSlice.reducer;
