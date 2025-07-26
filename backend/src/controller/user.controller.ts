@@ -9,28 +9,24 @@ import { getIo } from "../util/socket.util";
 
 // data
 import {
-  changeNick,
-  changePassword,
-  changeProfile,
-  createUser,
-  deleteUser,
+  // createUser,
   requestFriend,
   requestFriendhandle,
 } from "../data/user.data";
-import { nicknameOverlap } from "../data/auth.data";
+import { UserData } from "../data/user.data";
 
 // types
 import { SignupMessage } from "../types/auth.types";
-import { requestFriendError } from "../error/reqeustFriend.error";
 import { User } from "../types/user.types";
 import { getOnlineState } from "../event/friend.event";
 import { s3FileDelete, s3FileUpload } from "../util/aws.util";
 import { lutimesSync } from "fs";
+import { signupSchema } from "../validation/auth.validate";
 
 export const deleteController: RequestHandler = async (req, res) => {
   let { email } = req.params;
   try {
-    await deleteUser(email);
+    await UserData.deleteUser(email);
     res.status(200).json({ message: `${email} 계정이 삭제되었습니다.` });
   } catch (err) {
     res.status(400).json(err);
@@ -48,7 +44,7 @@ export const updateProfileImg: RequestHandler = async (req, res) => {
       bucket: config.aws.profile_bucket,
       file: req.file,
     });
-    await changeProfile(id, url, newkey);
+    await UserData.changeProfileImg(id, url, newkey);
     res.status(200).json({ msg: "이미지가 변경되었습니다.", key: newkey, url });
   } catch (err) {
     res.status(400).json(err);
@@ -58,7 +54,7 @@ export const updateProfileImg: RequestHandler = async (req, res) => {
 export const updateNickname: RequestHandler = async (req, res) => {
   let { id, nickname } = req.body;
   try {
-    await changeNick(id, nickname);
+    await UserData.changeNickname(parseInt(id), nickname);
     res.status(200).json({ msg: "닉네임이 변경되었습니다" });
   } catch (err) {
     res.status(400).json(err);
@@ -77,10 +73,10 @@ export const accountUser: RequestHandler = async (req, res, next) => {
 
   try {
     let hash_password = await hashingText(password);
-    await createUser({ email, nickname, password: hash_password });
+    await UserData.createUser(email, nickname, hash_password);
     res.status(201).json({ message: SignupMessage.SUCCESS });
   } catch (err) {
-    throw err;
+    next(err);
   }
 };
 
@@ -147,7 +143,7 @@ export const passwordChange: RequestHandler = async (req, res) => {
   let { email, password } = req.body;
   try {
     let hash_pw = await hashingText(password);
-    await changePassword(email, hash_pw);
+    await UserData;
 
     res.status(200).json({ message: "비밀번호가 변경되었습니다" });
   } catch (err) {

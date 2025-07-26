@@ -9,6 +9,7 @@ import { createFormData } from "../util/form";
 import { auth_service } from "../service/auth.service";
 import { AxiosError } from "../error/error";
 import { socketConnect } from "../util/socket";
+import axios from "axios";
 
 // type
 interface LoginInputProps {
@@ -52,13 +53,16 @@ export const Login = () => {
     e.preventDefault();
 
     try {
-      let formdata = createFormData({
+      await auth_service.login({
         email: email.value,
         password: password.value,
       });
-      let { user } = await auth_service.login(formdata);
       window.location.href = "/";
     } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status == 429)
+        return alert(
+          `${err.response.headers["retry-after"]}초후 다시 시도하세요.`
+        );
       let { path, msg } = AxiosError(err);
       loginError(path, msg);
     }

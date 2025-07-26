@@ -1,5 +1,6 @@
 export enum EmailError {
   // 이메일
+  EMAIL_EMPTY = "이메일을 입력하세요",
   EMAIL_FORM_ERROR = "이메일 형식이 올바르지 않습니다.",
   EMAIL_OVERLAP_ERROR = "이미 가입된 이메일입니다.",
   EMAIL_UNDEFINED_ERROR = "가입되어 있지 않은 이메일입니다.",

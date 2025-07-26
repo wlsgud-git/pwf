@@ -3,24 +3,14 @@ import { dbPlay } from "../util/database.util";
 
 // type
 import { User } from "../types/user.types";
+import { prisma } from "../config/db.config";
 
-export const emailOverlap = async (email: string) => {
-  try {
-    let query = `select * from users where email = $1`;
-    let data = [email];
-    return await dbPlay<User>(query, data);
-  } catch (err) {
-    throw err;
-  }
-};
+export const AuthData = {
+  async emailOverlap(email: string) {
+    return await prisma.users.findUnique({ where: { email } });
+  },
 
-// 닉네임 중복검사
-export const nicknameOverlap = async (nickname: string) => {
-  try {
-    let query = `select * from users where nickname = $1`;
-    let data = [nickname];
-    return await dbPlay<User>(query, data);
-  } catch (err) {
-    throw err;
-  }
+  async nicknameOverlap(nickname: string) {
+    return await prisma.users.findUnique({ where: { nickname } });
+  },
 };

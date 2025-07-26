@@ -76,7 +76,7 @@ export class userService extends HttpClient {
 
   // signup -----------------------------
   // 회원가입
-  async account(data: FormData) {
+  async account(data: User) {
     try {
       return await this.axiosFetch<boolean>("/account", {
         method: "post",
@@ -87,7 +87,7 @@ export class userService extends HttpClient {
     }
   }
   //회원가입 유저정보 보내기
-  async accountUser(data: FormData) {
+  async accountUser(data: any) {
     try {
       return await this.axiosFetch<User>(`/account/user`, {
         method: "post",

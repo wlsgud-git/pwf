@@ -1,4 +1,5 @@
 import { RequestHandler, Request, Response } from "express";
+import sanitiszeHtml from "sanitize-html";
 
 // config
 import { config } from "../config/env.config";
@@ -8,7 +9,7 @@ import { redisGet, redisSet, redisDelete } from "../util/redis.util";
 import { createJwt } from "../util/jwt.util";
 
 // data
-import { getMyFriends, getUserByEmail } from "../data/user.data";
+import { getMyFriends, getUserByEmail, UserData } from "../data/user.data";
 
 // type
 import { User } from "../types/user.types";
@@ -16,12 +17,15 @@ import {
   LoginMessage,
   AuthcodeError,
   PasswordError,
+  EmailError,
 } from "../types/auth.types";
 import { compareText, hashingText } from "../util/crypto.util";
 import { sendAuthcodeMail } from "../util/mail.util";
 import { AuthRequest } from "../types/http.types";
 import { getIo } from "../util/socket.util";
 import { getOnlineState } from "../event/friend.event";
+import { prisma } from "../config/db.config";
+import { loginSchema } from "../validation/auth.validate";
 // import "../types/express/express";
 
 // 현재 유저
@@ -45,23 +49,46 @@ export const current: AuthRequest = async (req, res) => {
 
 // login -------------------------------------
 // 로그인
-export const loginControl: RequestHandler = async (req, res) => {
+export const loginControl: RequestHandler = async (req, res, next) => {
   let { email, password } = req.body;
+
   try {
-    let response = await getUserByEmail(email);
-    let user: User | null = await response[0];
-    let check_password = await user!.password;
+    const result = await loginSchema.safeParseAsync(req.body);
 
-    let result: boolean = await compareText(password, check_password!);
+    if (!result.success) {
+      let errorField = result.error.issues[0];
+      throw {
+        status: 400,
+        path: errorField.path[0],
+        msg: errorField.message,
+      };
+    }
 
-    // 비밀번호가 올바르지 않다면
-    if (!result)
-      throw { path: "password", msg: PasswordError.PASSWORD_UNEQUAL_ERROR };
+    let response = await UserData.getUserByEmail(email);
+    let user = await response[0];
 
+    if (!user)
+      throw {
+        status: 404,
+        path: "email",
+        msg: EmailError.EMAIL_UNDEFINED_ERROR,
+      };
+    let check_pw = (await user.password) as string;
+    let password_result: boolean = await compareText(password, check_pw);
+
+    // // 비밀번호가 올바르지 않다면
+    if (!password_result)
+      throw {
+        status: 400,
+        path: "password",
+        msg: PasswordError.PASSWORD_UNEQUAL_ERROR,
+      };
+
+    // 여기서부턴 로그인 성공후 프로세스
     let sessionId = await hashingText(email);
     delete user["password"];
 
-    // 로그인이 성공한거임
+    // // 로그인이 성공한거임
     await redisSet(
       sessionId,
       JSON.stringify(user),
@@ -69,7 +96,7 @@ export const loginControl: RequestHandler = async (req, res) => {
     );
     let csrf_token = await createJwt({ email: user.email }, "refresh");
 
-    // cookie section
+    // // cookie section
     res.cookie("session_id", sessionId, {
       secure: true,
       httpOnly: true,
@@ -85,11 +112,10 @@ export const loginControl: RequestHandler = async (req, res) => {
       maxAge: config.session.session_expire * 1000,
       path: "/",
     });
-    delete user["password"];
 
-    res.status(200).json({ user, message: LoginMessage.SUCCESS });
+    res.status(200).json({ msg: LoginMessage.SUCCESS });
   } catch (err) {
-    res.status(400).json(err);
+    next(err);
   }
 };
 
@@ -118,7 +144,7 @@ export const sendAuthcodeController: RequestHandler = async (
     await redisSet(email, auth_code, config.authcode.expires);
     res.status(200).json({ message: `${email}에 인증번호를 전송하였습니다.` });
   } catch (err) {
-    throw err;
+    next(err);
   }
 };
 
@@ -138,6 +164,6 @@ export const checkAuthcodeController: RequestHandler = async (
 
     res.status(200).json({ msg: "인증이 완료되었습니다." });
   } catch (err) {
-    res.status(400).json(err);
+    next();
   }
 };

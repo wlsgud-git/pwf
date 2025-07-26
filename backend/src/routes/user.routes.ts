@@ -1,7 +1,11 @@
 import express, { Router } from "express";
 
 // middleware
-import { IsAuth, csrfProtection } from "../middleware/auth.middleware";
+import {
+  IsAuth,
+  csrfProtection,
+  signupValidation,
+} from "../middleware/auth.middleware";
 
 // controller
 import {
@@ -15,7 +19,7 @@ import {
 } from "../controller/user.controller";
 
 // validate
-import { signupUserValidate } from "../validation/auth.validate";
+// import { signupUserValidate } from "../validation/auth.validate";
 import { sendAuthcodeController } from "../controller/auth.controller";
 import { upload } from "../util/multer.util";
 
@@ -40,7 +44,7 @@ router.post("/account", accountUser);
 
 router.post(
   "/account/user",
-  signupUserValidate, // 정보 검증
+  signupValidation, // 정보 검증
   sendAuthcodeController // 이메일에 인증코드 보냄
 ); // 회원가입시 유저정보 확인
 

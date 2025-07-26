@@ -102,13 +102,11 @@ export const Signup = () => {
 
   const account = async () => {
     try {
-      await user_service.account(
-        createFormData({
-          email: email.value,
-          nickname: nickname.value,
-          password: password.value,
-        })
-      );
+      await user_service.account({
+        email: email.value,
+        nickname: nickname.value,
+        password: password.value,
+      });
       window.location.href = "/login";
     } catch (err) {
       alert(err);
@@ -120,14 +118,12 @@ export const Signup = () => {
     setSignupBtn((c) => ({ ...c, loading: true }));
 
     try {
-      let formdata = createFormData({
+      await user_service.accountUser({
         email: email.value,
         nickname: nickname.value,
         password: password.value,
         password_check: passwordCheck.value,
       });
-
-      await user_service.accountUser(formdata);
 
       emitter.emit("modal", { open: true, type: "authcode" });
       setShow(true);

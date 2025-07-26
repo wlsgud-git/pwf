@@ -30,8 +30,7 @@ export const emailValidate = async (email: string, overlap: boolean) => {
   try {
     if (emailFormValid(email))
       throw { path: "email", msg: EmailError.EMAIL_FORM_ERROR };
-    let formdata = createFormData({ email, overlap });
-    await auth_service.emailOverlap(formdata);
+    await auth_service.emailOverlap({ email, overlap });
 
     return false;
   } catch (err) {
@@ -45,8 +44,7 @@ export const nicknameValidate = async (nickname: string) => {
   try {
     if (nickname.length < 2 || nickname.length > 12)
       throw { path: "nickname", msg: NicknameError.NICKNAME_FORM_ERROR };
-    let formdata = createFormData({ nickname });
-    await auth_service.nicknameOverlap(formdata);
+    await auth_service.nicknameOverlap({ nickname });
     return false;
   } catch (err) {
     throw err;

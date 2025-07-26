@@ -12,6 +12,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.848.0",
     "@aws-sdk/s3-request-presigner": "^3.848.0",
+    "@prisma/client": "^6.12.0",
     "@types/bcrypt": "^5.0.2",
     "@types/body-parser": "^1.19.5",
     "@types/cookie-parser": "^1.4.8",
@@ -23,6 +24,7 @@
     "@types/nodemailer": "^6.4.17",
     "@types/pg": "^8.11.11",
     "@types/redis": "^4.0.11",
+    "@types/sanitize-html": "^2.16.0",
     "@types/socket.io": "^3.0.2",
     "bcrypt": "^5.1.1",
     "body-parser": "^2.2.0",
@@ -30,6 +32,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-rate-limit": "^8.0.1",
     "express-session": "^1.18.1",
     "express-validator": "^7.2.1",
     "helmet": "^8.1.0",
@@ -40,9 +43,12 @@
     "nodemailer": "^6.10.0",
     "nodemon": "^3.1.9",
     "pg": "^8.14.1",
+    "prisma": "^6.12.0",
     "redis": "^4.7.0",
+    "sanitize-html": "^2.17.0",
     "socket.io": "^4.8.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "zod": "^4.0.5"
   }
 }

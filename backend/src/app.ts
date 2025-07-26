@@ -7,26 +7,30 @@ import fs from "fs";
 import cookieParser from "cookie-parser";
 import https from "https";
 import helmet from "helmet";
-// import "../src/types/express/express";
 
 // config
 import { config } from "./config/env.config";
 import { corsOption } from "./config/cors.config";
 import { httpsOption } from "./config/app.config";
+import sanitizeHtml from "sanitize-html";
 
 // other file
 import { initSocket } from "./util/socket.util";
+import { sanitizeMiddleware } from "./middleware/sanitize.middleware";
 
 const app: Application = express();
 export const HttpsServer = https.createServer(httpsOption, app);
 
 // middleware --------------------------
+app.use(express.static(path.join(__dirname, "../../client/build")));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+
 app.use(helmet());
 app.use(cors(corsOption));
-app.use(express.static(path.join(__dirname, "../../client/build")));
+
+app.use(sanitizeMiddleware);
 
 // Routes ---------------
 const UserRoutes = require("./routes/user.routes");
@@ -37,12 +41,13 @@ app.use("/", UserRoutes);
 app.use("/", StreamRoomRoutes);
 app.use("/", AuthRoutes);
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-  next();
-});
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.log("에러 입니당");
+  let status = err.status || 500;
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  res.status(500).json({ message: "fuck" });
+  res.status(status).json(err);
+
+  if (!err) res.status(500).json({ message: "fuck" });
 });
 
 app.get("*", (req: Request, res: Response) => {

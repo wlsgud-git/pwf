@@ -5,11 +5,11 @@ import { User } from "../types/user";
 
 export class authService extends HttpClient {
   // 이메일 중복 체크
-  async emailOverlap(data: FormData) {
+  async emailOverlap(data: any) {
     try {
       return await this.axiosFetch<boolean>("/email/overlap", {
         method: "post",
-        body: data,
+        body: JSON.stringify(data),
       });
     } catch (err) {
       throw err;
@@ -17,11 +17,11 @@ export class authService extends HttpClient {
   }
 
   // 닉네임 중복 체크
-  async nicknameOverlap(data: FormData) {
+  async nicknameOverlap(data: any) {
     try {
       return await this.axiosFetch<boolean>("/nickname/overlap", {
         method: "post",
-        body: data,
+        body: JSON.stringify(data),
       });
     } catch (err) {
       throw err;
@@ -52,11 +52,11 @@ export class authService extends HttpClient {
   }
 
   // 로그인 ---------------------------------
-  async login(data: FormData) {
+  async login(data: User) {
     try {
       return await this.axiosFetch<User>("/login", {
         method: "post",
-        body: data,
+        body: JSON.stringify(data),
       });
     } catch (err) {
       throw err;

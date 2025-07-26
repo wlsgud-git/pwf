@@ -18,7 +18,7 @@ export class HttpClient {
     });
   }
 
-  async axiosFetch<T>(url: string, options: HttpRequest): Promise<any> {
+  async axiosFetch<T>(url: string, options: any): Promise<any> {
     let { body, method, headers } = options;
 
     // 요청에 보낼 정보들
