@@ -3,12 +3,11 @@ import "../css/home.css";
 
 import { emitter } from "../util/event";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { AppDispatch, RootState } from "../redux/store";
-import { useDispatch, useSelector } from "react-redux";
-import { userAction } from "../redux/actions/userAction";
-import { socketClient } from "../util/socket";
+import { RootState } from "../redux/store";
+import { useSelector } from "react-redux";
 
 // component
+import { Modal } from "../components/modal/modal.component";
 import { PageHeader } from "../components/pageHeader";
 
 const MyFriends = lazy(() =>
@@ -27,6 +26,7 @@ export const Home = () => {
 
   return (
     <div className="page home_page">
+      <Modal />
       {/* header */}
       <PageHeader />
 

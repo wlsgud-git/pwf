@@ -3,24 +3,21 @@ import "../../css/modal/delete.css";
 import { emitter } from "../../util/event";
 
 import { User } from "../../types/user";
-import { ModalList } from "../../page/modal";
 import { useLocation } from "react-router-dom";
 import { user_service } from "../../service/user.service";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
-interface DeleteProps {
-  user: User;
-  type: ModalList;
-}
-
-export const Delete = ({ user, type }: DeleteProps) => {
+export const Delete = () => {
+  let email = useSelector((state: RootState) => state.user.email);
   let navigate = useLocation();
   let reset = () => {
-    emitter.emit("modal", { type });
+    // emitter.emit("modal", { type });
   };
 
   let deleteUser = async () => {
     try {
-      await user_service.deleteUser(user.email!);
+      await user_service.deleteUser(email!);
       reset();
       alert("계정이 삭제되었습니다.");
       //   navigate("/login");
@@ -30,16 +27,13 @@ export const Delete = ({ user, type }: DeleteProps) => {
   };
 
   return (
-    <div
-      className="delete_modal"
-      style={{ display: type == "delete" ? "flex" : "none" }}
-    >
+    <div className="delete_modal">
       <header className="modal_header">
         <button onClick={reset}>X</button>
       </header>
 
       <div className="delete_box">
-        <span>{user.email} 계정을 삭제하시겠습니까?</span>
+        <span>{email} 계정을 삭제하시겠습니까?</span>
         <button onClick={deleteUser}>삭제</button>
       </div>
     </div>

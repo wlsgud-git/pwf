@@ -15,6 +15,7 @@ const initialState: User = {
   email: "",
   online: false,
   img_key: null,
+  loading: false,
 };
 
 const userSlice = createSlice({
@@ -25,6 +26,10 @@ const userSlice = createSlice({
       let { key, url } = data.payload;
       state.profile_img = url;
       state.img_key = key;
+    },
+
+    setLoading: (state: any, data: PayloadAction<boolean>) => {
+      console.log(data.payload);
     },
     // onlineUpdate: (current: any, data: PayloadAction<User>) => {
     //   let { nickname, online } = data.payload;
@@ -57,24 +62,8 @@ const userSlice = createSlice({
 
       socketConnect(action.payload.user);
     });
-
-    // 친구요청에 대한 결과
-    // builder.addCase(
-    //   userAction.requestFriendHandle.fulfilled,
-    //   (state, action) => {
-    //     let { sender, msg } = action.payload;
-
-    //     state.request_friends = state.request_friends?.filter((val) => {
-    //       if (val.nickname == sender.nickname) state.friends?.push(sender);
-    //       return val.nickname != sender.nickname;
-    //     });
-
-    //     alert(msg);
-    //     return;
-    //   }
-    // );
   },
 });
 
-export const { userInit, changeProfileImg } = userSlice.actions;
+export const { userInit, changeProfileImg, setLoading } = userSlice.actions;
 export default userSlice.reducer;

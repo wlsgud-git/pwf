@@ -1,6 +1,6 @@
 import { HttpClient } from "../network/http";
 
-import { User } from "../types/user";
+import { RequestFriendProps, ResponseFriendProps, User } from "../types/user";
 
 export class userService extends HttpClient {
   // 유저 ----------------
@@ -46,28 +46,24 @@ export class userService extends HttpClient {
   }
 
   // 친구요청 ------------------------
-  //
-  async handleRequestFriend(data: FormData) {
+
+  // 친구요청
+  async requestFriend(data: RequestFriendProps) {
     try {
-      return await this.axiosFetch<{
-        result: boolean;
-        sender: User;
-        msg: string;
-      }>(`/request/friend/response`, {
+      return await this.axiosFetch<User>(`/request/friend`, {
         method: "post",
-        body: data,
+        body: JSON.stringify(data),
       });
     } catch (err) {
       throw err;
     }
   }
 
-  // 친구요청
-  async requestFriend(data: FormData) {
+  async handleRequestFriend(data: ResponseFriendProps) {
     try {
-      return await this.axiosFetch<User>(`/request/friend`, {
+      return await this.axiosFetch(`/request/friend/response`, {
         method: "post",
-        body: data,
+        body: JSON.stringify(data),
       });
     } catch (err) {
       throw err;

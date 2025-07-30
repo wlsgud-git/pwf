@@ -93,11 +93,11 @@
   border-color: red;
 }
 
-.login_input_box span {
+/* .login_input_box span {
   z-index: 12352;
   margin-right: 8px;
   font-size: 14px;
-}
+} */
 
 .login_btn {
   padding: 8px;
@@ -109,6 +109,7 @@
   outline: none;
   background-color: var(--pwf-blue);
   /* border: ; */
+  cursor: not-allowed;
 }
 
 .login_error {

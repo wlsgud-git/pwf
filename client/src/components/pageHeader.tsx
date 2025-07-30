@@ -12,12 +12,13 @@ import { socketClient } from "../util/socket";
 import { useDispatch } from "react-redux";
 import { auth_service } from "../service/auth.service";
 import { resetAllstate } from "../redux/actions/root.action";
+import { modalState } from "../redux/reducer/modalReducer";
 
 export const PageHeader = () => {
   let navigate = useNavigate();
   let user = useSelector((state: RootState) => state.user);
-  let { request_friends, friends } = useSelector(
-    (state: RootState) => state.friend
+  let request_friends = useSelector(
+    (state: RootState) => state.friend.request_friends
   );
   let dispatch = useDispatch<AppDispatch>();
   let [userOption, setUserOption] = useState<boolean>(false);
@@ -43,12 +44,17 @@ export const PageHeader = () => {
       </span>
 
       <div className="header_control">
+        <button
+          onClick={() => dispatch(modalState({ active: true, type: "delete" }))}
+        >
+          del hi
+        </button>
         {/* 친구추가 */}
         <div className="pwf_friend_box">
           <button
             className="friend_btn"
             onClick={() =>
-              emitter.emit("modal", { type: "friend", open: true })
+              dispatch(modalState({ active: true, type: "friend" }))
             }
           >
             <i className="fa-solid fa-user-plus"></i>

@@ -1,7 +1,6 @@
 import "../../css/modal/pwFind.css";
 
 import { User } from "../../types/user";
-import { ModalList } from "../../page/modal";
 
 import { emitter } from "../../util/event";
 import { FormEvent, useState } from "react";

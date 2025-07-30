@@ -12,7 +12,6 @@ import { createFormData } from "../../util/form";
 // type
 import { User } from "../../types/user";
 import { FormSubmit, InputChange } from "../../types/event";
-import { ModalList } from "../../page/modal";
 import { emitter } from "../../util/event";
 import { AxiosError } from "../../error/error";
 
@@ -85,10 +84,6 @@ export const Authcode = ({ show, setShow, email, callback }: AuthcodeProps) => {
 
   return (
     <div className="authcode_modal" style={{ display: show ? "flex" : "none" }}>
-      <header className="modal_header">
-        <button onClick={reset}>X</button>
-      </header>
-
       <div className="authcode_container">
         {/* 인증코드 아이콘 */}
         <span className="authcode_icon">

@@ -13,6 +13,7 @@ export interface User {
   request_friends?: User[];
   online?: boolean;
   img_key?: string | null;
+  loading?: boolean | undefined;
 }
 
 export interface FriendOnlineStatus {
@@ -23,3 +24,26 @@ export interface FriendOnlineStatus {
 export interface UserComponent {
   [user: string]: User;
 }
+
+export interface UserInputProps {
+  value: string;
+  active?: boolean;
+  error: boolean;
+  show?: boolean;
+  error_msg: string;
+}
+
+export interface UserButtonProps {
+  active: boolean;
+  loading: boolean;
+}
+
+export interface RequestFriendProps {
+  receiver: string;
+}
+
+export interface ResponseFriendProps {
+  sender: string;
+  response: boolean;
+}
+// export interface Friend

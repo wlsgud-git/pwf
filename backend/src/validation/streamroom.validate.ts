@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { body, validationResult, Result } from "express-validator";
 import { LoginMessage } from "../types/auth.types";
-import { getUserByEmail } from "../data/user.data";
 
 // 로그인 유저정보 검증
 export const streamRoomValidate = [

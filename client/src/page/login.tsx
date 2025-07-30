@@ -2,46 +2,35 @@ import { useEffect, useRef, useState } from "react";
 import "../css/login.css";
 import { Link, useNavigate } from "react-router-dom";
 
-import { FormSubmit, InputChange } from "../types/event";
+import { FormSubmit } from "../types/event";
 import { emailFormValid, passwordFormValid } from "../validation/auth";
 import { EmailError, PasswordError } from "../types/auth";
-import { createFormData } from "../util/form";
 import { auth_service } from "../service/auth.service";
 import { AxiosError } from "../error/error";
-import { socketConnect } from "../util/socket";
 import axios from "axios";
 
-// type
-interface LoginInputProps {
-  value: string;
-  error: boolean;
-  error_msg: string;
-  show?: boolean;
-  active: boolean;
-}
+import { UserInputComponent } from "../components/global/input.components";
+import { useLogin, useSetLogin } from "../context/login.context";
+import { UserButtonComponet } from "../components/global/button.component";
+import { useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "../redux/store";
+import { setLoading } from "../redux/reducer/userReducer";
+import { userAction } from "../redux/actions/userAction";
+import { useSelector } from "react-redux";
 
-interface LoginBtnProps {
-  active: boolean;
-  loading: boolean;
-}
+// type
 
 export const Login = () => {
+  let { email, password, authBtn } = useLogin();
+  let { setEmail, setPassword, setAuthBtn } = useSetLogin();
+
   let navigate = useNavigate();
-  const InputInitState = {
-    value: "",
-    error: false,
-    error_msg: "",
-    show: false,
-    active: false,
-  };
-  const BtnInitState = { active: false, loading: false };
+  let userId = useSelector((state: RootState) => state.user.id);
+  let dispatch = useDispatch<AppDispatch>();
 
-  let emailRef = useRef<HTMLInputElement | null>(null);
-  let passwordRef = useRef<HTMLInputElement | null>(null);
-
-  let [email, setEmail] = useState<LoginInputProps>(InputInitState);
-  let [password, setPassword] = useState<LoginInputProps>(InputInitState);
-  let [loginBtn, setLoginBtn] = useState<LoginBtnProps>(BtnInitState);
+  useEffect(() => {
+    if (userId) navigate("/");
+  }, [userId]);
 
   const loginError = (path: "email" | "password", msg: string) => {
     if (path == "email")
@@ -52,12 +41,16 @@ export const Login = () => {
   const submitLogin = async (e: FormSubmit) => {
     e.preventDefault();
 
+    setAuthBtn((c) => ({ ...c, loading: true }));
+
     try {
+      dispatch(setLoading(true));
       await auth_service.login({
         email: email.value,
         password: password.value,
       });
-      window.location.href = "/";
+      dispatch(userAction.getUserAction());
+      dispatch(setLoading(false));
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status == 429)
         return alert(
@@ -66,12 +59,8 @@ export const Login = () => {
       let { path, msg } = AxiosError(err);
       loginError(path, msg);
     }
-  };
-
-  const inputFocus = (type: "email" | "password") => {
-    type == "email"
-      ? setEmail((c) => ({ ...c, active: true, error: false }))
-      : setPassword((c) => ({ ...c, active: true, error: false }));
+    dispatch(setLoading(false));
+    setAuthBtn((c) => ({ ...c, loading: false }));
   };
 
   const inputBlur = (type: "email" | "password") => {
@@ -97,10 +86,10 @@ export const Login = () => {
   };
 
   useEffect(() => {
-    let status = email.value !== "" && password.value !== "";
+    let active = email.value !== "" && password.value !== "";
 
-    setLoginBtn((c) => ({ ...c, active: status }));
-  }, [email.value, password.value]);
+    setAuthBtn((c) => ({ ...c, active }));
+  }, [email, password]);
 
   return (
     <div className="page login_page">
@@ -113,92 +102,23 @@ export const Login = () => {
 
         <form className="login_pwf_form" onSubmit={submitLogin}>
           {/* 이메일 */}
-          <div className="login_info_container">
-            <div
-              className="login_input_box"
-              style={{ border: `1px solid ${email.error ? "red" : "gray"}` }}
-              onFocus={() => inputFocus("email")}
-              onBlur={() => inputBlur("email")}
-            >
-              <p
-                style={{
-                  top:
-                    email.value === "" && email.active == false
-                      ? "calc(50% - var(--placeholder-font-size))"
-                      : "7%",
-                }}
-              >
-                이메일
-              </p>
-              <input
-                type="text"
-                spellCheck="false"
-                ref={emailRef}
-                value={email.value}
-                onChange={(e: InputChange) =>
-                  setEmail((c) => ({ ...c, value: e.target.value }))
-                }
-              />
-            </div>
-
-            <div
-              className="login_error"
-              style={{ display: email.error ? "flex" : "none" }}
-            >
-              {email.error_msg}
-            </div>
-          </div>
+          <UserInputComponent
+            path={"email"}
+            input={email}
+            setInput={setEmail}
+            cb={() => inputBlur("email")}
+          />
 
           {/* 비밀번호 */}
-          <div className="login_info_container">
-            <div
-              className="login_input_box"
-              style={{ border: `1px solid ${password.error ? "red" : "gray"}` }}
-              onFocus={() => inputFocus("password")}
-              onBlur={() => inputBlur("password")}
-            >
-              <p
-                style={{
-                  top:
-                    password.value === "" && !password.active
-                      ? "calc(50% - var(--placeholder-font-size))"
-                      : "7%",
-                }}
-              >
-                비밀번호
-              </p>
-              <input
-                type={password.show ? "text" : "password"}
-                value={password.value}
-                ref={passwordRef}
-                onChange={(e: InputChange) =>
-                  setPassword((c) => ({ ...c, value: e.target.value }))
-                }
-              />
-              <span
-                onClick={() => setPassword((c) => ({ ...c, show: !c.show }))}
-              >
-                <i
-                  className={`fa-solid fa-eye${password.show ? "" : "-slash"}`}
-                ></i>
-              </span>
-            </div>
+          <UserInputComponent
+            path={"password"}
+            input={password}
+            setInput={setPassword}
+            cb={() => inputBlur("password")}
+          />
 
-            <div
-              className="login_error"
-              style={{ display: password.error ? "flex" : "none" }}
-            >
-              {password.error_msg}
-            </div>
-          </div>
           {/* 로그인 버튼 */}
-          <button
-            className="login_btn"
-            style={{ opacity: loginBtn.active ? 1 : 0.5 }}
-            disabled={!loginBtn.active}
-          >
-            로그인
-          </button>
+          <UserButtonComponet text="로그인" button={authBtn} />
         </form>
 
         <div className="login_support_box">

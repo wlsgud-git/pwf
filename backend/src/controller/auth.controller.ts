@@ -9,10 +9,9 @@ import { redisGet, redisSet, redisDelete } from "../util/redis.util";
 import { createJwt } from "../util/jwt.util";
 
 // data
-import { getMyFriends, getUserByEmail, UserData } from "../data/user.data";
+import { UserData } from "../data/user.data";
 
 // type
-import { User } from "../types/user.types";
 import {
   LoginMessage,
   AuthcodeError,
@@ -22,9 +21,7 @@ import {
 import { compareText, hashingText } from "../util/crypto.util";
 import { sendAuthcodeMail } from "../util/mail.util";
 import { AuthRequest } from "../types/http.types";
-import { getIo } from "../util/socket.util";
 import { getOnlineState } from "../event/friend.event";
-import { prisma } from "../config/db.config";
 import { loginSchema } from "../validation/auth.validate";
 // import "../types/express/express";
 

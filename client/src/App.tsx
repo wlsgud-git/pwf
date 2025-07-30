@@ -1,14 +1,8 @@
 // css
 import "./css/App.css";
 
-import React, { useEffect, useMemo } from "react";
-import {
-  BrowserRouter,
-  Route,
-  Routes,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { useEffect } from "react";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
 import { userAction } from "./redux/actions/userAction";
 import { useDispatch } from "react-redux";
@@ -21,40 +15,36 @@ import { StreamRoom } from "./page/streamroom";
 import { Login } from "./page/login";
 import { Signup } from "./page/signup";
 import { useSelector } from "react-redux";
-import { Modal } from "./page/modal";
 import { Profile } from "./page/profile";
 import { PasswordReset } from "./page/passwordReset";
 import { StreamProvider } from "./context/stream.context";
 import { socketClient } from "./util/socket";
-import { friendOnlineUpdate } from "./redux/reducer/friendReducer";
+import {
+  friendOnlineUpdate,
+  friendReqeustHandle,
+  friendRequest,
+} from "./redux/reducer/friendReducer";
 import { insertUser, inviteRoom } from "./redux/reducer/roomReducer";
+import { LoginProvider } from "./context/login.context";
+import { SignupProvider } from "./context/signup.context";
+import { RequireAuth } from "./components/global/require.component";
 
 function App() {
   let dispatch = useDispatch<AppDispatch>();
-  let user = useSelector((state: RootState) => state.user);
-  let location = useLocation();
-  let navigate = useNavigate();
+  // let user = useSelector((state: RootState) => state.user);
 
-  // 로그인이 안 되어 있으면 로그인 페이지로
-  useEffect(() => {
-    let test = () => {
-      dispatch(userAction.getUserAction())
-        .unwrap()
-        .catch((err: any) => {
-          // let path = location.pathname;
-          // if (
-          //   path === "/login" ||
-          //   path === "/signup" ||
-          //   path === "/authcode/fcipras8694@naver.com"
-          // )
-          //   return;
-          // navigate("/login");
-        });
-    };
-    if (!user.id) test();
-  }, [dispatch]);
+  // // 로그인이 안 되어 있으면 로그인 페이지로
+  // useEffect(() => {
+  //   let test = () => dispatch(userAction.getUserAction());
+  //   if (!user.id) test();
+  // }, [dispatch]);
 
   useEffect(() => {
+    socketClient.on("friend_request", (data) => dispatch(friendRequest(data)));
+    socketClient.on("friend_request_handle", (data) =>
+      dispatch(friendReqeustHandle(data))
+    );
+
     // 친구 온라인 업데이트
     socketClient.on("update_friend_online", (data) =>
       dispatch(friendOnlineUpdate(data))
@@ -71,27 +61,51 @@ function App() {
       );
       socketClient.off("invite room", (room) => dispatch(inviteRoom(room)));
       socketClient.off("insert user", (data) => dispatch(insertUser(data)));
+      socketClient.off("friend_request", (data) =>
+        dispatch(friendRequest(data))
+      );
+      socketClient.off("friend_request_handle", (data) =>
+        dispatch(friendReqeustHandle(data))
+      );
     };
   }, []);
 
   return (
     <div className="App">
-      <Modal />
       <Routes>
-        <Route path="/" element={<Home />} />
+        {/* without login */}
         <Route
-          path="/room/:id"
+          path="/login"
           element={
-            <StreamProvider>
-              <StreamRoom />
-            </StreamProvider>
+            <LoginProvider>
+              <Login />
+            </LoginProvider>
           }
         />
-        <Route path="/login" element={<Login />} />
-        <Route path="/profile/:email" element={<Profile />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/password/reset" element={<PasswordReset />} />
-        <Route path="*" element={<Notfound />} />
+
+        <Route
+          path="/signup"
+          element={
+            <SignupProvider>
+              <Signup />
+            </SignupProvider>
+          }
+        />
+        {/* with login */}
+        <Route element={<RequireAuth />}>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/room/:id"
+            element={
+              <StreamProvider>
+                <StreamRoom />
+              </StreamProvider>
+            }
+          />
+          <Route path="/profile/:email" element={<Profile />} />
+          <Route path="/password/reset" element={<PasswordReset />} />
+          <Route path="*" element={<Notfound />} />
+        </Route>
       </Routes>
     </div>
   );

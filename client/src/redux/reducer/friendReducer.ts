@@ -22,6 +22,7 @@ const friendSlice = createSlice({
   initialState, // reducer
   reducers: {
     friendRequest: (state: any, data: any) => {
+      console.log("hihi");
       state.request_friends[data.payload.from.id] = data.payload.from;
     },
 
@@ -53,6 +54,7 @@ const friendSlice = createSlice({
     builder.addCase(
       friendAction.requestFriendHandle.fulfilled,
       (state, action) => {
+        console.log(action.payload);
         let { sender, response } = action.payload;
         delete state.request_friends[sender.id];
         if (response) state.friends[sender.id] = sender;
