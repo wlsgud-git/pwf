@@ -94,7 +94,6 @@ group by u.id`;
   async requestFriendHandle(receiver: string, sender: string, state: boolean) {
     try {
       if (state) {
-        console.log("true 실행됨");
         return await prisma.requestfriend.update({
           where: {
             res_nickname_req_nickname: {
@@ -135,6 +134,50 @@ group by u.id`;
       }
     } catch (err) {
       throw { status: 400, msg: "다시 시도해 주세요" };
+    }
+  },
+
+  async deleteFriend(nick1: string, nick2: string) {
+    try {
+      return await prisma.requestfriend.deleteMany({
+        where: {
+          AND: [
+            { state: true },
+            {
+              OR: [
+                { res_nickname: nick1, req_nickname: nick2 },
+                { res_nickname: nick2, req_nickname: nick1 },
+              ],
+            },
+          ],
+        },
+      });
+    } catch (err) {
+      throw { status: 400, msg: "다시 시도해주세요." };
+    }
+  },
+  // 내 친구들 검색
+  async searchMyFriends(nickname: string, my_nick: string) {
+    try {
+      return await prisma.$queryRaw`
+      with ff as (
+	      select * from requestFriend ref 
+	      where (
+		      ref.res_nickname = ${my_nick} or 
+		      ref.req_nickname = ${my_nick}) and 
+    	state = true
+      )
+      select u.nickname, u.profile_img, u.id from ff
+      join users u on (
+	      case 
+	        when ff.res_nickname = 'jins' then u.nickname = ff.req_nickname
+	        when ff.req_nickname = 'jins' then u.nickname = ff.res_nickname
+	      end 
+      )
+      where u.nickname like ${`%${nickname}%`}
+      `;
+    } catch (err) {
+      throw err;
     }
   },
 };

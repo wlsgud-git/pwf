@@ -1,31 +1,10 @@
-:root {
-  --video-screen-width: 330px;
-  --video-screen-height: 230px;
-
-  --video-share-screen-height: 80%;
-  --video-share-screen-max-width: 762px;
-
-  /* menu */
-  --stream-menu-width: 500px;
-  --stream-menu-btn-size: 60px;
-}
-
-.pwf-stream_container {
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-  align-items: center;
-  height: 100%;
-  position: relative;
-  flex-wrap: wrap;
-}
-
 /* 참가자 비디오 리스트 */
 .pwf-stream_screen_section {
   width: 100%;
   display: flex;
   flex-direction: column;
   height: calc(100% - var(--stream-menu-btn-size));
+  border: 1px solid green;
 }
 
 .participant_stream_container,
@@ -38,18 +17,24 @@
   display: flex;
   height: 100%;
   flex-wrap: wrap;
-  overflow-x: auto;
   justify-content: center;
   align-items: center;
+  border: 1px solid blue;
 }
 
 .participant_stream_container li {
+  width: 260px;
+  height: 150px;
+  border: 1px solid red;
+}
+
+/* .participant_stream_container li {
   margin: 5px;
   width: 600px;
   height: 200px;
   max-width: 300px;
   max-height: 190px;
-}
+} */
 
 /* 참가자 비디오 */
 .participant_track_box {
@@ -105,85 +90,7 @@
   font-weight: bold;
 }
 
-/* 화면공유 */
-.share_stream_container {
-  height: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.share_screen_box {
-  width: 100%;
-  height: 100%;
-  max-width: 500px;
-  max-height: 300px;
-  border: 1px solid blue;
-  position: relative;
-}
-
-.share_screen_box video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.share_user {
-  padding: 3px 8px;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  background-color: var(--pwf-background-transparent);
-  color: var(--pwf-white);
-}
-
 /* 풋터  ----------------------------------------------*/
-.pwf-stream_footer {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  background-color: var(--pwf-signiture-color);
-  display: flex;
-  align-items: center;
-  border-top: 1px solid var(--pwf-light-gray);
-  width: 100%;
-  height: var(--stream-menu-btn-size);
-
-  /* max-width: var(--stream-menu-width); */
-}
-
-.pwf-stream_footer button,
-.pwf-stream_footer .my_media_container {
-  border: none;
-  flex: 1;
-  width: 99%;
-  outline: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  height: 100%;
-  background-color: inherit;
-  font-weight: bold;
-  position: relative;
-  color: var(--pwf-gray);
-}
-
-.pwf-stream_footer button span {
-  margin-top: 4px;
-}
-
-.pwf-stream_footer button:not(:last-child) {
-  color: var(--pwf-gray);
-}
-
-.pwf-stream_footer button:hover {
-  background-color: var(--pwf-background-transparent-light);
-}
-
-.pwf-stream_footer button:hover {
-  background-color: var(--pwf-background-transparent-light);
-}
 
 .my_media_box {
   position: absolute;
@@ -230,10 +137,4 @@
   font-size: 21px;
   color: red;
   height: 100%;
-}
-
-@media screen and (max-width: 756px) {
-  .pwf-stream_footer button span {
-    display: none;
-  }
 }

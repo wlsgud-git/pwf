@@ -20,6 +20,7 @@ import { PasswordReset } from "./page/passwordReset";
 import { StreamProvider } from "./context/stream.context";
 import { socketClient } from "./util/socket";
 import {
+  deleteFriend,
   friendOnlineUpdate,
   friendReqeustHandle,
   friendRequest,
@@ -27,23 +28,20 @@ import {
 import { insertUser, inviteRoom } from "./redux/reducer/roomReducer";
 import { LoginProvider } from "./context/login.context";
 import { SignupProvider } from "./context/signup.context";
-import { RequireAuth } from "./components/global/require.component";
+import { RouteCheck } from "./components/global/require.component";
+import { GlobalStyle } from "./css/global/global.style";
+import { setLoading } from "./redux/reducer/userReducer";
 
 function App() {
   let dispatch = useDispatch<AppDispatch>();
-  // let user = useSelector((state: RootState) => state.user);
-
-  // // 로그인이 안 되어 있으면 로그인 페이지로
-  // useEffect(() => {
-  //   let test = () => dispatch(userAction.getUserAction());
-  //   if (!user.id) test();
-  // }, [dispatch]);
 
   useEffect(() => {
     socketClient.on("friend_request", (data) => dispatch(friendRequest(data)));
     socketClient.on("friend_request_handle", (data) =>
       dispatch(friendReqeustHandle(data))
     );
+
+    socketClient.on("delete friend", (data) => dispatch(deleteFriend(data)));
 
     // 친구 온라인 업데이트
     socketClient.on("update_friend_online", (data) =>
@@ -72,14 +70,17 @@ function App() {
 
   return (
     <div className="App">
+      <GlobalStyle />
       <Routes>
         {/* without login */}
         <Route
           path="/login"
           element={
-            <LoginProvider>
-              <Login />
-            </LoginProvider>
+            <RouteCheck type="pub">
+              <LoginProvider>
+                <Login />
+              </LoginProvider>
+            </RouteCheck>
           }
         />
 
@@ -92,20 +93,28 @@ function App() {
           }
         />
         {/* with login */}
-        <Route element={<RequireAuth />}>
-          <Route path="/" element={<Home />} />
-          <Route
-            path="/room/:id"
-            element={
+        {/* 홈 */}
+        <Route
+          path="/"
+          element={
+            <RouteCheck type="pri">
+              <Home />
+            </RouteCheck>
+          }
+        />
+        <Route
+          path="/room/:id"
+          element={
+            <RouteCheck type="pri">
               <StreamProvider>
                 <StreamRoom />
               </StreamProvider>
-            }
-          />
-          <Route path="/profile/:email" element={<Profile />} />
-          <Route path="/password/reset" element={<PasswordReset />} />
-          <Route path="*" element={<Notfound />} />
-        </Route>
+            </RouteCheck>
+          }
+        />
+        <Route path="/profile/:email" element={<Profile />} />
+        <Route path="/password/reset" element={<PasswordReset />} />
+        <Route path="*" element={<Notfound />} />
       </Routes>
     </div>
   );

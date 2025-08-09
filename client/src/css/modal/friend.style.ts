@@ -1,8 +1,15 @@
-import styled from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
+
+export const FriendGlobal = createGlobalStyle`
+:root{
+  --friend-modal-width: 600px;
+  --friend-modal-height: 400px;
+}
+`;
 
 export const FriendContent = styled.div`
-  width: 600px;
-  height: 400px;
+  width: var(--friend-modal-width);
+  height: var(--friend-modal-height);
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -61,11 +68,11 @@ export const FriendRequstList = styled.ul`
   overflow-y: auto;
 
   &::-webkit-scrollbar {
-    width: 7px;
+    width: var(--scroll-size);
   }
 
   &::-webkit-scrollbar-track {
-    // background-color: blue;
+    background-color: inherit;
     border-radius: 10px;
   }
 

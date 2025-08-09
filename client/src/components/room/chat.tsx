@@ -1,14 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { FormSubmit, InputChange } from "../../types/event";
 
-import "../../css/room/chat.css";
-import { User } from "../../types/user";
-import { emitter } from "../../util/event";
-import { useContextSelector } from "use-context-selector";
-import { StreamContext } from "../../context/stream.context";
-import { LocalParticipant, RemoteParticipant } from "livekit-client";
+import * as STC from "../../css/room/chat.style";
+
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import { useStream } from "../../context/stream.context";
 
 interface ChatingInterface {
   value: any;
@@ -17,35 +14,26 @@ interface ChatingInterface {
 
 const ChatLi = ({ value, me }: ChatingInterface) => {
   return (
-    <div className="chat_container" style={{ alignSelf: me ? "end" : "start" }}>
+    <STC.ChatLi me={me}>
       {!me && (
-        <span className="chat_user_profile_circle">
-          <img src={value.profile_img} />
-        </span>
+        <STC.ChatUserImgCircle>
+          <STC.ChatUserImg src={value.profile_img} />
+        </STC.ChatUserImgCircle>
       )}
-      <div className="chat_content_box">
-        {!me && <span className="chat_user_nickname">{value.nickname}</span>}
-        <div
-          className="chat_content"
-          style={{ backgroundColor: me ? "yellow" : "white" }}
-        >
-          {value.value}
-        </div>
-      </div>
-    </div>
+      <STC.ChatContentBox>
+        {!me && <STC.ChatUserNick>{value.nickname}</STC.ChatUserNick>}
+        <STC.ChatContent me={me}>{value.value}</STC.ChatContent>
+      </STC.ChatContentBox>
+    </STC.ChatLi>
   );
 };
 
 export const Chat = React.memo(() => {
+  let { room } = useStream();
   let user = useSelector((state: RootState) => state.user);
-  let room = useContextSelector(StreamContext, (ctx) => ctx.room);
 
   let [chatList, setChatList] = useState<any>([]);
   let [input, setInput] = useState<string>("");
-
-  // let chatLi = useMemo(() => {
-  //   () => ({ chatList });
-  // }, [chatList]);
 
   // 채팅 받기
   const onDataReceived = (payload: Uint8Array) => {
@@ -85,34 +73,28 @@ export const Chat = React.memo(() => {
   }, [room]);
 
   return (
-    <div className="pwf-chat_container">
-      {/* 윗부분 */}
-      <div className="menu_type">
-        <span>채팅</span>
-        <button
-          onClick={() => emitter.emit("menu", { state: false, type: "chat" })}
-        >
-          X
-        </button>
-      </div>
-      {/* 채팅 리스트 */}
-      <ul className="chat_lists">
-        {chatList.map((val: any) => (
-          <ChatLi value={val} me={val.nickname == user.nickname} />
-        ))}
-      </ul>
-      {/* 채팅인풋 */}
-      <form action="" className="pwf-chat_form" onSubmit={sendChat}>
-        <input
-          type="text"
-          value={input}
-          placeholder="채팅"
-          onChange={(e: InputChange) => setInput(e.target.value)}
-        />
-        <button>
-          <i className="fa-solid fa-paper-plane"></i>
-        </button>
-      </form>
-    </div>
+    <>
+      <STC.ChatGlobal />
+      <STC.ChatContainer>
+        {/* 채팅 리스트 */}
+        <STC.ChatLists>
+          {chatList.map((val: any) => (
+            <ChatLi value={val} me={val.nickname == user.nickname} />
+          ))}
+        </STC.ChatLists>
+        {/* 채팅인풋 */}
+        <STC.ChatForm onSubmit={sendChat}>
+          <STC.ChatInput
+            type="text"
+            value={input}
+            placeholder="채팅"
+            onChange={(e: InputChange) => setInput(e.target.value)}
+          />
+          <STC.ChatBtn>
+            <i className="fa-solid fa-paper-plane"></i>
+          </STC.ChatBtn>
+        </STC.ChatForm>
+      </STC.ChatContainer>
+    </>
   );
 });

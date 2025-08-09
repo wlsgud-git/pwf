@@ -35,14 +35,15 @@ app.use(sanitizeMiddleware);
 // Routes ---------------
 const UserRoutes = require("./routes/user.routes");
 const AuthRoutes = require("./routes/auth.routes");
+const FriendRoutes = require("./routes/friend.routes");
 const StreamRoomRoutes = require("./routes/streamRoom.routes");
 
 app.use("/", UserRoutes);
 app.use("/", StreamRoomRoutes);
 app.use("/", AuthRoutes);
+app.use("/", FriendRoutes);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.log("에러 입니당");
   let status = err.status || 500;
 
   res.status(status).json(err);

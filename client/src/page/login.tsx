@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import "../css/login.css";
+// import "../css/login.css";
 import { Link, useNavigate } from "react-router-dom";
 
 import { FormSubmit } from "../types/event";
@@ -19,6 +19,7 @@ import { userAction } from "../redux/actions/userAction";
 import { useSelector } from "react-redux";
 
 // type
+import * as SLOG from "../css/page/login.style";
 
 export const Login = () => {
   let { email, password, authBtn } = useLogin();
@@ -27,10 +28,6 @@ export const Login = () => {
   let navigate = useNavigate();
   let userId = useSelector((state: RootState) => state.user.id);
   let dispatch = useDispatch<AppDispatch>();
-
-  useEffect(() => {
-    if (userId) navigate("/");
-  }, [userId]);
 
   const loginError = (path: "email" | "password", msg: string) => {
     if (path == "email")
@@ -44,14 +41,14 @@ export const Login = () => {
     setAuthBtn((c) => ({ ...c, loading: true }));
 
     try {
-      dispatch(setLoading(true));
       await auth_service.login({
         email: email.value,
         password: password.value,
       });
       dispatch(userAction.getUserAction());
-      dispatch(setLoading(false));
+      navigate("/");
     } catch (err) {
+      console.log(err);
       if (axios.isAxiosError(err) && err.response?.status == 429)
         return alert(
           `${err.response.headers["retry-after"]}초후 다시 시도하세요.`
@@ -59,7 +56,7 @@ export const Login = () => {
       let { path, msg } = AxiosError(err);
       loginError(path, msg);
     }
-    dispatch(setLoading(false));
+
     setAuthBtn((c) => ({ ...c, loading: false }));
   };
 
@@ -92,40 +89,43 @@ export const Login = () => {
   }, [email, password]);
 
   return (
-    <div className="page login_page">
-      <div className="login_pwf_introduce">
-        PLAY WITH FRIENDS 친구들과 실시간 화면을 공유해 보세요.
-      </div>
+    <>
+      <SLOG.LoginGlobal />
+      <SLOG.LoginPage>
+        <SLOG.LoginIntroduce>
+          PLAY WITH FRIENDS 친구들과 실시간 화면을 공유해 보세요.
+        </SLOG.LoginIntroduce>
 
-      <div className="login_form_container">
-        <span className="login_text">로그인</span>
+        <SLOG.LoginContentContainer>
+          <SLOG.LoginText>로그인</SLOG.LoginText>
 
-        <form className="login_pwf_form" onSubmit={submitLogin}>
-          {/* 이메일 */}
-          <UserInputComponent
-            path={"email"}
-            input={email}
-            setInput={setEmail}
-            cb={() => inputBlur("email")}
-          />
+          <SLOG.LoginForm onSubmit={submitLogin}>
+            {/* 이메일 */}
+            <UserInputComponent
+              path={"email"}
+              input={email}
+              setInput={setEmail}
+              cb={() => inputBlur("email")}
+            />
 
-          {/* 비밀번호 */}
-          <UserInputComponent
-            path={"password"}
-            input={password}
-            setInput={setPassword}
-            cb={() => inputBlur("password")}
-          />
+            {/* 비밀번호 */}
+            <UserInputComponent
+              path={"password"}
+              input={password}
+              setInput={setPassword}
+              cb={() => inputBlur("password")}
+            />
 
-          {/* 로그인 버튼 */}
-          <UserButtonComponet text="로그인" button={authBtn} />
-        </form>
+            {/* 로그인 버튼 */}
+            <UserButtonComponet text="로그인" button={authBtn} />
+          </SLOG.LoginForm>
 
-        <div className="login_support_box">
-          <Link to="/signup">회원가입</Link>
-          <Link to="/password/reset">비밀번호 찾기</Link>
-        </div>
-      </div>
-    </div>
+          <SLOG.LoginSuppporBox>
+            <Link to="/signup">회원가입</Link>
+            <Link to="/password/reset">비밀번호 찾기</Link>
+          </SLOG.LoginSuppporBox>
+        </SLOG.LoginContentContainer>
+      </SLOG.LoginPage>
+    </>
   );
 };

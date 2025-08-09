@@ -6,10 +6,11 @@ import { userAction } from "../actions/userAction";
 // type
 import { User } from "../../types/user";
 import { friendAction } from "../actions/friendAction";
+import { AnyMxRecord } from "dns";
 
 interface FriendProps {
-  request_friends: { [id: number]: User };
-  friends: { [id: number]: User };
+  request_friends: { [nickname: string]: User };
+  friends: { [nickname: string]: User };
 }
 
 const initialState: FriendProps = {
@@ -22,16 +23,20 @@ const friendSlice = createSlice({
   initialState, // reducer
   reducers: {
     friendRequest: (state: any, data: any) => {
-      console.log("hihi");
-      state.request_friends[data.payload.from.id] = data.payload.from;
+      state.request_friends[data.payload.from.nickname] = data.payload.from;
     },
 
     friendReqeustHandle: (state: any, data: any) => {
-      state.friends[data.payload.id] = data.payload;
+      state.friends[data.payload.nickname] = data.payload;
     },
 
     friendOnlineUpdate: (state: any, data: any) => {
-      state.friends[data.payload.who.id].online = data.payload.online;
+      state.friends[data.payload.who.nickname].online = data.payload.online;
+    },
+
+    deleteFriend(state: any, data: any) {
+      console.log(data);
+      delete state.friends[data.payload];
     },
     init: (current) => (current = initialState),
   },
@@ -44,10 +49,10 @@ const friendSlice = createSlice({
 
       if (request_friends && request_friends.length)
         request_friends.map(
-          (val: User) => (state.request_friends[val.id!] = val)
+          (val: User) => (state.request_friends[val.nickname!] = val)
         );
       if (friends && friends.length)
-        friends.map((val: User) => (state.friends[val.id!] = val));
+        friends.map((val: User) => (state.friends[val.nickname!] = val));
     });
 
     // 친구요청에 대한 결과
@@ -56,13 +61,17 @@ const friendSlice = createSlice({
       (state, action) => {
         console.log(action.payload);
         let { sender, response } = action.payload;
-        delete state.request_friends[sender.id];
-        if (response) state.friends[sender.id] = sender;
+        delete state.request_friends[sender.nickname];
+        if (response) state.friends[sender.nickname] = sender;
       }
     );
   },
 });
 
-export const { friendRequest, friendReqeustHandle, friendOnlineUpdate } =
-  friendSlice.actions;
+export const {
+  friendRequest,
+  friendReqeustHandle,
+  friendOnlineUpdate,
+  deleteFriend,
+} = friendSlice.actions;
 export default friendSlice.reducer;

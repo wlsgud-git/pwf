@@ -3,13 +3,7 @@ import express, { Router } from "express";
 // middleware
 
 // controller
-import {
-  createRoom,
-  getRoom,
-  inviteRoom,
-  roomAccessToken,
-} from "../controller/streamRoom.controller";
-import { streamRoomValidate } from "../validation/streamroom.validate";
+import { StreamController } from "../controller/streamRoom.controller";
 import { csrfProtection, IsAuth } from "../middleware/auth.middleware";
 
 // import { loginValidate, signupUserValidate } from "../validation/auth";
@@ -17,9 +11,22 @@ import { csrfProtection, IsAuth } from "../middleware/auth.middleware";
 const router: Router = express.Router();
 
 //  authentication  Or  authorization
-router.get("/room/:id", IsAuth, getRoom);
-router.post("/room", IsAuth, csrfProtection, streamRoomValidate, createRoom);
-router.post("/room/token", IsAuth, csrfProtection, roomAccessToken);
-router.post("/room/invite", IsAuth, csrfProtection, inviteRoom);
+router.get("/room/:id", IsAuth, StreamController.getRoom);
+
+router.post("/room", IsAuth, csrfProtection, StreamController.createRoom);
+
+router.post(
+  "/room/token",
+  IsAuth,
+  csrfProtection,
+  StreamController.roomAccessToken
+);
+
+router.post(
+  "/room/invite",
+  IsAuth,
+  csrfProtection,
+  StreamController.inviteRoom
+);
 
 module.exports = router;

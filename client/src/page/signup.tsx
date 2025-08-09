@@ -1,26 +1,16 @@
 // css
-import "../css/signup.css";
-import axios from "axios";
 
 // library
-import { useEffect, useRef, useState } from "react";
-import { Form, Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 // other file
-import { createFormData } from "../util/form";
 import { user_service } from "../service/user.service";
 import { AxiosError } from "../error/error";
 
 // types
-import { User, UserInputProps } from "../types/user";
-import {
-  SignupMessage,
-  EmailError,
-  PasswordError,
-  NicknameError,
-} from "../types/auth";
-import { InputChange, FormSubmit } from "../types/event";
-import { auth_service } from "../service/auth.service";
+import { PasswordError } from "../types/auth";
+import { FormSubmit } from "../types/event";
 import {
   emailValidate,
   nicknameValidate,
@@ -28,15 +18,11 @@ import {
 } from "../validation/auth";
 import { Authcode } from "../components/modal/authcode";
 import { emitter } from "../util/event";
-import { emit } from "process";
 import { UserInputComponent } from "../components/global/input.components";
 import { useSetSignup, useSignup } from "../context/signup.context";
 import { UserButtonComponet } from "../components/global/button.component";
 
-interface SignupBtnProps {
-  active: boolean;
-  loading: boolean;
-}
+import * as S from "../css/page/login.style";
 
 type InputChecker = "email" | "nickname" | "password" | "passwordCheck";
 
@@ -83,6 +69,7 @@ export const Signup = () => {
         nickname: nickname.value,
         password: password.value,
       });
+      alert("회원가입이 완료되었습니다");
       window.location.href = "/login";
     } catch (err) {
       alert(err);
@@ -155,7 +142,7 @@ export const Signup = () => {
   }, [email.value, nickname.value, password.value, passwordCheck.value]);
 
   return (
-    <div className="page signup_page">
+    <S.LoginPage>
       <Authcode
         show={show}
         setShow={setShow}
@@ -163,10 +150,10 @@ export const Signup = () => {
         callback={account}
       />
 
-      <div className="signup_form_container">
-        <span className="signup_text">회원가입</span>
+      <S.LoginContentContainer>
+        <S.LoginText>회원가입</S.LoginText>
 
-        <form className="signup_pwf_form" onSubmit={submitSignup}>
+        <S.LoginForm onSubmit={submitSignup}>
           {/* 이메일 */}
           <UserInputComponent
             path="email"
@@ -201,13 +188,13 @@ export const Signup = () => {
 
           {/* 회원가입 버튼 */}
           <UserButtonComponet text="회원가입" button={authBtn} />
-        </form>
+        </S.LoginForm>
 
-        <div className="signup_support_box">
+        <S.LoginSuppporBox>
           <span>계정이 있다면?</span>
-          <Link to={"/login"}>로그인</Link>{" "}
-        </div>
-      </div>
-    </div>
+          <Link to={"/login"}>로그인</Link>
+        </S.LoginSuppporBox>
+      </S.LoginContentContainer>
+    </S.LoginPage>
   );
 };

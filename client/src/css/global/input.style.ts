@@ -1,12 +1,12 @@
 import styled from "styled-components";
 import { UserInputProps } from "../../types/user";
 
-export const UserInputContainer = styled.div<{ width: number }>`
+export const UserInputContainer = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 14px;
   align-items: start;
-  width: ${(p) => p.width}px;
+  width: var(--user-input-width);
 `;
 
 export const UserInputBox = styled.div<{ input: UserInputProps }>`
@@ -22,19 +22,19 @@ export const UserInputBox = styled.div<{ input: UserInputProps }>`
 
 export const UserInputText = styled.p<{ input: UserInputProps }>`
   transition: all 0.3s ease;
-  font-size: var(--placeholder-font-size);
+  font-size: var(--user-input-font-size);
   position: absolute;
-  left: var(--input-placeholder-left);
+  left: var(--user-input-margin-left);
   margin-bottom: 5px;
   top: ${(props) =>
     props.input.value === "" && !props.input.active
-      ? "calc(50% - var(--placeholder-font-size))"
+      ? "calc(50% - var(--user-input-font-size))"
       : "7%"};
 `;
 
 export const UserInput = styled.input`
   flex: 1;
-  padding: 20px 7px 7px var(--input-placeholder-left);
+  padding: 20px 7px 7px var(--user-input-margin-left);
   font-weight: 600;
   border: none;
   color: var(--pwf-white);

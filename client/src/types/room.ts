@@ -1,9 +1,9 @@
 import { User } from "./user";
 
 export interface Room {
-  id?: number | undefined;
-  room_name?: string | undefined;
-  participants?: User[];
+  id?: number;
+  room_name?: string;
+  participants?: User[] | number[];
   create_at?: Date;
 }
 

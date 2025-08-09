@@ -1,24 +1,39 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react";
-import "../../css/modal/streamRoom.css";
 import { emitter } from "../../util/event";
 
 // types
-import { User, UserComponent } from "../../types/user";
+import { User } from "../../types/user";
 import { FormSubmit, InputChange } from "../../types/event";
 import { createFormData } from "../../util/form";
 import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
-import { roomAction } from "../../redux/actions/roomAction";
 import { useSelector } from "react-redux";
-import { keyboard } from "@testing-library/user-event/dist/keyboard";
 import { stream_service } from "../../service/stream.service";
 
-interface CompoentProps {
-  user: User;
-  type: string;
-}
+import * as SSTR from "../../css/modal/stream.style";
+import { AxiosError } from "../../error/error";
 
 // 초대할 친구정보
+export const LiInviter = ({ user }: { [user: string]: User }) => {
+  return (
+    <SSTR.InviteLi>
+      <SSTR.InviteLiImgBox>
+        <SSTR.InviteImgCircle>
+          <SSTR.InviteUserImg src={user.profile_img} />
+        </SSTR.InviteImgCircle>
+
+        <SSTR.InviteOutBtn
+          type="button"
+          onClick={() => emitter.emit(`${user.nickname} select off`)}
+        >
+          x
+        </SSTR.InviteOutBtn>
+      </SSTR.InviteLiImgBox>
+      <SSTR.InviteUserNick>{user.nickname}</SSTR.InviteUserNick>
+    </SSTR.InviteLi>
+  );
+};
+
 export const LiFriend = ({ user }: { [user: string]: User }) => {
   let [select, Setselect] = useState<boolean>(false);
 
@@ -42,7 +57,7 @@ export const LiFriend = ({ user }: { [user: string]: User }) => {
   }, [select]);
 
   return (
-    <li className="invite_friend_li">
+    <SSTR.FriendLi>
       <input
         id={user.nickname}
         type="radio"
@@ -50,19 +65,21 @@ export const LiFriend = ({ user }: { [user: string]: User }) => {
         value={user.nickname}
         onClick={selectControl}
       />
-      <span className="invite_friend_img">
-        <img src={user.profile_img} />
-      </span>
-      <span className="invite_friend_nickname">{user.nickname}</span>
-    </li>
+      <SSTR.FriendImgCircle>
+        <SSTR.FriendImg src={user.profile_img} />
+      </SSTR.FriendImgCircle>
+
+      <SSTR.FriendNickname>{user.nickname}</SSTR.FriendNickname>
+    </SSTR.FriendLi>
   );
 };
 
 // 방 만들기 모달
-export const StreamRoom = ({ user, type }: CompoentProps) => {
+export const StreamRoom = () => {
   let dispatch = useDispatch<AppDispatch>();
 
-  let { friends } = useSelector((state: RootState) => state.friend);
+  let id = useSelector((state: RootState) => state.user.id);
+  let friends = useSelector((state: RootState) => state.friend.friends);
   let formRef = useRef<HTMLFormElement>(null);
   let [inviteUsers, setInviteUsers] = useState<User[]>([]);
 
@@ -75,7 +92,6 @@ export const StreamRoom = ({ user, type }: CompoentProps) => {
     inviteUsers.map((val) => {
       emitter.emit(`${val.nickname} select off`);
     });
-    emitter.emit("modal", { type });
   }
 
   // invite
@@ -101,86 +117,78 @@ export const StreamRoom = ({ user, type }: CompoentProps) => {
   const createStreamRoom = async (e: FormSubmit) => {
     e.preventDefault();
 
-    if (!roomname.length || roomname.length >= 21) {
-      alert("방 이름은 1~20자 이내여야 합니다.");
-      return;
-    }
+    // if (!roomname.length || roomname.length >= 21) {
+    //   alert("방 이름은 1~20자 이내여야 합니다.");
+    //   return;
+    // }
 
-    if (!inviteUsers.length) {
-      alert("최소 1명이상의 친구를 초대해야 합니다.");
-      return;
-    }
+    // if (!inviteUsers.length) {
+    //   alert("최소 1명이상의 친구를 초대해야 합니다.");
+    //   return;
+    // }
 
     try {
       let participants = inviteUsers.map((val) => val.id);
-      participants.push(user.id);
-      let formdata = createFormData({ room_name: roomname, participants });
-      await stream_service.createStreamRoom(formdata);
+      participants.push(id);
+      await stream_service.createStreamRoom({
+        room_name: roomname,
+        participants: participants as number[],
+      });
       resetModal();
-    } catch (err) {
-      alert(err);
+    } catch (err: any) {
+      let { msg } = AxiosError(err);
+      alert(msg);
     }
   };
 
   return (
-    <div
-      className="stream_modal"
-      style={{ display: type == "stream" ? "flex" : "none" }}
-    >
-      <header className="modal_header">
-        <button onClick={resetModal}>X</button>
-      </header>
-      {/* 모달 내용 */}
-      <div className="stream_create_box">
-        <form onSubmit={createStreamRoom} ref={formRef}>
-          {/* 방 이름 */}
-          <div className="stream_roomname_box">
-            <label htmlFor="stream_roomname">방이름</label>
-            <input
-              type="text"
-              value={roomname}
-              className="pwf_roomname_input"
-              placeholder="방이름"
-              onChange={(e: InputChange) => setRoomname(e.target.value)}
-            />
-          </div>
-          {/* 참여자 목록 */}
-          <div className="participants_box">
-            <label htmlFor="participants">참여자 {inviteUsers.length}</label>
-            <ul
-              className="participants_list"
-              style={{
-                border: inviteUsers.length
-                  ? "1px solid var(--pwf-white)"
-                  : "none",
-              }}
-            >
-              {inviteUsers.length ? (
-                inviteUsers.map((val) => <li>{val.nickname}</li>)
-              ) : (
-                <p style={{ color: "gray" }}>초대된 친구가 없습니다</p>
-              )}
-            </ul>
-          </div>
-          {/* 초대할 친구목록 */}
-          <div className="friends_invite_box">
-            <label htmlFor="friends_list">친구목록</label>
-            <ul className="friends_list">
-              {Object.entries(friends).length ? (
-                Object.entries(friends).map(([key, val]) => (
-                  <LiFriend user={val} />
-                ))
-              ) : (
-                <p>초대할 친구가 없습니다.</p>
-              )}
-            </ul>
-          </div>
-          {/* 모달 풋터 */}
-          <footer className="stream_modal_footer">
-            <button>방 만들기</button>
-          </footer>
-        </form>
-      </div>
-    </div>
+    <SSTR.StreamContent>
+      <SSTR.StreamForm onSubmit={createStreamRoom} ref={formRef}>
+        {/* 방 이름 */}
+        <SSTR.StreamContentDiv>
+          <SSTR.StreamContentLabel>참여자</SSTR.StreamContentLabel>
+          <SSTR.StreamRoomNameInput
+            type="text"
+            value={roomname}
+            className="pwf_roomname_input"
+            placeholder="방이름"
+            spellCheck="false"
+            onChange={(e: InputChange) => setRoomname(e.target.value)}
+          />
+        </SSTR.StreamContentDiv>
+        {/* 참여자 목록 */}
+        <SSTR.StreamContentDiv>
+          <SSTR.StreamContentLabel>
+            참여자 {inviteUsers.length}
+          </SSTR.StreamContentLabel>
+          <SSTR.StreamRoomInviteList length={inviteUsers.length}>
+            {inviteUsers.length ? (
+              inviteUsers.map((val) => <LiInviter user={val} />)
+            ) : (
+              <SSTR.StreamRoomNoInvite>
+                초대한 친구가 없습니다
+              </SSTR.StreamRoomNoInvite>
+            )}
+          </SSTR.StreamRoomInviteList>
+        </SSTR.StreamContentDiv>
+        {/* 초대할 친구목록 */}
+        <SSTR.StreamContentDiv>
+          <SSTR.StreamContentLabel>친구목록</SSTR.StreamContentLabel>
+          <SSTR.InviteFriendList length={Object.entries(friends).length}>
+            {Object.entries(friends).length ? (
+              Object.entries(friends).map(([key, val]) => (
+                <LiFriend user={val} />
+              ))
+            ) : (
+              <SSTR.InviteFriendNo>초대할 친구가 없습니다.</SSTR.InviteFriendNo>
+            )}
+          </SSTR.InviteFriendList>
+        </SSTR.StreamContentDiv>
+        {/* 모달 풋터 */}
+        <footer className="stream_modal_footer">
+          <SSTR.CreateStreamRoomBtn>방 만들기</SSTR.CreateStreamRoomBtn>
+        </footer>
+      </SSTR.StreamForm>
+    </SSTR.StreamContent>
   );
 };

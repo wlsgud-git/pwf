@@ -30,26 +30,31 @@ export const RequestFriendLi = ({ sender }: { sender: User }) => {
   };
 
   return (
-    <SFR.FriendLi>
-      <SFR.FriendLiUserBox>
-        <SFR.FriendLiProfileBox>
-          <SFR.FriendLiProfileImg src={sender.profile_img} />
-        </SFR.FriendLiProfileBox>
-        <SFR.FriendLiNickname>{sender.nickname}</SFR.FriendLiNickname>
-      </SFR.FriendLiUserBox>
-      {/* button */}
-      <SFR.FriendBtnBox>
-        <SFR.FriendLiBtn title="수락" onClick={() => handleRequestFriend(true)}>
-          <i className="fa-solid fa-check"></i>
-        </SFR.FriendLiBtn>
-        <SFR.FriendLiBtn
-          title="거절"
-          onClick={() => handleRequestFriend(false)}
-        >
-          <i className="fa-solid fa-xmark"></i>
-        </SFR.FriendLiBtn>
-      </SFR.FriendBtnBox>
-    </SFR.FriendLi>
+    <>
+      <SFR.FriendLi>
+        <SFR.FriendLiUserBox>
+          <SFR.FriendLiProfileBox>
+            <SFR.FriendLiProfileImg src={sender.profile_img} />
+          </SFR.FriendLiProfileBox>
+          <SFR.FriendLiNickname>{sender.nickname}</SFR.FriendLiNickname>
+        </SFR.FriendLiUserBox>
+        {/* button */}
+        <SFR.FriendBtnBox>
+          <SFR.FriendLiBtn
+            title="수락"
+            onClick={() => handleRequestFriend(true)}
+          >
+            <i className="fa-solid fa-check"></i>
+          </SFR.FriendLiBtn>
+          <SFR.FriendLiBtn
+            title="거절"
+            onClick={() => handleRequestFriend(false)}
+          >
+            <i className="fa-solid fa-xmark"></i>
+          </SFR.FriendLiBtn>
+        </SFR.FriendBtnBox>
+      </SFR.FriendLi>
+    </>
   );
 };
 
@@ -88,38 +93,41 @@ export const Friend = () => {
   }, [nickname]);
 
   return (
-    <SFR.FriendContent>
-      {/* 친추요청 검색 */}
-      <SFR.FriendSearchBox>
-        <SFR.FriendSearchForm onSubmit={requestFriend}>
-          <SFR.FriendSearchInput
-            error={error.state}
-            type="text"
-            value={nickname}
-            onChange={(e: InputChange) => setNickname(e.target.value)}
-            placeholder="친구요청 닉네임"
-            spellCheck="false"
-            onFocus={() => setError((c) => ({ ...c, state: false }))}
-          />
-        </SFR.FriendSearchForm>
-        <SFR.FriendSearchError error={error.state}>
-          {error.msg}
-        </SFR.FriendSearchError>
-      </SFR.FriendSearchBox>
+    <>
+      <SFR.FriendGlobal />
+      <SFR.FriendContent>
+        {/* 친추요청 검색 */}
+        <SFR.FriendSearchBox>
+          <SFR.FriendSearchForm onSubmit={requestFriend}>
+            <SFR.FriendSearchInput
+              error={error.state}
+              type="text"
+              value={nickname}
+              onChange={(e: InputChange) => setNickname(e.target.value)}
+              placeholder="친구요청 닉네임"
+              spellCheck="false"
+              onFocus={() => setError((c) => ({ ...c, state: false }))}
+            />
+          </SFR.FriendSearchForm>
+          <SFR.FriendSearchError error={error.state}>
+            {error.msg}
+          </SFR.FriendSearchError>
+        </SFR.FriendSearchBox>
 
-      {/* 친추 리스트 */}
-      <SFR.FriendRequestBox>
-        <SFR.FriendRequestLabel>친구요청</SFR.FriendRequestLabel>
-        <SFR.FriendRequstList>
-          {Object.entries(request_friends).length ? (
-            Object.entries(request_friends).map(([key, value]) => (
-              <RequestFriendLi sender={value} />
-            ))
-          ) : (
-            <SFR.FriendRequstEmpty>친구요청이 없습니다</SFR.FriendRequstEmpty>
-          )}
-        </SFR.FriendRequstList>
-      </SFR.FriendRequestBox>
-    </SFR.FriendContent>
+        {/* 친추 리스트 */}
+        <SFR.FriendRequestBox>
+          <SFR.FriendRequestLabel>친구요청</SFR.FriendRequestLabel>
+          <SFR.FriendRequstList>
+            {Object.entries(request_friends).length ? (
+              Object.entries(request_friends).map(([key, value]) => (
+                <RequestFriendLi sender={value} />
+              ))
+            ) : (
+              <SFR.FriendRequstEmpty>친구요청이 없습니다</SFR.FriendRequstEmpty>
+            )}
+          </SFR.FriendRequstList>
+        </SFR.FriendRequestBox>
+      </SFR.FriendContent>
+    </>
   );
 };

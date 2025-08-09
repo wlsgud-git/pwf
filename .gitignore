@@ -1,13 +1,24 @@
 # client
 client/node_modules/
+client/.env
 
 # backend
-backend/db.sql
+# backend/db.sql
 backend/node_modules/
 backend/.env
 
 # ignore
 .gitignore
 
-# 환경파일
-*.env
+
+# {/* <UserVideo nickname={user.nickname!} audio={audio} video={video} /> */}
+
+#           {/* {Object.entries(participants as UserTrackProps).map(
+#             ([nickname, value]) => (
+#               <UserVideo
+#                 nickname={nickname}
+#                 audio={value.audio}
+#                 video={value.video}
+#               />
+#             )
+#           )} */}

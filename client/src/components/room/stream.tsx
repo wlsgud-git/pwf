@@ -12,31 +12,58 @@ import {
   TrackPublication,
   createLocalAudioTrack,
   createLocalVideoTrack,
-  attachToElement,
-  LocalParticipant,
   Participant,
 } from "livekit-client";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { emitter } from "../../util/event";
-import { StreamContext, useSetStream } from "../../context/stream.context";
-import {
-  getMyMedia,
-  getShareMedia,
-  getStream,
-  getTrack,
-} from "../../util/stream";
+import { useSetStream, useStream } from "../../context/stream.context";
+import { getMyMedia, getStream, getTrack } from "../../util/stream";
 import { TrackProps, UserTrackProps } from "../../types/stream.types";
 import { useContextSelector } from "use-context-selector";
-import { current } from "@reduxjs/toolkit";
 import { Invitation } from "../modal/invitation";
 import { useNavigate } from "react-router-dom";
+
+// css
+import * as STR from "../../css/room/stream.style";
+import * as STLI from "../../css/room/lists.style";
 
 interface ParticipantProps {
   nickname: string;
   audio: TrackProps;
   video: TrackProps;
 }
+
+interface PageProps {
+  list: number[];
+  width: number;
+  share: boolean;
+}
+
+const ParticipantPage = ({ list, width, share }: PageProps) => {
+  let [size, setSize] = useState<{ width: number; height: number }>({
+    width: 0,
+    height: 0,
+  });
+  useEffect(() => {
+    let cut = Math.ceil(Math.sqrt(list.length));
+    if (cut == 0) return;
+    setSize((c) => ({
+      ...c,
+      width: share ? list.length : cut,
+      height: share ? 1 : Math.ceil(list.length / cut),
+    }));
+  }, [list, share, width]);
+  return (
+    <STLI.Page width={width}>
+      {list.map((val) => (
+        <STLI.TestLi share={share} width={size.width} height={size.height}>
+          {val}
+        </STLI.TestLi>
+      ))}
+    </STLI.Page>
+  );
+};
 
 const UserVideo = React.memo(({ nickname, audio, video }: ParticipantProps) => {
   let videoRef = useRef<HTMLVideoElement | null>(null);
@@ -80,19 +107,16 @@ export const Stream = () => {
   let navigate = useNavigate();
 
   let user = useSelector((state: RootState) => state.user);
-  let room = useContextSelector(StreamContext, (ctx) => ctx.room);
-  let participants = useContextSelector(
-    StreamContext,
-    (ctx) => ctx.participants
-  );
+  let { room } = useStream();
+
   let { setParticipants } = useSetStream();
 
   // 참가자 참가
-  let joinParticipant = (who: string) =>
-    setParticipants((c: UserTrackProps) => ({
-      ...c,
-      [who]: { audio: {}, video: {} },
-    }));
+  let joinParticipant = (who: string) => {};
+  // setParticipants((c) => ({
+  //   ...c,
+  //   [who]: { audio: {}, video: {} },
+  // }));
 
   let start = async () => {
     await setMyTracks();
@@ -396,65 +420,87 @@ export const Stream = () => {
     }
   };
 
-  return (
-    <div className="pwf-stream_container">
-      <Invitation show={invitation} setShow={setInvitation} />
-      {/* 참가자들 화면 부분들 */}
-      <div className="pwf-stream_screen_section">
-        {/* 참가자 화면 리스트 */}
-        <ul
-          className="participant_stream_container"
-          style={{ flexDirection: share.state ? "row" : "column" }}
-        >
-          <UserVideo nickname={user.nickname!} audio={audio} video={video} />
+  // 참가자 화면 조절
+  let listsRef = useRef<HTMLUListElement | null>(null);
+  const [page, setPage] = useState<{ arr: number[][]; current: number }>({
+    arr: [],
+    current: 0,
+  });
+  const [listSize, setListSize] = useState<{ width: number; height: number }>({
+    width: 0,
+    height: 0,
+  });
+  const [party, setParty] = useState<number[]>([1, 2, 3, 4, 5, 6]);
 
-          {Object.entries(participants as UserTrackProps).map(
-            ([nickname, value]) => (
-              <UserVideo
-                nickname={nickname}
-                audio={value.audio}
-                video={value.video}
-              />
-            )
-          )}
-        </ul>
-        {/* 공유 화면 */}
-        <div
-          className="share_stream_container"
-          style={{ display: share.state ? "flex" : "none" }}
-        >
-          <div className="share_screen_box">
-            <video ref={shareVideoRef} autoPlay></video>
-            <span className="share_user">{share.nickname}</span>
-          </div>
-        </div>
-      </div>
+  // 현재 리스트박스 사이즈
+  useEffect(() => {
+    if (!listsRef.current) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+
+      setListSize((c) => ({
+        ...c,
+        width,
+        height,
+      }));
+    });
+
+    observer.observe(listsRef.current);
+    return () => observer.disconnect();
+  }, []);
+  // 페이지 조절
+  useEffect(() => {
+    let ss = Math.floor(listSize.width / (share.state ? 200 : 270));
+    let cut = ss * (share.state ? 1 : ss);
+
+    let newPages: number[][] = [];
+
+    if (cut == 0) return;
+
+    for (var i = 0; i < party.length; i += cut) {
+      newPages.push(party.slice(i, i + cut));
+    }
+    setPage((prev) => ({ ...prev, arr: newPages }));
+  }, [party, listSize.width, share.state]);
+
+  function updatePage(type: "l" | "r") {
+    if (type == "l" && page.current == 0) return;
+    else if (type == "r" && page.current == page.arr.length - 1) return;
+
+    setPage((c) => ({
+      ...c,
+      current: type == "l" ? c.current - 1 : c.current + 1,
+    }));
+  }
+
+  return (
+    <STR.StreamBox>
       {/* 풋터 */}
-      <footer className="pwf-stream_footer">
+      <STR.Footer>
         {/* 오디오 */}
-        <button title="오디오" onClick={() => toggleTrack("audio")}>
+        <button onClick={() => setShare((c) => ({ ...c, state: true }))}>
           <i
             className={`fa-solid fa-microphone${audio.state ? "" : "-slash"}`}
           ></i>
           <span>오디오</span>
         </button>
         {/* 비디오 */}
-        <button title="비디오" onClick={() => toggleTrack("video")}>
+        <button onClick={() => toggleTrack("video")}>
           <i className={`fa-solid fa-video${video.state ? "" : "-slash"}`}></i>
           <span>비디오</span>
         </button>
         {/* 방에 친구초대 */}
-        <button title="초대" onClick={() => setInvitation(true)}>
+        <button onClick={() => setInvitation(true)}>
           <i className="fa-solid fa-user-plus"></i>
           <span>초대</span>
         </button>
         {/* 화면공유 */}
-        <button title="화면공유" onClick={ScreenShareControl}>
+        <button onClick={ScreenShareControl}>
           <i className="fa-brands fa-creative-commons-share"></i>
           <span>화면공유</span>
         </button>
         {/* 내 미디어 변경 */}
-        <div className="my_media_container">
+        <button onClick={() => setDevices((c) => ({ ...c, show: true }))}>
           <div
             tabIndex={0}
             style={{ display: devices.show ? "flex" : "none" }}
@@ -495,14 +541,9 @@ export const Stream = () => {
               </li>
             ))}
           </div>
-          <button
-            title="내 미디어"
-            onClick={() => setDevices((c) => ({ ...c, show: true }))}
-          >
-            <i className="fa-solid fa-desktop"></i>
-            <span>내미디어</span>
-          </button>
-        </div>
+          <i className="fa-solid fa-desktop"></i>
+          <span>내미디어</span>
+        </button>
         {/* 채팅 */}
         <button
           title="채팅"
@@ -523,10 +564,10 @@ export const Stream = () => {
         </button>
 
         {/* 방 나가기 */}
-        <button className="room_exit" title="방 나가기" onClick={roomLeave}>
+        <button title="방 나가기" onClick={roomLeave}>
           <i className="fa-solid fa-right-from-bracket"></i>
         </button>
-      </footer>
-    </div>
+      </STR.Footer>
+    </STR.StreamBox>
   );
 };

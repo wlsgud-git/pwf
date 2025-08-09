@@ -1,3 +1,6 @@
+import { createGlobalStyle } from "styled-components";
+
+export const GlobalStyle = createGlobalStyle`
 * {
   margin: 0;
   padding: 0;
@@ -18,12 +21,13 @@
   --pwf-background-transparent: rgb(0, 0, 0, 0.6);
   --pwf-background-transparent-light: rgba(0, 0, 0, 0.1);
 
-  /* streaming room */
-  --pwf-menu-width: 370px;
-  --pwf-menu-height: 65px;
-
   /* scroll */
   --scroll-size: 7px;
+
+  // user input
+  --user-input-margin-left: 8px;
+  --user-input-font-size: 10.3px;
+  --user-input-width: 250px;
 }
 
 body {
@@ -64,3 +68,6 @@ input {
   height: 100vh;
   background-color: var(--pwf-signiture-color);
 }
+
+
+`;

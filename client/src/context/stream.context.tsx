@@ -1,12 +1,27 @@
 // import { Room } from "livekit-client";
-import React, { ReactNode, useContext, useMemo, useState } from "react";
+import React, {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import { TrackProps, UserTrackProps } from "../types/stream.types";
-import { createContext } from "use-context-selector";
+import { createContext, useContextSelector } from "use-context-selector";
 
-import { Room } from "../types/room";
+interface StreamContext {
+  room: any;
+  participants: UserTrackProps;
+}
 
-export let StreamContext = createContext<any>(undefined);
-let SetStreamContext = React.createContext<any>(undefined);
+interface SetStreamContext {
+  setRoom: Dispatch<SetStateAction<any>>;
+  setParticipants: Dispatch<SetStateAction<UserTrackProps>>;
+}
+
+let StreamContext = createContext<StreamContext | null>(null);
+let SetStreamContext = createContext<SetStreamContext | null>(null);
 
 export const StreamProvider = ({ children }: { children: ReactNode }) => {
   const [room, setRoom] = useState<any>(null);
@@ -37,8 +52,14 @@ export const StreamProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+export let useStream = () => {
+  const ctx = useContextSelector(StreamContext, (ctx) => ctx);
+  if (!ctx) throw new Error("value가 없다고");
+  return ctx;
+};
+
 export let useSetStream = () => {
-  const context = useContext(SetStreamContext);
-  if (context === undefined) throw new Error("value가 없다고");
-  return context;
+  const ctx = useContextSelector(SetStreamContext, (ctx) => ctx);
+  if (!ctx) throw new Error("value가 없다고");
+  return ctx;
 };

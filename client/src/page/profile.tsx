@@ -1,6 +1,6 @@
 import "../css/profile.css";
 
-import { PageHeader } from "../components/pageHeader";
+import { PageHeader } from "../components/views/pageHeader";
 import { useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
 import { emitter } from "../util/event";
@@ -17,6 +17,7 @@ import { useDispatch } from "react-redux";
 import { resetAllstate } from "../redux/actions/root.action";
 import { socketClient } from "../util/socket";
 import { changeProfileImg } from "../redux/reducer/userReducer";
+import { modalState } from "../redux/reducer/modalReducer";
 
 export const Profile = () => {
   let dispatch = useDispatch<AppDispatch>();
@@ -199,7 +200,13 @@ export const Profile = () => {
         </div>
         <div className="profile_side_box account_delete_alert">
           <div>회원 탈퇴시 기존 결제 및 정보는 모두 없어지게 됩니다.</div>
-          <button>회원 탈퇴</button>
+          <button
+            onClick={() =>
+              dispatch(modalState({ active: true, type: "delete" }))
+            }
+          >
+            회원 탈퇴
+          </button>
         </div>
       </div>
     </div>

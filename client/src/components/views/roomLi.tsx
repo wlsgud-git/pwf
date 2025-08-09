@@ -1,6 +1,6 @@
-import { Room } from "../types/room";
+import { Room } from "../../types/room";
 import { Link } from "react-router-dom";
-import "../css/streamLi.css";
+import "../../css/streamLi.css";
 import { useEffect } from "react";
 
 export const StreamRoomLi = ({ data }: { [data: string]: Room }) => {

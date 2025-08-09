@@ -12,6 +12,7 @@ export class userService extends HttpClient {
     }
   }
 
+  // 닉네임 변경
   async changeNickname(data: FormData) {
     try {
       return await this.axiosFetch<User>("/update/nickname", {
@@ -23,6 +24,7 @@ export class userService extends HttpClient {
     }
   }
 
+  // 프로필 이미지 변경
   async changeProfileImg(data: FormData) {
     try {
       return await this.axiosFetch<User>("/update/profile_img", {
@@ -35,6 +37,7 @@ export class userService extends HttpClient {
     }
   }
 
+  // 유저 삭제
   async deleteUser(email: string) {
     try {
       return await this.axiosFetch<string>(`/delete/${email}`, {
@@ -45,7 +48,7 @@ export class userService extends HttpClient {
     }
   }
 
-  // 친구요청 ------------------------
+  // 친구관련 ------------------------
 
   // 친구요청
   async requestFriend(data: RequestFriendProps) {
@@ -59,11 +62,34 @@ export class userService extends HttpClient {
     }
   }
 
+  // 친구요청 응답
   async handleRequestFriend(data: ResponseFriendProps) {
     try {
       return await this.axiosFetch(`/request/friend/response`, {
         method: "post",
         body: JSON.stringify(data),
+      });
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  // 친구 삭제
+  async deleteFriend(nick: string) {
+    try {
+      return await this.axiosFetch(`/friend/${nick}`, {
+        method: "delete",
+      });
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  // 닉네임으로 친구들 검색
+  async searchFriendsByNick(nickname: string) {
+    try {
+      return await this.axiosFetch(`/search/friends?nickname=${nickname}`, {
+        method: "get",
       });
     } catch (err) {
       throw err;

@@ -1,6 +1,7 @@
 // css
+import * as STRM from "../../css/room/menu.style";
+
 import React, { useEffect, useState } from "react";
-import "../../css/room/menu.css";
 
 import { emitter } from "../../util/event";
 
@@ -14,8 +15,7 @@ interface MenuType {
 }
 
 export const Menu = () => {
-  // console.log("menu rerender");
-  let [menu, setMenu] = useState<MenuType>({ state: true, type: "chat" });
+  let [menu, setMenu] = useState<MenuType>({ state: false, type: "chat" });
 
   useEffect(() => {
     const handler = ({ state, type }: MenuType) => {
@@ -30,11 +30,19 @@ export const Menu = () => {
   });
 
   return (
-    <div
-      className="pwf-stream_room_menu"
-      style={{ display: menu.state ? "flex" : "none" }}
-    >
-      {menu.type == "chat" ? <Chat /> : <Participants />}
-    </div>
+    <>
+      <STRM.MenuGlobal />
+      <STRM.MenuBox show={menu.state}>
+        <STRM.MenuTextBox>
+          <span>{menu.type == "chat" ? "채팅" : "참가자"}</span>
+          <STRM.MenuCloseBtn
+            onClick={() => setMenu((c) => ({ ...c, state: false }))}
+          >
+            X
+          </STRM.MenuCloseBtn>
+        </STRM.MenuTextBox>
+        {menu.type == "chat" ? <Chat /> : <Participants />}
+      </STRM.MenuBox>
+    </>
   );
 };

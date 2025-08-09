@@ -25,7 +25,7 @@ export const UserInputComponent = ({
     setInput((c) => ({ ...c, active: true, error: false }));
 
   return (
-    <SIP.UserInputContainer width={250}>
+    <SIP.UserInputContainer>
       <SIP.UserInputBox input={input} onFocus={inputFocus} onBlur={cb}>
         <SIP.UserInputText input={input}>{path}</SIP.UserInputText>
         <SIP.UserInput

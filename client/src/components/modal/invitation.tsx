@@ -84,7 +84,9 @@ export const Invitation = ({ show, setShow }: InvitationProps) => {
   useEffect(() => {
     if (id) {
       let newMap: { [nick: string]: User } = {};
-      room[parseInt(id)].participants?.map((val) => {
+
+      let participantsList = room[parseInt(id)].participants as User[];
+      participantsList.map((val) => {
         if (val.nickname !== user.nickname) newMap[val.nickname!] = val;
       });
       setInUser(newMap);

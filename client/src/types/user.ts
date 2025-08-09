@@ -1,7 +1,7 @@
 import { Room } from "./room";
 
 export interface User {
-  id?: number | undefined;
+  id?: number;
   nickname?: string;
   email?: string;
   password?: string;
@@ -13,7 +13,7 @@ export interface User {
   request_friends?: User[];
   online?: boolean;
   img_key?: string | null;
-  loading?: boolean | undefined;
+  loading?: boolean;
 }
 
 export interface FriendOnlineStatus {

@@ -9,7 +9,7 @@ import { friendAction } from "../actions/friendAction";
 
 interface modalProps {
   active: boolean;
-  type: null | "friend" | "delete";
+  type: null | "friend" | "delete" | "stream";
 }
 
 const initialState: modalProps = {

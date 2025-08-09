@@ -1,31 +1,37 @@
 // css
+import * as SHOME from "../css/page/home.style";
 import "../css/home.css";
 
 import { emitter } from "../util/event";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { RootState } from "../redux/store";
+import { AppDispatch, RootState } from "../redux/store";
 import { useSelector } from "react-redux";
 
 // component
 import { Modal } from "../components/modal/modal.component";
-import { PageHeader } from "../components/pageHeader";
+import { PageHeader } from "../components/views/pageHeader";
+import { useDispatch } from "react-redux";
+import { modalState } from "../redux/reducer/modalReducer";
+
+// const Page
 
 const MyFriends = lazy(() =>
-  import("../components/myFriend").then(({ MyFriends }) => ({
+  import("../components/views/myFriend").then(({ MyFriends }) => ({
     default: MyFriends,
   }))
 );
 const StreamRoomLi = lazy(() =>
-  import("../components/roomLi").then(({ StreamRoomLi }) => ({
+  import("../components/views/roomLi").then(({ StreamRoomLi }) => ({
     default: StreamRoomLi,
   }))
 );
 
 export const Home = () => {
+  let dispatch = useDispatch<AppDispatch>();
   let room = useSelector((state: RootState) => state.room);
 
   return (
-    <div className="page home_page">
+    <SHOME.HomePage>
       <Modal />
       {/* header */}
       <PageHeader />
@@ -42,7 +48,7 @@ export const Home = () => {
 
           <button
             onClick={() =>
-              emitter.emit("modal", { type: "stream", open: true })
+              dispatch(modalState({ active: true, type: "stream" }))
             }
           >
             방만들기
@@ -55,6 +61,6 @@ export const Home = () => {
           <MyFriends />
         </Suspense>
       </div>
-    </div>
+    </SHOME.HomePage>
   );
 };

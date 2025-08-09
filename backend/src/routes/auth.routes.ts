@@ -1,22 +1,14 @@
 import express, { Router } from "express";
 
 // middleware
-import {
-  IsAuth,
-  emailOverlapCheck,
-  nicknameOverlapCheck,
-} from "../middleware/auth.middleware";
+import { IsAuth } from "../middleware/auth.middleware";
 
 // controller
-import {
-  checkAuthcodeController,
-  current,
-  loginControl,
-  logoutControl,
-  sendAuthcodeController,
-} from "../controller/auth.controller";
+import { AuthController } from "../controller/auth.controller";
 
 import rateLimit from "express-rate-limit";
+import { asyncValidate, validate } from "../validation/global.validate";
+import { AuthSchema } from "../validation/auth.validate";
 
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000,
@@ -29,20 +21,34 @@ const limiter = rateLimit({
   },
 });
 
-// validate
-// import { loginValidate } from "../validation/auth.validate";
-
 const router: Router = express.Router();
 
-// auth 관련 -------------------------------------------------------
-router.get("/current", IsAuth, current); // 현재 유저
-router.post("/email/overlap", emailOverlapCheck); // 이메일 중복
-router.post("/nickname/overlap", nicknameOverlapCheck); // 닉네임
-
-router.post("/login", limiter, loginControl); //로그인
-router.post("/logout", logoutControl); //로그아웃
-// authcode -------------------------------
-router.post("/authcode/resend", sendAuthcodeController); // 인증번호 전송
-router.post("/authcode/check", checkAuthcodeController);
+// 현재유저
+router.get("/current", IsAuth, AuthController.current);
+// 이메일 중복
+router.post(
+  "/email/overlap",
+  asyncValidate(AuthSchema.emailOverlap),
+  AuthController.emailOverlap
+);
+// 닉네임 중복
+router.post(
+  "/nickname/overlap",
+  asyncValidate(AuthSchema.nicknameOverlap),
+  AuthController.nicknameOverlap
+);
+// 로그인
+router.post(
+  "/login",
+  limiter,
+  validate(AuthSchema.login),
+  AuthController.login
+);
+// 로그아웃
+router.post("/logout", AuthController.logout);
+// 인증번호 재전송
+router.post("/authcode/resend", AuthController.sendAuthCode);
+// 인증번호 확인
+router.post("/authcode/check", AuthController.checkAuthCode);
 
 module.exports = router;

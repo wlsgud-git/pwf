@@ -12,11 +12,11 @@ export class streamService extends HttpClient {
   }
 
   // 방 만들기
-  async createStreamRoom(data: FormData) {
+  async createStreamRoom(data: Room) {
     try {
       return await this.axiosFetch<Room>("/room", {
         method: "post",
-        body: data,
+        body: JSON.stringify(data),
       });
     } catch (err) {
       throw err;

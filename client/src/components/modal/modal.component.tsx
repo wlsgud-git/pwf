@@ -5,14 +5,16 @@ import { useDispatch } from "react-redux";
 import { Friend } from "./friend";
 import { modalState } from "../../redux/reducer/modalReducer";
 import { Delete } from "./delete";
-
-interface ModalProps {
-  Component: React.ComponentType<any>;
-}
+import { StreamRoom } from "./streamRoom";
+import { useEffect } from "react";
 
 export const Modal = () => {
   let dispatch = useDispatch<AppDispatch>();
   let { active, type } = useSelector((state: RootState) => state.modal);
+
+  useEffect(() => {
+    console.log(active, type);
+  }, [active, type]);
 
   return (
     <SMO.ModalBackground active={active}>
@@ -24,7 +26,15 @@ export const Modal = () => {
             X
           </SMO.ModalCloseBtn>
         </SMO.ModalContentHeader>
-        {type == "friend" ? <Friend /> : type == "delete" ? <Delete /> : ""}
+        {type == "friend" ? (
+          <Friend />
+        ) : type == "stream" ? (
+          <StreamRoom />
+        ) : type == "delete" ? (
+          <Delete />
+        ) : (
+          ""
+        )}
       </SMO.ModalContent>
     </SMO.ModalBackground>
   );

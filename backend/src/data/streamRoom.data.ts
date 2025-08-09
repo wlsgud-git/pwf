@@ -1,9 +1,31 @@
 import { dbPlay } from "../util/database.util";
 import { User } from "../types/user.types";
 import { Room } from "../types/streamroom.types";
+import { prisma } from "../config/db.config";
 
 // Authentication OR Authorization ------------------------
 // 방 정보 얻기
+
+export const StreamRoomData = {
+  async createStreamRoom(name: string, participants: number[]) {
+    try {
+      return await prisma.$queryRaw<Room[]>`
+    with inserted as (
+	    insert into streamingRoom 
+	    (room_name, participants, create_at)
+	    select ${name}, ${participants}, now()
+	    returning *
+    )
+    select i.id, i.room_name, json_agg(distinct u.*) as participants
+    from inserted i 
+    join users u on u.id = any(i.participants)
+    group by i.id, i.room_name`;
+    } catch (err) {
+      throw { state: 400, msg: "알 수 없는 오류 다시 시도해 주세요" };
+    }
+  },
+};
+
 export const getStreamRoomData = async (id: number) => {
   try {
     let query = `
