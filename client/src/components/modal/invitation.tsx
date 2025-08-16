@@ -1,6 +1,4 @@
-import "../../css/modal/invitation.css";
-
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { emitter } from "../../util/event";
 
@@ -10,12 +8,9 @@ import { createFormData } from "../../util/form";
 import { stream_service } from "../../service/stream.service";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
-interface InvitationProps {
-  show: boolean;
-  setShow: any;
-}
+import * as SIV from "../../css/modal/invitation.style";
 
 const InvitationLi = ({ user }: { [nickname: string]: User }) => {
   let [select, setSelect] = useState<boolean>(false);
@@ -34,36 +29,34 @@ const InvitationLi = ({ user }: { [nickname: string]: User }) => {
   }, []);
 
   return (
-    <li className="invitation_li">
+    <SIV.InvitationLi>
       {/* 유저 정보 */}
       <div>
-        <span className="invitation_profile_box">
-          <img src={user.profile_img} />
-        </span>
-        <span className="invitation_nickname">{user.nickname}</span>
+        <SIV.InvitationProfileCricle>
+          <SIV.InvitationProfileImg src={user.profile_img} />
+        </SIV.InvitationProfileCricle>
+        <SIV.InviationUserNick>{user.nickname}</SIV.InviationUserNick>
       </div>
       {/* 초대버튼 */}
       <input type="radio" checked={select} onClick={handleClick} />
-    </li>
+    </SIV.InvitationLi>
   );
 };
 
 // 친구 관련 모달
-export const Invitation = ({ show, setShow }: InvitationProps) => {
-  let { id } = useParams();
-  let { friends } = useSelector((state: RootState) => state.friend);
-  let user = useSelector((state: RootState) => state.user);
+export const Invitation = () => {
+  let [id, setId] = useState<number>(0);
+  let location = useLocation();
+  let friends = useSelector((state: RootState) => state.friend.friends);
+  let nickname = useSelector((state: RootState) => state.user.nickname);
   let room = useSelector((state: RootState) => state.room);
-
-  // 초기화
-  function reset() {
-    setShow(false);
-    setInvitationList([]);
-    emitter.emit("modal", { type: "invitation" });
-  }
 
   let [inUser, setInUser] = useState<{ [nick: string]: User }>({});
   let [invitationList, setInvitationList] = useState<User[]>([]);
+
+  useEffect(() => {
+    setId(parseInt(location.pathname.split("/")[2]));
+  }, []);
 
   useEffect(() => {
     const handle = ({ user, select }: { user: User; select: boolean }) => {
@@ -79,75 +72,71 @@ export const Invitation = ({ show, setShow }: InvitationProps) => {
     return () => {
       emitter.off("invitation select", handle);
     };
-  });
+  }, []);
 
-  useEffect(() => {
+  useMemo(() => {
     if (id) {
       let newMap: { [nick: string]: User } = {};
 
-      let participantsList = room[parseInt(id)].participants as User[];
+      let participantsList = room[id].participants as User[];
       participantsList.map((val) => {
-        if (val.nickname !== user.nickname) newMap[val.nickname!] = val;
+        if (val.nickname !== nickname) newMap[val.nickname!] = val;
       });
       setInUser(newMap);
     }
-  }, [room]);
+  }, [id]);
 
   // 친구초대
   const invite = async () => {
     try {
-      let inviteList = invitationList.map((val) => val);
-      let formdata = createFormData({ room: room[parseInt(id!)], inviteList });
-      let { msg } = await stream_service.inviteStreamRoom(formdata);
-      reset();
+      let inviteList = invitationList.map((val) => val.id) as number[];
+      let { msg } = await stream_service.inviteStreamRoom({
+        id,
+        inviteList,
+      });
+      alert(msg);
     } catch (err) {
       console.log(err);
     }
   };
 
   return (
-    <div
-      className="invitation_modal"
-      style={{ display: show ? "flex" : "none" }}
-    >
-      <header className="modal_header">
-        <button onClick={reset}>X</button>
-      </header>
-
-      <div className="invitation_container">
+    <>
+      <SIV.InvitationGlobal />
+      <SIV.InvitationContainer>
         {/* 초대할 친구목록 */}
-        <ul className="invitation_list">
+        <SIV.InviteList>
           {!invitationList.length ? (
-            <p className="i_text">친구를 방에 초대하세요</p>
+            <SIV.NoInviteText>친구를 방에 초대하세요</SIV.NoInviteText>
           ) : (
             invitationList.map((val) => (
-              <div className="listup_user">
-                <span className="listup_user_profile_box">
-                  <img src={val.profile_img} />
-                  <button
+              <SIV.InviteLi key={val.id}>
+                <SIV.InviteUserImgBox>
+                  <SIV.InviteUserImg src={val.profile_img} />
+                  <SIV.InviteUserDelBtn
                     onClick={() =>
                       emitter.emit(`invite control ${val.nickname}`)
                     }
                   >
                     x
-                  </button>
-                </span>
+                  </SIV.InviteUserDelBtn>
+                </SIV.InviteUserImgBox>
 
-                <span className="listup_nickname">{val.nickname}</span>
-              </div>
+                <SIV.InviteUserNick>{val.nickname}</SIV.InviteUserNick>
+              </SIV.InviteLi>
             ))
           )}
-        </ul>
+        </SIV.InviteList>
         {/* 내가 초대할 친구목록 */}
-        <ul className="invitation_friend_list">
+        <SIV.InvitationList>
           {Object.entries(friends).map(([key, value]) =>
             !inUser[value.nickname!] ? <InvitationLi user={value} /> : ""
           )}
-        </ul>
-        <div className="invitation_btn_box">
-          <button onClick={invite}>초대하기</button>
-        </div>
-      </div>
-    </div>
+        </SIV.InvitationList>
+        <SIV.InvitationBtnBox>
+          <SIV.InvitationBtn onClick={invite}>초대하기</SIV.InvitationBtn>
+        </SIV.InvitationBtnBox>
+      </SIV.InvitationContainer>
+    </>
   );
 };

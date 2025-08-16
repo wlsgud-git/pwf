@@ -30,7 +30,7 @@ import { LoginProvider } from "./context/login.context";
 import { SignupProvider } from "./context/signup.context";
 import { RouteCheck } from "./components/global/require.component";
 import { GlobalStyle } from "./css/global/global.style";
-import { setLoading } from "./redux/reducer/userReducer";
+import { Modal } from "./components/modal/modal.component";
 
 function App() {
   let dispatch = useDispatch<AppDispatch>();
@@ -71,6 +71,7 @@ function App() {
   return (
     <div className="App">
       <GlobalStyle />
+      <Modal />
       <Routes>
         {/* without login */}
         <Route

@@ -32,7 +32,6 @@ export const Home = () => {
 
   return (
     <SHOME.HomePage>
-      <Modal />
       {/* header */}
       <PageHeader />
 

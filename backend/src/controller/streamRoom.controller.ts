@@ -12,7 +12,6 @@ import { insertNewUser, inviteStreamingRoom } from "../event/stream.event";
 import { Room } from "../types/streamroom.types";
 import { User } from "../types/user.types";
 import { prisma } from "../config/db.config";
-import { createRoomSchema } from "../validation/streamroom.validate";
 import { ControllerProps } from "../types/control.types";
 
 export const StreamController: ControllerProps = {
@@ -32,15 +31,18 @@ export const StreamController: ControllerProps = {
   createRoom: async (req, res, next) => {
     let { room_name, participants } = req.body;
     try {
-      let result = await createRoomSchema.safeParseAsync(req.body);
+      let result = await prisma.users.findMany({
+        where: {
+          id: {
+            in: participants,
+          },
+        },
+        select: { id: true },
+      });
 
-      if (!result.success) {
-        let errorField = result.error.issues[0];
-        throw {
-          status: 400,
-          msg: errorField.message,
-        };
-      }
+      if (result.length !== participants.length)
+        throw { status: 400, msg: "맞지 않은 유저가 있습니다." };
+
       let room: Room[] = await StreamRoomData.createStreamRoom(
         room_name,
         participants
@@ -73,17 +75,25 @@ export const StreamController: ControllerProps = {
   // 방 친구초대
   inviteRoom: async (req, res, next) => {
     try {
-      let { room, inviteList } = req.body;
-      room = JSON.parse(room);
-      inviteList = inviteList.map((val: any) => JSON.parse(val));
+      let { id, inviteList } = req.body;
 
-      let uroom = (await inviteStreamRoom(
-        room.id,
-        inviteList.map((val: User) => val.id)
-      )) as Room[];
+      let room = (await StreamRoomData.getStreamRoomData(id)) as Room[];
+      if (!room[0]) throw { status: 400, msg: "존재하지 않는 방입니다." };
 
-      inviteStreamingRoom(inviteList, uroom[0]);
-      insertNewUser(room, inviteList);
+      let invite_li = await prisma.users.findMany({
+        where: { id: { in: inviteList } },
+      });
+
+      if (invite_li.length !== inviteList.length)
+        throw {
+          status: 400,
+          msg: "존재하지 않는 유저가 있습니다. 다시 시도해 주세요.",
+        };
+
+      let uroom = (await inviteStreamRoom(id, inviteList)) as Room[];
+
+      inviteStreamingRoom(invite_li, uroom[0]);
+      insertNewUser(room[0], invite_li);
 
       res.status(200).json({ msg: "초대가 완료되었습니다." });
     } catch (err) {

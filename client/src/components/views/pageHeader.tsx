@@ -24,10 +24,7 @@ export const PageHeader = () => {
     try {
       await auth_service.logout();
       dispatch(resetAllstate());
-      socketClient.disconnect();
-      navigate("/login");
     } catch (err) {
-      console.log(err);
       throw err;
     }
   };

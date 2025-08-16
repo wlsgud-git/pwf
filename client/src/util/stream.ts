@@ -31,10 +31,6 @@ export let getStream = async (audio: boolean, video: boolean) => {
   }
 };
 
-// export let getTrackWithId = async (id: string)=>{
-
-// }
-
 // 트랙 스트림 가져오기
 export let getMediaStream = (tracks: LocalTrack<Track.Kind>[]) =>
   new MediaStream(tracks.map((track) => track.mediaStreamTrack));

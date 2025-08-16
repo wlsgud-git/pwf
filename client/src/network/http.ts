@@ -1,8 +1,13 @@
-import axios, { Axios, AxiosInstance } from "axios";
+import axios, { Axios, AxiosError, AxiosInstance } from "axios";
 
-import { HttpRequest, HttpResponse } from "../types/http";
-import { AxiosError } from "../error/error";
-// import { config } from "";
+import { store } from "../redux/store";
+import { resetAllstate } from "../redux/actions/root.action";
+
+type UnauthorizedHandler = () => void;
+const unauthorizedHandlers: UnauthorizedHandler[] = [];
+
+export const onUnauthorized = (handler: UnauthorizedHandler) =>
+  unauthorizedHandlers.push(handler);
 
 export class HttpClient {
   baseURL: string | undefined;
@@ -16,6 +21,21 @@ export class HttpClient {
       },
       withCredentials: true,
     });
+
+    this.client.interceptors.response.use(
+      (response) => {
+        return response;
+      },
+      (error: AxiosError<any>) => {
+        let status = error.response?.status;
+
+        if (status === 401) {
+          unauthorizedHandlers.forEach((fn) => fn());
+        }
+
+        return Promise.reject(error);
+      }
+    );
   }
 
   async axiosFetch<T>(url: string, options: any): Promise<any> {
@@ -35,6 +55,7 @@ export class HttpClient {
       let res = await this.client(req);
       return res.data;
     } catch (err) {
+      console.log(err);
       throw err;
     }
   }

@@ -1,19 +1,20 @@
-import { useNavigate } from "react-router-dom";
 import { user_service } from "../../service/user.service";
 import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
+import { AppDispatch, RootState } from "../../redux/store";
 
 import * as SDEL from "../../css/modal/delete.style";
+import { useDispatch } from "react-redux";
+import { resetAllstate } from "../../redux/actions/root.action";
 
 export const Delete = () => {
+  let dispatch = useDispatch<AppDispatch>();
   let email = useSelector((state: RootState) => state.user.email);
-  let navigate = useNavigate();
 
   let deleteUser = async () => {
     try {
       await user_service.deleteUser(email!);
       alert("계정이 삭제되었습니다.");
-      navigate("/login");
+      dispatch(resetAllstate());
     } catch (err) {
       alert(err);
     }

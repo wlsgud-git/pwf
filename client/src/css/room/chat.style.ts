@@ -7,7 +7,7 @@ export const ChatGlobal = createGlobalStyle`
 `;
 
 export const ChatContainer = styled.div`
-  width: 100%;
+  width: var(--pwf-menu-box-width);
   height: 100%;
   display: flex;
   flex-direction: column;

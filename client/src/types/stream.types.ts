@@ -7,7 +7,7 @@ import {
 
 export interface TrackProps {
   active?: boolean;
-  state: boolean;
+  state?: boolean;
   track?:
     | RemoteAudioTrack
     | RemoteVideoTrack
@@ -16,8 +16,14 @@ export interface TrackProps {
   id?: string;
 }
 
+export interface ParticipantTrack {
+  nickname?: string;
+  audio: TrackProps;
+  video: TrackProps;
+}
+
 export interface UserTrackProps {
-  [nickname: string]: { audio: TrackProps; video: TrackProps };
+  [nickname: string]: ParticipantTrack;
 }
 
 export type LocalTrackProps = LocalAudioTrack | LocalVideoTrack;

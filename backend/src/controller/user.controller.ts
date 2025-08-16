@@ -8,9 +8,10 @@ import { hashingText } from "../util/crypto.util";
 import { UserData } from "../data/user.data";
 
 // types
-import { SignupMessage } from "../types/auth.types";
+import { NicknameError, SignupMessage } from "../types/auth.types";
 import { s3FileDelete, s3FileUpload } from "../util/aws.util";
 import { ControllerProps } from "../types/control.types";
+import { prisma } from "../config/db.config";
 
 export const UserController: ControllerProps = {
   signupUserInfoControl: (req, res, next) => {
@@ -52,7 +53,11 @@ export const UserController: ControllerProps = {
   updateNickname: async (req, res, next) => {
     let { id, nickname } = req.body;
     try {
-      await UserData.changeNickname(parseInt(id), nickname);
+      let user = await prisma.users.findUnique({ where: { nickname } });
+      if (user)
+        throw { status: 409, msg: NicknameError.NICKNAME_OVERLAP_ERROR };
+
+      await UserData.changeNickname(id, nickname);
       res.status(200).json({ msg: "닉네임이 변경되었습니다" });
     } catch (err) {
       next(err);
@@ -64,6 +69,19 @@ export const UserController: ControllerProps = {
     try {
       await UserData.deleteUser(email);
       res.status(200).json({ message: `${email} 계정이 삭제되었습니다.` });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  changePassword: async (req, res, next) => {
+    let { email, password } = req.body;
+
+    try {
+      let hash_password = await hashingText(password);
+      await UserData.changePassword(email, hash_password);
+
+      res.status(200).json({ msg: "비밀번호가 변경되었습니다" });
     } catch (err) {
       next(err);
     }

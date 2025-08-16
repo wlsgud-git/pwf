@@ -10,7 +10,7 @@ export const StreamGlobal = createGlobalStyle`
     --participant-video-share-height: 140px;
     --participant-video-max-height: 235px;
     // any
-    --participant-video-gap: 4px;
+    --participant-video-gap: 1.5px;
     // share ----------------------------------------
 
     // footer ----------------------------------------
@@ -22,7 +22,6 @@ export const StreamPage = styled.div`
   width: 100%;
   height: 100vh;
   display: flex;
-  border: 4px solid green;
 `; // ---------------------------
 
 // 비디오 and 풋터 포함 박스
@@ -32,13 +31,14 @@ export const StreamBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  border: 1px solid orange;
+  overflow: hidden;
 `;
 
 // 비디오 담는 박스
 export const StreamSectionBox = styled.div`
   width: 100%;
   display: flex;
+  overflow: hidden;
   flex-direction: column;
   height: calc(100% - var(--stream-footer-btn-size));
 `;
@@ -56,7 +56,6 @@ export const shareVideoBox = styled.div`
   height: 100%;
   max-width: 500px;
   position: relative;
-  border: 1px solid red;
 `;
 
 export const shareVideo = styled.video`
@@ -102,6 +101,54 @@ export const Footer = styled.footer`
     }
     &:hover {
       background-color: var(--pwf-background-transparent-light);
+    }
+  }
+`;
+
+export const MediaBox = styled.div<{ show: boolean }>`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  overflow: hidden;
+  z-index: 125123;
+  background: var(--pwf-signiture-color);
+  display: ${(p) => (p.show ? "flex" : "none")};
+  flex-direction: column;
+  border-radius: 4px;
+  bottom: calc(var(--stream-footer-btn-size) + 8px);
+  color: var(--pwf-white);
+  box-shadow: 3px 3px 3px 3px black;
+
+  label {
+    width: 100%;
+    text-align: start;
+    padding: 3px 5px;
+    background-color: var(--pwf-light-gray);
+
+    i {
+      margin-right: 6px;
+    }
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 8px;
+
+    &:hover {
+      background-color: var(--pwf-background-transparent);
+    }
+
+    i {
+      background-color: inherit;
+      margin-right: 8px;
     }
   }
 `;

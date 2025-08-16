@@ -17,11 +17,14 @@ import {
   AuthcodeError,
   PasswordError,
   EmailError,
+  NicknameError,
 } from "../types/auth.types";
 import { compareText, hashingText } from "../util/crypto.util";
 import { sendAuthcodeMail } from "../util/mail.util";
 import { getOnlineState } from "../event/friend.event";
 import { ControllerProps } from "../types/control.types";
+import { AuthData } from "../data/auth.data";
+import { prisma } from "../config/db.config";
 // import "../types/express/express";
 
 export const AuthController: ControllerProps = {
@@ -114,12 +117,36 @@ export const AuthController: ControllerProps = {
   },
   // 이메일 중복
   emailOverlap: async (req, res, next) => {
-    res.status(200).json({ msg: "이메일 중복없음" });
+    let { email } = req.body;
+    try {
+      await AuthData.emailOverlap(email);
+      res.status(200).json({ msg: "이메일 중복없음" });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  // 이메일 존재
+  emailDefine: async (req, res, next) => {
+    let { email } = req.body;
+    try {
+      let user = await prisma.users.findUnique({ where: { email } });
+      if (!user) throw { status: 400, msg: EmailError.EMAIL_UNDEFINED_ERROR };
+      return res.status(200).json({ msg: "이메일 존재함" });
+    } catch (err) {
+      next(err);
+    }
   },
 
   // 닉네임 중복
   nicknameOverlap: async (req, res, next) => {
-    res.status(200).json({ msg: "닉네임 중복없음" });
+    let { nickname } = req.body;
+    try {
+      await AuthData.nicknameOverlap(nickname);
+      res.status(200).json({ msg: "닉네임 중복없음" });
+    } catch (err) {
+      next(err);
+    }
   },
 
   // 인증번호 전송
@@ -143,8 +170,9 @@ export const AuthController: ControllerProps = {
     try {
       let code = await redisGet(email);
 
-      if (!code) throw { msg: AuthcodeError.AUTHCODE_EXPIRE };
-      if (code !== authcode) throw { msg: AuthcodeError.AUTHCODE_UNEQUAL };
+      if (!code) throw { status: 410, msg: AuthcodeError.AUTHCODE_EXPIRE };
+      if (code !== authcode)
+        throw { status: 400, msg: AuthcodeError.AUTHCODE_UNEQUAL };
 
       res.status(200).json({ msg: "인증이 완료되었습니다." });
     } catch (err) {

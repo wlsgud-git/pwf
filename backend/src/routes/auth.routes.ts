@@ -9,6 +9,7 @@ import { AuthController } from "../controller/auth.controller";
 import rateLimit from "express-rate-limit";
 import { asyncValidate, validate } from "../validation/global.validate";
 import { AuthSchema } from "../validation/auth.validate";
+import { AuthService } from "../service/auth.service";
 
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000,
@@ -28,13 +29,19 @@ router.get("/current", IsAuth, AuthController.current);
 // 이메일 중복
 router.post(
   "/email/overlap",
-  asyncValidate(AuthSchema.emailOverlap),
+  validate(AuthSchema.email),
   AuthController.emailOverlap
+);
+// 이메일 존재
+router.post(
+  "/email/define",
+  validate(AuthSchema.email),
+  AuthController.emailDefine
 );
 // 닉네임 중복
 router.post(
   "/nickname/overlap",
-  asyncValidate(AuthSchema.nicknameOverlap),
+  validate(AuthSchema.nickname),
   AuthController.nicknameOverlap
 );
 // 로그인
@@ -47,8 +54,16 @@ router.post(
 // 로그아웃
 router.post("/logout", AuthController.logout);
 // 인증번호 재전송
-router.post("/authcode/resend", AuthController.sendAuthCode);
+router.post(
+  "/authcode/resend",
+  validate(AuthSchema.email),
+  AuthController.sendAuthCode
+);
 // 인증번호 확인
-router.post("/authcode/check", AuthController.checkAuthCode);
+router.post(
+  "/authcode/check",
+  validate(AuthSchema.checkAuthcode),
+  AuthController.checkAuthCode
+);
 
 module.exports = router;

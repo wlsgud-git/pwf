@@ -12,6 +12,7 @@ import { stream_service } from "../../service/stream.service";
 
 import * as SSTR from "../../css/modal/stream.style";
 import { AxiosError } from "../../error/error";
+import { modalState } from "../../redux/reducer/modalReducer";
 
 // 초대할 친구정보
 export const LiInviter = ({ user }: { [user: string]: User }) => {
@@ -86,14 +87,6 @@ export const StreamRoom = () => {
   // infomation
   let [roomname, setRoomname] = useState<string>("");
 
-  // 모달 리셋
-  function resetModal() {
-    setRoomname("");
-    inviteUsers.map((val) => {
-      emitter.emit(`${val.nickname} select off`);
-    });
-  }
-
   // invite
   useEffect(() => {
     const handler = (data: any) => {
@@ -117,15 +110,15 @@ export const StreamRoom = () => {
   const createStreamRoom = async (e: FormSubmit) => {
     e.preventDefault();
 
-    // if (!roomname.length || roomname.length >= 21) {
-    //   alert("방 이름은 1~20자 이내여야 합니다.");
-    //   return;
-    // }
+    if (!roomname.length || roomname.length >= 21) {
+      alert("방 이름은 1~20자 이내여야 합니다.");
+      return;
+    }
 
-    // if (!inviteUsers.length) {
-    //   alert("최소 1명이상의 친구를 초대해야 합니다.");
-    //   return;
-    // }
+    if (!inviteUsers.length) {
+      alert("최소 1명이상의 친구를 초대해야 합니다.");
+      return;
+    }
 
     try {
       let participants = inviteUsers.map((val) => val.id);
@@ -134,7 +127,7 @@ export const StreamRoom = () => {
         room_name: roomname,
         participants: participants as number[],
       });
-      resetModal();
+      dispatch(modalState({ active: false, type: null }));
     } catch (err: any) {
       let { msg } = AxiosError(err);
       alert(msg);

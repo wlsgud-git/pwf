@@ -13,11 +13,11 @@ export class userService extends HttpClient {
   }
 
   // 닉네임 변경
-  async changeNickname(data: FormData) {
+  async changeNickname(data: { id: number; nickname: string }) {
     try {
       return await this.axiosFetch<User>("/update/nickname", {
         method: "post",
-        body: data,
+        body: JSON.stringify(data),
       });
     } catch (err) {
       throw err;
@@ -120,11 +120,15 @@ export class userService extends HttpClient {
     }
   }
 
-  async passwordChange(data: FormData) {
+  async passwordChange(data: {
+    email: string;
+    password: string;
+    password_check: string;
+  }) {
     try {
       return await this.axiosFetch<string>("/password_change", {
         method: "post",
-        body: data,
+        body: JSON.stringify(data),
       });
     } catch (err) {
       throw err;

@@ -24,14 +24,6 @@ export const Profile = () => {
   let navigate = useNavigate();
   let user = useSelector((state: RootState) => state.user);
 
-  // state
-  let [show, setShow] = useState<boolean>(false);
-
-  const showingModal = () => {
-    emitter.emit("modal", { type: "password", open: true });
-    setShow(true);
-  };
-
   // 프로필 이미지 관련 -----------------------
   let [profileSrc, setProfileSrc] = useState<any>("");
   let profileFileRef = useRef<HTMLInputElement | null>(null);
@@ -84,17 +76,16 @@ export const Profile = () => {
   });
 
   const updateNickname = async () => {
-    if (nickname.value == user.nickname)
-      throw { msg: "같은 이름으로 변경할 수 없습니다." };
+    // if (nickname.value == user.nickname)
+    //   throw { msg: "같은 이름으로 변경할 수 없습니다." };
     try {
-      await nicknameValidate(nickname.value);
-      let formData = createFormData({ id: user.id, nickname: nickname.value });
-      let { msg } = await user_service.changeNickname(formData);
+      let { msg } = await user_service.changeNickname({
+        id: user.id!,
+        nickname: nickname.value,
+      });
       alert(msg);
       await auth_service.logout();
       dispatch(resetAllstate());
-      socketClient.disconnect();
-      navigate("/login");
     } catch (err) {
       let { msg } = AxiosError(err);
       setNickname((c) => ({ ...c, error: true, error_msg: msg }));
@@ -105,8 +96,6 @@ export const Profile = () => {
     <div className="page profile_page">
       {/* header */}
       <PageHeader />
-
-      <PwFind email={user.email!} show={show} setshow={setShow} />
 
       {/* content */}
       <div className="profile_content_container">
@@ -177,6 +166,7 @@ export const Profile = () => {
                     })`,
                   }}
                   placeholder={user.nickname}
+                  onFocus={() => setNickname((c) => ({ ...c, error: false }))}
                   value={nickname.value}
                   onChange={(e: InputChange) =>
                     setNickname((c) => ({ ...c, value: e.target.value }))
@@ -196,7 +186,7 @@ export const Profile = () => {
             비밀번호는 도난방지, 보안설정을 위하여 3개월~6개월 사이에 주기적으로
             변경하는 것이 안전합니다.
           </div>
-          <button onClick={showingModal}>비밀번호 변경</button>
+          <button>비밀번호 변경</button>
         </div>
         <div className="profile_side_box account_delete_alert">
           <div>회원 탈퇴시 기존 결제 및 정보는 모두 없어지게 됩니다.</div>

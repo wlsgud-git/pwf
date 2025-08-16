@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const ParticipantsContent = styled.div`
-  width: 100%;
+  width: var(--pwf-menu-box-width);
   height: 100%;
   padding: 6px;
   background-color: transparent;

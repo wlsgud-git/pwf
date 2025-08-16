@@ -6,6 +6,7 @@ import RoomReducer from "./roomReducer";
 import ModalReducer from "./modalReducer";
 
 import storage from "redux-persist/lib/storage";
+import { socketClient } from "../../util/socket";
 
 const appReducer = combineReducers({
   user: UserReducer,
@@ -17,6 +18,8 @@ const appReducer = combineReducers({
 const rootReducer = (state: any, action: any) => {
   if (action.type == "RESET_ALL_STATE") {
     storage.removeItem("persist:root");
+    socketClient.disconnect();
+    window.location.href = "/login";
     return appReducer(undefined, action);
   }
   return appReducer(state, action);

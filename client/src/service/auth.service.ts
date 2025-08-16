@@ -5,9 +5,20 @@ import { User } from "../types/user";
 
 export class authService extends HttpClient {
   // 이메일 중복 체크
-  async emailOverlap(data: any) {
+  async emailOverlap(data: { email: string }) {
     try {
       return await this.axiosFetch<boolean>("/email/overlap", {
+        method: "post",
+        body: JSON.stringify(data),
+      });
+    } catch (err) {
+      throw err;
+    }
+  }
+  // 이메일 존재여부
+  async emailDefine(data: { email: string }) {
+    try {
+      return await this.axiosFetch<boolean>("/email/define", {
         method: "post",
         body: JSON.stringify(data),
       });
@@ -29,22 +40,22 @@ export class authService extends HttpClient {
   }
 
   // 인증코드  ----------------
-  async resendAuthcode(data: FormData) {
+  async resendAuthcode(data: { email: string }) {
     try {
       return await this.axiosFetch<boolean>("/authcode/resend", {
         method: "post",
-        body: data,
+        body: JSON.stringify(data),
       });
     } catch (err) {
       throw err;
     }
   }
 
-  async checkAuthcode(data: FormData) {
+  async checkAuthcode(data: { email: string; authcode: string }) {
     try {
       return await this.axiosFetch<boolean>("/authcode/check", {
         method: "post",
-        body: data,
+        body: JSON.stringify(data),
       });
     } catch (err) {
       throw err;

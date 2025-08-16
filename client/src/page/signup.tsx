@@ -16,25 +16,29 @@ import {
   nicknameValidate,
   passwordFormValid,
 } from "../validation/auth";
-import { Authcode } from "../components/modal/authcode";
-import { emitter } from "../util/event";
 import { UserInputComponent } from "../components/global/input.components";
 import { useSetSignup, useSignup } from "../context/signup.context";
-import { UserButtonComponet } from "../components/global/button.component";
 
 import * as S from "../css/page/login.style";
+import { useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "../redux/store";
+import { modalState } from "../redux/reducer/modalReducer";
+import { UserButtonComponet } from "../components/global/button.component";
+import { emitter } from "../util/event";
+import { useSelector } from "react-redux";
 
 type InputChecker = "email" | "nickname" | "password" | "passwordCheck";
 
 export const Signup = () => {
+  let { status, type } = useSelector((state: RootState) => state.modal.auth!);
   let { email, nickname, password, passwordCheck, authBtn } = useSignup();
   let { setEmail, setNickname, setPassword, setPasswordCheck, setAuthBtn } =
     useSetSignup();
   let navigate = useNavigate();
 
-  // authcode
-  let [show, setShow] = useState<boolean>(false);
+  let dispatch = useDispatch<AppDispatch>();
 
+  // 에러 컨트롤
   const signupError = (path: InputChecker, msg: string) => {
     if (path == "email")
       setEmail((c) => ({
@@ -62,13 +66,22 @@ export const Signup = () => {
       }));
   };
 
+  // 회원가입
   const account = async () => {
     try {
       await user_service.account({
         email: email.value,
         nickname: nickname.value,
         password: password.value,
+        password_check: passwordCheck.value,
       });
+      dispatch(
+        modalState({
+          active: false,
+          type: null,
+          auth: { status: false, type: null },
+        })
+      );
       alert("회원가입이 완료되었습니다");
       window.location.href = "/login";
     } catch (err) {
@@ -88,8 +101,14 @@ export const Signup = () => {
         password_check: passwordCheck.value,
       });
 
-      emitter.emit("modal", { open: true, type: "authcode" });
-      setShow(true);
+      dispatch(
+        modalState({
+          active: true,
+          type: "authcode",
+          email: email.value,
+          auth: { status: false, type: "signup" },
+        })
+      );
     } catch (err) {
       let { path, msg } = AxiosError(err);
       signupError(path, msg);
@@ -141,15 +160,12 @@ export const Signup = () => {
     }));
   }, [email.value, nickname.value, password.value, passwordCheck.value]);
 
+  useEffect(() => {
+    if (status && type == "signup") account();
+  }, [status]);
+
   return (
     <S.LoginPage>
-      <Authcode
-        show={show}
-        setShow={setShow}
-        email={email.value}
-        callback={account}
-      />
-
       <S.LoginContentContainer>
         <S.LoginText>회원가입</S.LoginText>
 

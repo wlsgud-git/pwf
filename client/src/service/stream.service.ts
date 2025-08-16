@@ -23,11 +23,11 @@ export class streamService extends HttpClient {
     }
   }
 
-  async inviteStreamRoom(data: FormData) {
+  async inviteStreamRoom(data: { id: number; inviteList: number[] }) {
     try {
       return await this.axiosFetch("/room/invite", {
         method: "post",
-        body: data,
+        body: JSON.stringify(data),
       });
     } catch (err) {
       throw err;

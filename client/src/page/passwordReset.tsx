@@ -1,17 +1,19 @@
-import { useState } from "react";
-import "../css/passwordReset.css";
+import { useEffect, useState } from "react";
+import * as SPW from "../css/page/passwordReset.style";
 import { FormSubmit, InputChange } from "../types/event";
 import { auth_service } from "../service/auth.service";
 import { emailValidate } from "../validation/auth";
 
 import { Link, useNavigate } from "react-router-dom";
 import { AxiosError } from "../error/error";
-import { Authcode } from "../components/modal/authcode";
-import { emitter } from "../util/event";
-import { createFormData } from "../util/form";
-import { PwFind } from "../components/modal/pwFind";
+import { useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "../redux/store";
+import { modalState } from "../redux/reducer/modalReducer";
+import { useSelector } from "react-redux";
 
 export const PasswordReset = () => {
+  let dispatch = useDispatch<AppDispatch>();
+  let { status, type } = useSelector((state: RootState) => state.modal.auth!);
   let navigate = useNavigate();
   let [email, setEmail] = useState<string>("");
   let [error, setError] = useState<{ state: boolean; msg: string }>({
@@ -19,17 +21,21 @@ export const PasswordReset = () => {
     msg: "",
   });
   let [loading, setLoading] = useState<boolean>(false);
-  let [show, setShow] = useState<boolean>(false);
-  let [pwModal, setPwModal] = useState<boolean>(false);
 
   const EmailCheck = async (e: FormSubmit) => {
     e.preventDefault();
     setLoading(true);
     try {
       await emailValidate(email, true);
-      await auth_service.resendAuthcode(createFormData({ email }));
-      emitter.emit("modal", { open: true, type: "authcode" });
-      setShow(true);
+      await auth_service.resendAuthcode({ email });
+      dispatch(
+        modalState({
+          active: true,
+          type: "authcode",
+          email,
+          auth: { status: false, type: "password reset" },
+        })
+      );
     } catch (err) {
       let { path, msg } = AxiosError(err);
       setError((c) => ({ ...c, state: true, msg }));
@@ -37,73 +43,56 @@ export const PasswordReset = () => {
     setLoading(false);
   };
 
-  const pwChange = () => {
-    emitter.emit("modal", { open: true, type: "pwfind" });
-    setPwModal(true);
-  };
+  useEffect(() => {
+    if (status && type == "password reset")
+      dispatch(
+        modalState({
+          active: true,
+          type: "password",
+          auth: { status: false, type: null },
+        })
+      );
+  }, [status, type]);
 
   const finish = () => navigate("/login");
 
   return (
-    <div className="page password_reset_page">
-      {/* 인증코드 모달 */}
-      <Authcode
-        email={email}
-        show={show}
-        setShow={setShow}
-        callback={pwChange}
-      />
-      {/* 새 비밀번호 모달 */}
-      <PwFind
-        email={email}
-        show={pwModal}
-        setshow={setPwModal}
-        callback={finish}
-      />
+    <SPW.PwResetBox>
+      {/* icon */}
+      <SPW.PwResetIcon>
+        <i className="fa-solid fa-lock"></i>
+      </SPW.PwResetIcon>
 
-      <div className="password_reset_container">
-        {/* icon */}
-        <span className="password_reset_icon">
-          <i className="fa-solid fa-lock"></i>
-        </span>
+      <SPW.PwResetText>
+        비밀번호를 변경하기 위해 이메일 인증을 하세요.
+      </SPW.PwResetText>
 
-        <span className="password_reset_text">
-          비밀번호를 변경하기 위해 이메일 인증을 하세요.
-        </span>
+      <SPW.PwResetEmailForm onSubmit={EmailCheck}>
+        <SPW.PwResetEmailBox>
+          <SPW.PwResetEmailInput
+            type="email"
+            spellCheck={false}
+            error={error.state}
+            value={email}
+            placeholder="이메일"
+            onFocus={() => setError((c) => ({ ...c, state: false }))}
+            onChange={(e: InputChange) => setEmail(e.target.value)}
+          />
+          <SPW.PwResetErrorBox error={error.state}>
+            {error.msg}
+          </SPW.PwResetErrorBox>
+        </SPW.PwResetEmailBox>
 
-        <form className="password_reset_email_form" onSubmit={EmailCheck}>
-          <div className="password_reset_email_input_box">
-            <input
-              type="email"
-              spellCheck={false}
-              style={{
-                border: `1px solid var(--pwf-${error.state ? "red" : "white"})`,
-              }}
-              className="password_reset_email_input"
-              value={email}
-              placeholder="이메일"
-              onFocus={() => setError((c) => ({ ...c, state: false }))}
-              onChange={(e: InputChange) => setEmail(e.target.value)}
-            />
-            <span
-              style={{ display: error.state ? "flex" : "none" }}
-              className="password_reset_error"
-            >
-              {error.msg}
-            </span>
-          </div>
+        <SPW.PwResetBtn disabled={loading}>
+          {loading ? "...진행중" : "인증하기"}
+        </SPW.PwResetBtn>
+      </SPW.PwResetEmailForm>
 
-          <button className="password_reset_btn" disabled={loading}>
-            {loading ? "...진행중" : "인증하기"}
-          </button>
-        </form>
-
-        {/* <div> */}
-        <Link to="/login" className="return_login">
-          로그인 페이지로 돌아가기
-        </Link>
-        {/* </div> */}
-      </div>
-    </div>
+      {/* <div> */}
+      <SPW.ReturnLoginBtn to="/login">
+        로그인 페이지로 돌아가기
+      </SPW.ReturnLoginBtn>
+      {/* </div> */}
+    </SPW.PwResetBox>
   );
 };

@@ -1,5 +1,7 @@
 import styled, { createGlobalStyle } from "styled-components";
 
+import { ParticipantTrack } from "../../types/stream.types";
+
 export const ParticipantsListsBox = styled.ul<{ share: boolean }>`
   width: 100%;
   height: ${(p) =>
@@ -25,13 +27,15 @@ export const Page = styled.div<{ width: number }>`
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  // flex-wrap: wrap;
   padding: 12px 25px;
   justify-content: center;
 `;
 
-export const TestLi = styled.li<{
+// 참가자 비디오
+export const UserVideoLi = styled.li<{
   share: boolean;
+  active: boolean;
   width: number;
   height: number;
 }>`
@@ -50,12 +54,13 @@ export const TestLi = styled.li<{
   );
   max-height: var(--participant-video-max-height);
   margin: var(--participant-video-gap);
-  border: 1px solid red;
+  border: 2px solid var(--pwf-${(p) => (p.active ? "blue" : "gray")});
+  position: relative;
 `;
 
 export const PageUpdateBtnLeft = styled.button<{
   page: {
-    arr: number[][];
+    arr: ParticipantTrack[][];
     current: number;
   };
 }>`
@@ -79,7 +84,7 @@ export const PageUpdateBtnLeft = styled.button<{
 
 export const PageUpdateBtnRight = styled.button<{
   page: {
-    arr: number[][];
+    arr: ParticipantTrack[][];
     current: number;
   };
 }>`
@@ -99,5 +104,40 @@ export const PageUpdateBtnRight = styled.button<{
 
   &:hover {
     color: var(--pwf-blue);
+  }
+`;
+
+export const UserVideo = styled.video`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+export const UserNoVideoText = styled.span<{ video_state: boolean }>`
+  z-index: 123;
+  overflow: hidden;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: ${(p) => (p.video_state ? "none" : "flex")};
+  transform: translate(-50%, -50%);
+  color: var(--pwf-white);
+`;
+
+export const UserInfoBox = styled.div`
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  padding: 4px 7px;
+  z-index: 1234;
+  background-color: var(--pwf-background-transparent);
+  display: flex;
+  align-items: baseline;
+
+  span {
+    margin: 0px 5px;
+    color: var(--pwf-white);
+    font-weight: bold;
   }
 `;

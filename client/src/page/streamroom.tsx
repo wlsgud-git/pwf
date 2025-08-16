@@ -15,25 +15,30 @@ import { useDispatch } from "react-redux";
 // css
 import * as STR from "../css/room/stream.style";
 import { emitter } from "../util/event";
+import { UserTrackProps } from "../types/stream.types";
 
 export const StreamRoom = () => {
   let { room } = useStream();
-  let { setRoom } = useSetStream();
+  let { setRoom, setParticipants } = useSetStream();
   let { id } = useParams();
   // using
 
   let dispatch = useDispatch<AppDispatch>();
-  let user = useSelector((state: RootState) => state.user);
+  let nickname = useSelector((state: RootState) => state.user.nickname);
 
   // 방 연결
   useEffect(() => {
     let roomConnect = async () => {
       try {
         let token = await stream_service.roomAccessToken(
-          createFormData({ room: `room${id}`, identity: user.nickname })
+          createFormData({ room: `room${id}`, identity: nickname })
         );
         let room = await connectRoom(token);
         setRoom(room);
+        setParticipants((c: UserTrackProps) => ({
+          ...c,
+          [nickname!]: { audio: {}, video: {} },
+        }));
       } catch (err) {
         console.log(err);
       }

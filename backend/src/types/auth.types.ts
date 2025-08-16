@@ -19,6 +19,8 @@ export enum PasswordError {
 }
 
 export enum AuthcodeError {
+  AUTHCODE_LEN_ERROR = "인증번호는 6자리 입니다.",
+  AUTHCODE_ONLY_NUM = "인증번호는 숫자만 가능합니다.",
   AUTHCODE_EXPIRE = "인증번호가 만료되었습니다.",
   AUTHCODE_UNEQUAL = "인증번호가 올바르지 않습니다.",
   AUTHCODE_RESEND = "인증번호를 재전송하였습니다.",

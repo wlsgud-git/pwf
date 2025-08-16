@@ -6,18 +6,19 @@ import { Friend } from "./friend";
 import { modalState } from "../../redux/reducer/modalReducer";
 import { Delete } from "./delete";
 import { StreamRoom } from "./streamRoom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Authcode } from "./authcode";
+import { PwFind } from "./pwFind";
+import { emitter } from "../../util/event";
+import { Invitation } from "./invitation";
 
 export const Modal = () => {
   let dispatch = useDispatch<AppDispatch>();
-  let { active, type } = useSelector((state: RootState) => state.modal);
-
-  useEffect(() => {
-    console.log(active, type);
-  }, [active, type]);
+  let { active, type } = useSelector((state: RootState) => state.modal!);
+  let email = useSelector((state: RootState) => state.modal.email);
 
   return (
-    <SMO.ModalBackground active={active}>
+    <SMO.ModalBackground active={active!}>
       <SMO.ModalContent>
         <SMO.ModalContentHeader>
           <SMO.ModalCloseBtn
@@ -32,6 +33,12 @@ export const Modal = () => {
           <StreamRoom />
         ) : type == "delete" ? (
           <Delete />
+        ) : type == "password" ? (
+          <PwFind email={email!} />
+        ) : type == "authcode" ? (
+          <Authcode email={email!} />
+        ) : type == "invite" ? (
+          <Invitation />
         ) : (
           ""
         )}

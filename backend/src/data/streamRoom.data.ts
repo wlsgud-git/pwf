@@ -7,6 +7,14 @@ import { prisma } from "../config/db.config";
 // 방 정보 얻기
 
 export const StreamRoomData = {
+  async getStreamRoomData(id: number) {
+    return await prisma.$queryRaw`
+    select str.id, str.room_name, jsonb_agg(distinct to_jsonb(u)) as participants  from streamingRoom str
+    left join users u on u.id = any(str.participants)
+    where str.id = ${id}
+    group by str.id`;
+  },
+
   async createStreamRoom(name: string, participants: number[]) {
     try {
       return await prisma.$queryRaw<Room[]>`

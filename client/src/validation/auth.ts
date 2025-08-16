@@ -30,7 +30,8 @@ export const emailValidate = async (email: string, overlap: boolean) => {
   try {
     if (emailFormValid(email))
       throw { path: "email", msg: EmailError.EMAIL_FORM_ERROR };
-    await auth_service.emailOverlap({ email, overlap });
+    if (!overlap) await auth_service.emailOverlap({ email });
+    else await auth_service.emailDefine({ email });
 
     return false;
   } catch (err) {

@@ -14,7 +14,6 @@ import { useLogin, useSetLogin } from "../context/login.context";
 import { UserButtonComponet } from "../components/global/button.component";
 import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
-import { setLoading } from "../redux/reducer/userReducer";
 import { userAction } from "../redux/actions/userAction";
 import { useSelector } from "react-redux";
 
@@ -48,7 +47,6 @@ export const Login = () => {
       dispatch(userAction.getUserAction());
       navigate("/");
     } catch (err) {
-      console.log(err);
       if (axios.isAxiosError(err) && err.response?.status == 429)
         return alert(
           `${err.response.headers["retry-after"]}초후 다시 시도하세요.`

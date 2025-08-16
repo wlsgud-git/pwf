@@ -7,7 +7,7 @@ export interface corsProps {
   origin: string;
 }
 
-interface AuthencateRequest extends Request {
+export interface AuthencateRequest extends Request {
   user?: User;
 }
 

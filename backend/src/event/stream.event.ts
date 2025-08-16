@@ -12,6 +12,7 @@ export const inviteStreamingRoom = (list: User[], room: Room) => {
 export const insertNewUser = (room: Room, new_users: User[]) => {
   let io = getIo();
   let participants = room.participants as User[];
+
   participants.map((val) =>
     io
       .to(`user:${val.nickname}`)

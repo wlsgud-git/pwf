@@ -1,66 +1,84 @@
-:root {
-  --invitation-width: 350px;
-  --invitation-height: 400px;
+import styled, { createGlobalStyle } from "styled-components";
 
-  --invitation-li-height: 30px;
+export const InvitationGlobal = createGlobalStyle`
+  :root{
+    --invitation-width: 350px;
+    --invitation-height: 400px;
 
-  --invitation-list-height: 60px;
-  --invitation-btn-height: 50px;
-}
+    --invitation-li-height: 30px;
 
-.invitation_modal {
+    --invitation-list-height: 60px;
+    --invitation-btn-height: 50px;
+  }
+`;
+
+export const InvitationContainer = styled.div`
   width: var(--invitation-width);
   height: var(--invitation-height);
   background-color: var(--pwf-signiture-color);
-  flex-direction: column;
-  border-radius: 8px;
-  z-index: 123512;
-  position: absolute;
   border: 1px solid var(--pwf-light-gray);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.invitation_container {
-  width: 100%;
   display: flex;
-  height: calc(100% - var(--modal-hedaer-height));
   flex-direction: column;
-}
+`;
 
-/* 초대된 친구목록 */
-.invitation_list {
+export const InviteList = styled.ul`
   width: 100%;
   display: flex;
   height: var(--invitation-list-height);
   align-items: center;
-}
+  border-bottom: var(--pwf-light-gray);
+  overflow-x: auto;
+  position: relative;
 
-.listup_user {
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: inherit;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--pwf-white);
+    border-radius: 10px;
+  }
+`;
+
+export const NoInviteText = styled.p`
+  color: var(--pwf-gray);
+  font-size: 14px;
+  align-self: center;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0%);
+`;
+
+// 초대된 친구
+export const InviteLi = styled.li`
   width: var(--invitation-list-height);
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-}
+`;
 
-.listup_user_profile_box {
+export const InviteUserImgBox = styled.span`
   width: calc(var(--invitation-list-height) / 2);
   height: calc(var(--invitation-list-height) / 2);
   border: 1px solid var(--pwf-light-gray);
   position: relative;
   border-radius: 50%;
-}
+`;
 
-.listup_user_profile_box img {
+export const InviteUserImg = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
+`;
 
-.listup_user_profile_box button {
+export const InviteUserDelBtn = styled.button`
   z-index: 123;
   overflow: hidden;
   position: absolute;
@@ -74,29 +92,19 @@
   justify-content: center;
   padding: 4px;
   border: none;
-  /* transform: translate(0%, -100%); */
-}
+`;
 
-.listup_nickname {
+export const InviteUserNick = styled.span`
   width: 100%;
   color: var(--pwf-white);
   font-size: 12px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
+`;
 
-.i_text {
-  color: var(--pwf-gray);
-  font-size: 14px;
-  align-self: center;
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, 0%);
-}
-
-/* 내 친구목록 */
-.invitation_friend_list {
+// 내 친구부분
+export const InvitationList = styled.ul`
   display: flex;
   height: calc(
     100% - var(--invitation-list-height) - var(--invitation-btn-height)
@@ -105,87 +113,68 @@
   border-bottom: 1px solid var(--pwf-light-gray);
   flex-direction: column;
   overflow-y: auto;
-}
 
-.friends_list::-webkit-scrollbar {
-  height: 8px;
-}
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
 
-.friends_list::-webkit-scrollbar-track {
-  background-color: inherit;
-  border-radius: 10px;
-}
+  &::-webkit-scrollbar-track {
+    background-color: inherit;
+    border-radius: 10px;
+  }
 
-.friends_list::-webkit-scrollbar-thumb {
-  background-color: var(--pwf-white);
-  border-radius: 10px;
-}
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--pwf-white);
+    border-radius: 10px;
+  }
+`;
 
-.invitation_btn_box {
+export const InvitationBtnBox = styled.div`
   height: var(--invitation-btn-height);
   line-height: var(--invitation-btn-height);
-}
+`;
 
-.invitation_btn_box button {
+export const InvitationBtn = styled.button`
   padding: 6px;
   font-weight: 600;
   background-color: var(--pwf-blue);
   color: var(--pwf-white);
   border: none;
   outline: none;
-}
+`;
 
-.invitation_btn_box button:hover {
-  /* background-color: var(--); */
-}
-
-/* 리스트 */
-.invitation_li {
+export const InvitationLi = styled.li`
   width: 100%;
   min-height: var(--invitation-li-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 8px;
-}
 
-.invitation_li div {
-  width: 80%;
-  display: flex;
-  align-items: center;
-}
+  div {
+    width: 80%;
+    display: flex;
+    align-items: center;
+  }
+`;
 
-.invitation_profile_box {
+export const InvitationProfileCricle = styled.span`
   width: calc(var(--invitation-li-height));
   height: calc(var(--invitation-li-height));
   border-radius: 50%;
   overflow: hidden;
   margin-right: 15px;
   border: 1px solid var(--pwf-light-gray);
-}
+`;
 
-.invitation_profile_box img {
+export const InvitationProfileImg = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
+`;
 
-.invitation_nickname {
+export const InviationUserNick = styled.span`
   font-size: 16px;
   color: var(--pwf-white);
   font-weight: 600;
-}
-
-.invitation_li button {
-  background-color: var(--pwf-blue);
-  color: var(--pwf-white);
-  font-weight: 600;
-  border-radius: 10px;
-  padding: 6px 8px;
-  border: none;
-  outline: none;
-}
-
-.invitation_li button:hover {
-  text-decoration: underline;
-}
+`;

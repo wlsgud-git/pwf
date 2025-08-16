@@ -41,7 +41,11 @@ export const Menu = () => {
             X
           </STRM.MenuCloseBtn>
         </STRM.MenuTextBox>
-        {menu.type == "chat" ? <Chat /> : <Participants />}
+
+        <STRM.MenuContent type={menu.type}>
+          <Chat />
+          <Participants />
+        </STRM.MenuContent>
       </STRM.MenuBox>
     </>
   );
