@@ -12,6 +12,8 @@ const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const https_1 = __importDefault(require("https"));
 const helmet_1 = __importDefault(require("helmet"));
+// config
+const env_config_1 = require("./config/env.config");
 const cors_config_1 = require("./config/cors.config");
 const app_config_1 = require("./config/app.config");
 // other file
@@ -47,6 +49,7 @@ app.get("*", (req, res) => {
     res.sendFile(path_1.default.join(__dirname, "../../client/build/index.html"));
 });
 (0, socket_util_1.initSocket)();
-exports.HttpsServer.listen(8443, () => {
-    console.log(`pwf start with ${8443}`);
+const PORT = env_config_1.config.https.port || 8443;
+exports.HttpsServer.listen(PORT, () => {
+    console.log(`pwf start with ${PORT}`);
 });
