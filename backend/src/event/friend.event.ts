@@ -34,8 +34,6 @@ export const onlineState = async (who: User, state: boolean) => {
 export const deleteMyFriend = (nick1: string, nick2: string) => {
   let io = getIo();
 
-  console.log("여기도 왔당께", nick1, nick2);
-
   io.to(`user:${nick1}`).emit("delete friend", nick2);
   io.to(`user:${nick2}`).emit("delete friend", nick1);
 };
