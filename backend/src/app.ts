@@ -1,18 +1,16 @@
+// config
+import { config } from "./config/env.config";
+import { corsOption } from "./config/cors.config";
+import { httpsOption } from "./config/app.config";
+
 // librarㅛ
 import express, { Application, NextFunction, Request, Response } from "express";
 import path from "path";
 import bodyParser from "body-parser";
 import cors from "cors";
-import fs from "fs";
 import cookieParser from "cookie-parser";
 import https from "https";
 import helmet from "helmet";
-
-// config
-import { config } from "./config/env.config";
-import { corsOption } from "./config/cors.config";
-import { httpsOption } from "./config/app.config";
-import sanitizeHtml from "sanitize-html";
 
 // other file
 import { initSocket } from "./util/socket.util";
@@ -58,7 +56,6 @@ app.get("*", (req: Request, res: Response) => {
 
 initSocket();
 
-const PORT = config.https.port || 8443;
-HttpsServer.listen(PORT, () => {
-  console.log(`pwf start with ${PORT}`);
+HttpsServer.listen(config.https.port, () => {
+  console.log(`pwf start with ${config.https.port}`);
 });

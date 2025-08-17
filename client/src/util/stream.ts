@@ -1,12 +1,9 @@
+import { LiveKitRoom } from "@livekit/components-react";
 import {
   Track,
   Room,
-  RemoteParticipant,
-  RemoteTrackPublication,
   createLocalTracks,
-  LocalVideoTrack,
   LocalTrack,
-  LocalAudioTrack,
   createLocalScreenTracks,
 } from "livekit-client";
 
@@ -14,7 +11,10 @@ import {
 export let connectRoom = async (token: string) => {
   try {
     const room = await new Room();
-    await room.connect("http://localhost:7880", token);
+
+    let LIVEKIT_URL = process.env.REACT_APP_LIVEKIT_HOST;
+    if (!LIVEKIT_URL) throw new Error("livekit url 없음.");
+    await room.connect(LIVEKIT_URL, token);
     return room;
   } catch (err) {
     throw err;

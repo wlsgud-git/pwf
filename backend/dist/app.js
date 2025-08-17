@@ -4,6 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HttpsServer = void 0;
+// config
+const env_config_1 = require("./config/env.config");
+const cors_config_1 = require("./config/cors.config");
+const app_config_1 = require("./config/app.config");
 // librarㅛ
 const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
@@ -12,10 +16,6 @@ const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const https_1 = __importDefault(require("https"));
 const helmet_1 = __importDefault(require("helmet"));
-// config
-const env_config_1 = require("./config/env.config");
-const cors_config_1 = require("./config/cors.config");
-const app_config_1 = require("./config/app.config");
 // other file
 const socket_util_1 = require("./util/socket.util");
 const sanitize_middleware_1 = require("./middleware/sanitize.middleware");
@@ -49,7 +49,6 @@ app.get("*", (req, res) => {
     res.sendFile(path_1.default.join(__dirname, "../../client/build/index.html"));
 });
 (0, socket_util_1.initSocket)();
-const PORT = env_config_1.config.https.port || 8443;
-exports.HttpsServer.listen(PORT, () => {
-    console.log(`pwf start with ${PORT}`);
+exports.HttpsServer.listen(env_config_1.config.https.port, () => {
+    console.log(`pwf start with ${env_config_1.config.https.port}`);
 });
