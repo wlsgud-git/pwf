@@ -50,6 +50,8 @@ export const AuthController: ControllerProps = {
   login: async (req, res, next) => {
     let { email, password } = req.body;
 
+    console.log(email, password);
+
     try {
       let response = await UserData.getUserByEmail(email);
       let user = await response[0];

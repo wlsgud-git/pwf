@@ -2,7 +2,7 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://localhost:3000",
+  "proxy": "https://pwf.vercel.app",
   "dependencies": {
     "@livekit/components-react": "^2.9.12",
     "@reduxjs/toolkit": "^2.6.1",
