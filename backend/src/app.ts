@@ -56,6 +56,7 @@ app.get("*", (req: Request, res: Response) => {
 
 initSocket();
 
-HttpsServer.listen(8443, () => {
-  console.log(`pwf start with ${8443}`);
+const PORT = config.https.port || 8443;
+HttpsServer.listen(PORT, () => {
+  console.log(`pwf start with ${PORT}`);
 });
