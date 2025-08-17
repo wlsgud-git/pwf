@@ -4,8 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HttpsServer = void 0;
-// config
-const env_config_1 = require("./config/env.config");
 const cors_config_1 = require("./config/cors.config");
 const app_config_1 = require("./config/app.config");
 // librarㅛ
@@ -49,6 +47,6 @@ app.get("*", (req, res) => {
     res.sendFile(path_1.default.join(__dirname, "../../client/build/index.html"));
 });
 (0, socket_util_1.initSocket)();
-exports.HttpsServer.listen(env_config_1.config.https.port, () => {
-    console.log(`pwf start with ${env_config_1.config.https.port}`);
+exports.HttpsServer.listen(8443, () => {
+    console.log(`pwf start with ${8443}`);
 });

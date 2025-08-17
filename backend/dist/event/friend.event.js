@@ -35,7 +35,6 @@ const onlineState = async (who, state) => {
 exports.onlineState = onlineState;
 const deleteMyFriend = (nick1, nick2) => {
     let io = (0, socket_util_1.getIo)();
-    console.log("여기도 왔당께", nick1, nick2);
     io.to(`user:${nick1}`).emit("delete friend", nick2);
     io.to(`user:${nick2}`).emit("delete friend", nick1);
 };
