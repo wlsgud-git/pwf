@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model requestfriend {
+  res_nickname                            String  @db.VarChar(12)
+  req_nickname                            String  @db.VarChar(12)
+  state                                   Boolean
+  users_requestfriend_req_nicknameTousers users   @relation("requestfriend_req_nicknameTousers", fields: [req_nickname], references: [nickname], onDelete: Cascade)
+  users_requestfriend_res_nicknameTousers users   @relation("requestfriend_res_nicknameTousers", fields: [res_nickname], references: [nickname], onDelete: Cascade)
+
+  @@unique([res_nickname, req_nickname])
+}
+
+model streamingroom {
+  id           Int      @id @default(autoincrement())
+  room_name    String   @db.VarChar(20)
+  participants Int[]
+  create_at    DateTime @default(now()) @db.Timestamp(6)
+}
+
+model users {
+  id                                              Int             @id @default(autoincrement())
+  nickname                                        String          @unique @db.VarChar(12)
+  profile_img                                     String          @default("https://pwf-profile-img.s3.ap-northeast-2.amazonaws.com/user-image-icon-16.jpg") @db.VarChar(100)
+  email                                           String          @unique @db.VarChar
+  password                                        String          @db.VarChar(255)
+  create_at                                       DateTime        @default(now()) @db.Timestamp(6)
+  img_key                                         String?         @db.VarChar
+  admin                                           String          @default("user")
+  requestfriend_requestfriend_req_nicknameTousers requestfriend[] @relation("requestfriend_req_nicknameTousers")
+  requestfriend_requestfriend_res_nicknameTousers requestfriend[] @relation("requestfriend_res_nicknameTousers")
+}
