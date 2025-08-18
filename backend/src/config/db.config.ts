@@ -15,7 +15,7 @@ redis.on("connect", () => {
 });
 
 redis.on("error", (err) => {
-  console.log("Redis connected error");
+  console.log("Redis connected error:", err);
 });
 
 export const pgClient = new pg.Client({
