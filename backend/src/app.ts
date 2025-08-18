@@ -18,7 +18,7 @@ import { sanitizeMiddleware } from "./middleware/sanitize.middleware";
 
 const app: Application = express();
 export const HttpsServer = https.createServer(httpsOption, app);
-
+export const HttpServer = https.createServer(app);
 // middleware --------------------------
 app.use(express.static(path.join(__dirname, "../../client/build")));
 app.use(bodyParser.json());
@@ -42,7 +42,6 @@ app.use("/", AuthRoutes);
 app.use("/", FriendRoutes);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.log(err);
   let status = err.status || 500;
 
   res.status(status).json(err);
@@ -57,6 +56,10 @@ app.get("*", (req: Request, res: Response) => {
 initSocket();
 
 const PORT = process.env.PORT || 3000;
-HttpsServer.listen(PORT, () => {
+
+HttpServer.listen(PORT, () => {
   console.log(`pwf start with ${PORT}`);
 });
+// HttpsServer.listen(PORT, () => {
+//   console.log(`pwf start with ${PORT}`);
+// });

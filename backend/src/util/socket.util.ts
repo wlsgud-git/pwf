@@ -1,7 +1,7 @@
 import { Socket, Server } from "socket.io";
 import * as mediasoup from "mediasoup";
 
-import { HttpsServer } from "../app";
+import { HttpServer, HttpsServer } from "../app";
 import { NextFunction } from "express";
 
 // utils
@@ -23,7 +23,7 @@ let socketCors = {
 };
 
 export function initSocket() {
-  io = new Server(HttpsServer, {
+  io = new Server(HttpServer, {
     cors: socketCors,
   });
 
