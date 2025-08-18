@@ -6,7 +6,6 @@ import Redis from "ioredis";
 
 export const redis = new Redis({
   host: config.redis.host,
-  port: config.redis.port,
 });
 
 export const pgClient = new pg.Client({
