@@ -4,8 +4,8 @@ import { config } from "./env.config";
 
 import Redis from "ioredis";
 
-export const redis = new Redis({
-  host: config.redis.host,
+export const redis = new Redis(config.redis.host as string, {
+  tls: {},
 });
 
 export const pgClient = new pg.Client({
