@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const required = (key: string, defaultValue?: undefined) => {
-  console.log(key, process.env[key]);
   let value = process.env[key] || defaultValue;
   if (!value) throw new Error("해당 환경변수는 존재하지 않습니다");
   return value;
