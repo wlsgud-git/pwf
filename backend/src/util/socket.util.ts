@@ -23,8 +23,7 @@ let socketCors = {
 };
 
 export function initSocket() {
-  console.log(`socket connect try to ${config.https.client_host}`);
-  io = new Server(HttpServer, {
+  io = new Server(HttpsServer, {
     cors: socketCors,
     transports: ["websocket"],
   });

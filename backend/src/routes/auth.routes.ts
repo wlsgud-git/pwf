@@ -47,8 +47,8 @@ router.post(
 // 로그인
 router.post(
   "/login",
-  // limiter,
-  // validate(AuthSchema.login),
+  limiter,
+  validate(AuthSchema.login),
   AuthController.login
 );
 // 로그아웃
