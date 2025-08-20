@@ -83,8 +83,6 @@ export const AuthController: ControllerProps = {
       );
       let csrf_token = await createJwt({ email: user.email }, "refresh");
 
-      console.log("여까지도 해결이 됨");
-
       // // cookie section
       res.cookie("session_id", sessionId, {
         secure: true,
@@ -103,6 +101,7 @@ export const AuthController: ControllerProps = {
         maxAge: config.session.session_expire * 1000,
         path: "/",
       });
+      console.log("cookie가 문제야");
 
       res.status(200).json({ msg: LoginMessage.SUCCESS });
     } catch (err) {

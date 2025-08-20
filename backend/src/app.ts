@@ -42,6 +42,7 @@ app.use("/", AuthRoutes);
 app.use("/", FriendRoutes);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.log("에러임:", err);
   let status = err.status || 500;
 
   res.status(status).json(err);
