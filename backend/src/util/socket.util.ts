@@ -26,6 +26,7 @@ export function initSocket() {
   console.log("socket connect try");
   io = new Server(HttpServer, {
     cors: socketCors,
+    transports: ["websocket"],
   });
 
   io.use(async (socket: Socket, next: NextFunction) => {
