@@ -57,7 +57,7 @@ initSocket();
 
 const PORT = process.env.PORT || 3000;
 
-HttpServer.listen(PORT as number, "0.0.0.0", () => {
+app.listen(PORT as number, "0.0.0.0", () => {
   console.log(`pwf start with ${PORT}`);
 });
 // HttpsServer.listen(PORT, () => {
