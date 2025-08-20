@@ -4,6 +4,8 @@ import { AppDispatch } from "../redux/store";
 import { initFriendSocketEvent } from "../event/friend.event";
 // import { insertReceiver, onlineUpdate } from "../redux/reducer/userReducer";
 
+console.log(process.env.REACT_APP_BASEURL);
+
 export const socketClient: Socket = io(process.env.REACT_APP_BASEURL, {
   reconnection: true,
   reconnectionAttempts: 5,
