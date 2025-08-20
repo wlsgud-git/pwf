@@ -10,6 +10,7 @@ export const socketClient: Socket = io(process.env.REACT_APP_BASEURL, {
   reconnectionDelay: 1000,
   withCredentials: true,
   autoConnect: false,
+  transports: ["websocket"],
   extraHeaders: {
     "my-custom-header": "abcd",
   },
