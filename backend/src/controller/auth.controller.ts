@@ -88,6 +88,7 @@ export const AuthController: ControllerProps = {
       // // cookie section
       res.cookie("session_id", sessionId, {
         secure: true,
+        domain: config.https.host,
         httpOnly: true,
         sameSite: "lax",
         maxAge: config.session.session_expire * 1000,
@@ -96,6 +97,7 @@ export const AuthController: ControllerProps = {
 
       res.cookie("csrf_token", csrf_token, {
         secure: true,
+        domain: config.https.host,
         httpOnly: true,
         sameSite: "lax",
         maxAge: config.session.session_expire * 1000,
