@@ -40,6 +40,7 @@ export function initSocket() {
 
   io.on("connect", async (socket: Socket) => {
     let { user } = socket.handshake.auth;
+    console.log("user connected");
     // // 로그인하면 online인걸 친구들한테 보내줘야 함
     socket.join(`user:${user.nickname}`);
 
