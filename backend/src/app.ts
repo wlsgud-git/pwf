@@ -10,6 +10,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import https from "https";
+import http from "http";
 import helmet from "helmet";
 
 // other file
@@ -18,7 +19,7 @@ import { sanitizeMiddleware } from "./middleware/sanitize.middleware";
 
 const app: Application = express();
 export const HttpsServer = https.createServer(httpsOption, app);
-export const HttpServer = https.createServer(app);
+export const HttpServer = http.createServer(app);
 // middleware --------------------------
 app.use(express.static(path.join(__dirname, "../../client/build")));
 app.use(bodyParser.json());
