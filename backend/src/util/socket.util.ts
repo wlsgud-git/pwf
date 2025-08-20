@@ -23,7 +23,7 @@ let socketCors = {
 };
 
 export function initSocket() {
-  io = new Server(HttpsServer, {
+  io = new Server(HttpServer, {
     cors: socketCors,
     transports: ["websocket"],
   });
