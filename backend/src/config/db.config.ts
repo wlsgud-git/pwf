@@ -10,7 +10,6 @@ export const redis = new Redis(
   //   rejectUnauthorized: false,
   // },
 );
-console.log(config.redis.host);
 
 redis.on("connect", () => {
   console.log("Redis connected");

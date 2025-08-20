@@ -16,7 +16,7 @@ import { initFriendSocketEvent, onlineState } from "../event/friend.event";
 
 let io: any = null;
 let socketCors = {
-  origin: config.https.host,
+  origin: config.https.client_host,
   methods: ["get", "post"],
   allowedHeaders: ["my-custom-header"],
   credentials: true,
