@@ -86,18 +86,16 @@ export const AuthController: ControllerProps = {
       // // cookie section
       res.cookie("session_id", sessionId, {
         secure: true,
-        domain: config.https.server_host,
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "none",
         maxAge: config.session.session_expire * 1000,
         path: "/",
       });
 
       res.cookie("csrf_token", csrf_token, {
         secure: true,
-        domain: config.https.server_host,
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "none",
         maxAge: config.session.session_expire * 1000,
         path: "/",
       });
