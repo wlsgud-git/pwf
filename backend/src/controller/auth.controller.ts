@@ -50,13 +50,9 @@ export const AuthController: ControllerProps = {
   login: async (req, res, next) => {
     let { email, password } = req.body;
 
-    console.log(email, password);
-
     try {
-      console.log("여까지 옴");
       let response = await UserData.getUserByEmail(email);
       let user = await response[0];
-      console.log(response, user);
 
       if (!user)
         throw {
@@ -86,6 +82,8 @@ export const AuthController: ControllerProps = {
         config.session.session_expire
       );
       let csrf_token = await createJwt({ email: user.email }, "refresh");
+
+      console.log("여까지도 해결이 됨");
 
       // // cookie section
       res.cookie("session_id", sessionId, {
