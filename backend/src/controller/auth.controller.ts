@@ -53,6 +53,7 @@ export const AuthController: ControllerProps = {
     console.log(email, password);
 
     try {
+      console.log("여까지 옴");
       let response = await UserData.getUserByEmail(email);
       let user = await response[0];
       console.log(response, user);
