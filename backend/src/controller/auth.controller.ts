@@ -86,7 +86,7 @@ export const AuthController: ControllerProps = {
       // // cookie section
       res.cookie("session_id", sessionId, {
         secure: true,
-        domain: config.https.host,
+        domain: config.https.server_host,
         httpOnly: true,
         sameSite: "lax",
         maxAge: config.session.session_expire * 1000,
@@ -95,13 +95,12 @@ export const AuthController: ControllerProps = {
 
       res.cookie("csrf_token", csrf_token, {
         secure: true,
-        domain: config.https.host,
+        domain: config.https.server_host,
         httpOnly: true,
         sameSite: "lax",
         maxAge: config.session.session_expire * 1000,
         path: "/",
       });
-      console.log("cookie가 문제야");
 
       res.status(200).json({ msg: LoginMessage.SUCCESS });
     } catch (err) {
