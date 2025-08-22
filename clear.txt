@@ -1,6 +1,0 @@
-데이터 베이스 
-
-stream_room
-users
-follow
-
