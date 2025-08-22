@@ -14,7 +14,7 @@ export const sendAuthcodeMail = async (email: string) => {
       subject: "pwf 인증코드",
       html: `
       PWF인증번호 6자리 <br>
-      <p style="font-weight: bold; font-size: 20px"> ${code} </p>
+      <p style="font-weighut: bold; font-size: 20px"> ${code} </p>
       `,
     });
     return code;
